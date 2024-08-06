@@ -1,9 +1,20 @@
 import styled from 'styled-components';
 
-export const NavBar = styled.nav`
-    display: flex;
-    background: black;
+export const Div = styled.div`
+display: block;
+    margin-bottom: 150px;
 `
+
+export const NavBar = styled.nav`
+    display: inline-flex;
+    justify-content: space-between;
+    background: #2A0800;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 124px; 
+`;
 
 export const BurgerMenu = styled.button`
     display: flex;
@@ -16,9 +27,15 @@ export const BurgerMenu = styled.button`
     cursor: pointer;
     padding: 0;
     z-index: 10; 
-
+    margin: 40px 25px 0 0;
+    transition: transform 0.3s ease-in-out;
+    
     &:focus {
         outline: none;
+    }
+
+    &:hover div {
+        background: Grey; 
     }
 
     div {
@@ -32,31 +49,35 @@ export const BurgerMenu = styled.button`
 
         :first-child {
             transform: ${({ open }) => open
-                    ? 'rotate(45deg)' : 'rotate(0)'};
+    ? 'rotate(45deg)' : 'rotate(0)'};
         }
 
         :nth-child(2) {
             opacity: ${({ open }) => open ? '0' : '1'};
             transform: ${({ open }) => open ? 'translateX(20px)' : 'translateX(0)'}; 
+        }
 
-        }(-45deg)' : 'rotate(0)'};
+        :last-child {
+            transform: ${({ open }) => open
+    ? 'rotate(-45deg)' : 'rotate(0)'};
+        }
     }
-}
 `;
 
 export const Menu = styled.ul`
     list-style: none;
     display: flex;
     flex-direction: column;
-    background: #a87676;
+    background: #2A0800;
     position: absolute;
-    transform: ${({ open }) => open ? 'translateX(0)' : 'translateX(-100%)'};
+    transform: ${({ open }) => open ? 'translateX(0)' : 'translateX(100%)'};
     top: 5rem; 
-    left: 0;
-    height: 100vh;
+    right: 0;  
+    height: 20vh;
     width: 200px; 
     padding: 20px;
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: ${({ open }) => open ? '0 4px 8px rgba(0, 0, 0, 0.3)' : 'none'}; // Ombre lors de l'ouverture
 
     li {
         margin-bottom: 1rem;
@@ -66,6 +87,16 @@ export const Menu = styled.ul`
         a {
             text-decoration: none;
             color: white;
+            &:hover {
+                color: #775144 ;
+            }
         }
     }
 `;
+
+export const Img = styled.img`
+    width: 85px ;
+    height: 85px;
+    display: flex;
+    padding: 20px;
+`
