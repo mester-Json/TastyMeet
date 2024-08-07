@@ -27,7 +27,6 @@ function LoginForm() {
                 const data = await response.json();
                 console.log('Login successful:', data);
             } else {
-                // Handle login errors (e.g., display error message)
                 const errorData = await response.json();
                 setError(errorData.message || 'Erreur de connexion.');
             }

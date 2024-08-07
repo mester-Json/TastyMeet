@@ -10,7 +10,7 @@ export const Form = styled.form`
     width: 70%;        
     max-width: 450px;  
     height: auto;
-    margin: 300px 0 0 650px ;
+    margin: 300px 0 0 750px ;
     border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 
@@ -56,7 +56,7 @@ export const Button = styled.button`
 
 export const Inscription = styled(Link)`
     color: black  ;
-    margin-left: 105px;
+    margin-left: 115px;
     &:hover {
         color: #775144;
     }
@@ -64,7 +64,7 @@ export const Inscription = styled(Link)`
 
 export  const Mdp = styled(Link)`
     color: black;
-    margin-left: 45px;
+    margin-left: 40px;
     &:hover {
         color: #775144;
     }

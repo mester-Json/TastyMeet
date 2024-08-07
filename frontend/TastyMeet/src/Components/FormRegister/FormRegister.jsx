@@ -1,104 +1,146 @@
-import {Form , InputField } from './FormRegister.style.jsx' ;
-import { useEffect , useState } from "react";
-
+import  { useState, useEffect } from "react";
+import { Form, InputField } from "./FormRegister.style.jsx";
 
 function FormRegister() {
-    const [ email , setEmail ] = useState ();
-    const [ password , setPassword ] = useState ();
-    const [ nom , setNom ] = useState ();
-    const [ prenom , setPrenom ] = useState ();
-    const [ genre , setGenre ] = useState ();
-    const [ birthDate , setBirthDate ] = useState ();
-    const [ age , setAge ] = useState ( null );
 
+    const [errors, setErrors] = useState({
+        nom: "",
+        prenom: "",
+        email: "",
+        password: "",
+        genre: "",
+        birthDate: "",
+    })
 
-    useEffect ( () => {
-        const today = new Date ();
-        const birthDateObj = new Date ( birthDate );
-        const ageDiffMs = today - birthDateObj;
-        const ageDate = new Date ( ageDiffMs );
-        const calculatedAge = Math.abs ( ageDate.getUTCFullYear () - 1965 );
-        setAge ( calculatedAge );
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [nom, setNom] = useState("");
+    const [prenom, setPrenom] = useState("");
+    const [genre, setGenre] = useState("");
+    const [birthDate, setBirthDate] = useState("");
+    const [isAdult, setIsAdult] = useState(null);
 
-        if (calculatedAge >= 18) {
-            console.log ( "L'utilisateur a 18 ans ou plus." );
-        } else if (calculatedAge === null) {
+    useEffect(() => {
+        if (birthDate) {
+            const today = new Date();
+            const birthDateObj = new Date(birthDate);
+            const age = today.getFullYear() - birthDateObj.getFullYear();
 
-            setAge(null);
-
+            setIsAdult(age >= 18);
         } else {
-            console.log ( "L'utilisateur n'a pas encore 18 ans." );
-    }
-    }, [ birthDate ]);
+            setIsAdult(null);
+        }
+    }, [birthDate]);
 
+    const validateForm = () => {
+        const newErrors = {};
 
+        if (!nom) newErrors.nom = "Le nom est requis";
+        if (!prenom) newErrors.prenom = "Le prénom est requis";
+        if (!email) newErrors.email = "L'email est requis";
+        if (!password) newErrors.password = "Le mot de passe est requis";
+        if (genre === "") newErrors.genre = "Veuillez choisir un genre";
+        if (!birthDate) newErrors.birthDate = "La date de naissance est requise";
+        if (isAdult === false) newErrors.birthDate = "Vous devez être majeur pour vous inscrire";
 
-    const handleLogin = async () => {
-        try {
-            const response = await fetch("http://localhost:5173/register"  , {
-    methode: 'POST',
-                headers: {
-        'content-type': 'application/json',
-                },
-                body: JSON.stringify({ nom, prenom, age, genre, email, password })
-        });
-            if (response.ok) {
-                throw new Error("Error ");
-            }
-            const data = await response.json();
-            console.log('Login successful:', data);
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
-    }catch(e){
-            console.error('Error:', e);
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        switch (name) {
+            case "nom":
+                setNom ( value );
+                break;
+            case "prenom":
+                setPrenom ( value );
+                break;
+                // Ajoute des autre Input
+        }
+        validateField(name, value);
+    };
+
+    const validateField = (name, value) => {
+        let error = "";
+        switch (name) {
+            case "nom":
+            case "prenom":
+                if (!value) error = "Ce champ est requis";
+                break;
+            case "email":
+                if (!value) error = "L'email est requis";
+                else if (!/\S+@\S+\.\S+/.test(value)) error = "L'email est invalide";
+                break;
+            case "password":
+                if (!value) error = "Le mot de passe est requis";
+                break;
+            case "genre":
+                if (value === "") error = "Veuillez choisir un genre";
+                break;
+            case "birthDate":
+                if (!value) error = "La date de naissance est requise";
+                else if (isAdult === false) error = "Vous devez être majeur pour vous inscrire";
+                break;
         }
 
-    }
-
-/*
-    const handleLogin = () => {
-        console.log("Login boutton clicked");
-
+        setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
     };
 
-    const handleGenre = (e) => {
-            if (genre != null) {
-                setGenre(e.target.value );
+    const handleDateChange = (event) => {
+        setBirthDate(event.target.value);
+    };
+
+    const handleLogin = async () => {
+        if (validateForm()) {
+            try {
+                const response = await fetch("http://localhost:5173/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nom, prenom, genre, email, password, birthDate }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Erreur lors de l'inscription");
+                }
+
+                const data = await response.json();
+                console.log("Inscription réussie:", data);
+            } catch (error) {
+                console.error("Erreur:", error);
             }
-    }
-
-
-    const handleBirthDate = () => {
-        const today = new Date();
-        const birthDateObj = new Date(birthDate);
-        let ageNow = today.getFullYear() - birthDateObj.getFullYear(); // donne le nombre d'année
-        console.log("Voici age now après la soustraction  : "+ ageNow.toString());
+        }
     };
-*/
-
 
     return (
-        <>
-            <Form>
-                <InputField type="text" placeholder="Nom" value={ nom } onChange={ (e) => setNom ( e.target.value ) }/>
-                <InputField type="text" placeholder="Prénom" value={ prenom }
-                            onChange={ (e) => setPrenom ( e.target.value ) }/>
-                <InputField type="date" value={ birthDate } />
-                <label htmlFor="options">Genre :</label>
-                <select id="options" value={ genre } >
-                    <option value="">Veuillez Choisir un genre</option>
-                    <option value="Homme">Homme</option>
-                    <option value="Femme">Femme</option>
-                    <option value="Furry">Furry</option>
-                    <option value="NonBinaire">Non Binaire</option>
-                </select>
-                <InputField type="text" placeholder="Adresse e-mail" value={ email }
-                            onChange={ (e) => setEmail ( e.target.value ) }/>
-                <InputField type="text" placeholder="Mot de passe" value={ password }
-                            onChange={ (e) => setPassword ( e.target.value ) }/>
-                <InputField type="button" value="Se connecter" onClick={ handleLogin }/>
-            </Form>
-        </>
-    )
+        <Form>
+            <InputField
+                type="text"
+                placeholder="Nom"
+                name="nom" // Ajout du nom pour identifier le champ
+                value={nom}
+                onChange={handleInputChange}
+            />
+            {errors.nom && <p style={{ color: "red" }}>{errors.nom}</p>}
+                        onChange={ (e) => setPrenom ( e.target.value ) }
+            <label htmlFor="options">Genre :</label>
+            <select id="options" value={ genre } >
+                <option value="">Veuillez Choisir un genre</option>
+                <option value="Homme">Homme</option>
+                <option value="Femme">Femme</option>
+                <option value="Furry">Furry</option>
+                <option value="NonBinaire">Non Binaire</option>
+            </select>            <InputField type="date" value={birthDate} onChange={handleDateChange} />
+            {errors.birthDate && <p style={{ color: "red" }}>{errors.birthDate}</p>}
+
+            <InputField type="text" placeholder="Adresse e-mail" value={ email }
+                        onChange={ (e) => setEmail ( e.target.value ) }/>
+            <InputField type="text" placeholder="Mot de passe" value={ password }
+                        onChange={ (e) => setPassword ( e.target.value ) }/>
+            <InputField type="button" value="Se connecter" onClick={ handleLogin }/>
+        </Form>
+    );
 }
+
 
 export default FormRegister;

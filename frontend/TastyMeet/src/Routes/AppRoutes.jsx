@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from "../Pages/Login.jsx";
 import Register from "../Pages/Register.jsx";
 
+
 function AppRoutes() {
     return (
         <BrowserRouter>

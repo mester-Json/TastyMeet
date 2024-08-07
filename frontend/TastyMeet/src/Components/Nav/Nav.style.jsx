@@ -1,9 +1,6 @@
 import styled from 'styled-components';
 
-export const Div = styled.div`
-display: block;
-    margin-bottom: 150px;
-`
+
 
 export const NavBar = styled.nav`
     display: inline-flex;
