@@ -2,7 +2,7 @@ body {
   display: flex;
   flex-direction: column;
   margin: 0;
-  background-image: url('././Resources/Images/Background.png');
+  background-image: url('Resources/Images/Background.png');
   min-height: 100vh ;
   background-size: 100% 100% ;
   background-position: center;
