@@ -6,7 +6,7 @@ export const Form = styled.form`
     flex-wrap: wrap;
     background-color: rgba(207, 206, 206, 0.5); 
     padding: 20px;        
-    max-width: 650px;  
+    max-width: 700px;  
     height: auto;
     border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
@@ -22,13 +22,12 @@ export const Form = styled.form`
 
 export const InputField = styled.input`
     width: 300px;
-    height: 30px;
-    margin: 10px;
-    padding: 0;       
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
     transition: box-shadow 0.3s ease;
+    margin-bottom: 20px;
 
     &:focus {
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); 
@@ -38,13 +37,13 @@ export const InputField = styled.input`
 
 export const  Select = styled.select
 `
-width: 300px;
-height: 30px;
-margin: 10px;
+width: 320px;
+padding: 10px;
 border-radius: 20px;
+border: 1px solid #ccc;
 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
 transition: box-shadow 0.3s ease;
-border: 1px solid #ccc;
+margin-bottom: 20px;
 &:focus {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); 
     outline: none; 
@@ -52,7 +51,8 @@ border: 1px solid #ccc;
 
 `;
 
-export const Button = styled.button`
+export const Button = styled.button
+`
     width: 200px;
     height: 30px;
     background: #2A0800;
@@ -72,6 +72,7 @@ export const Button = styled.button`
 export  const  Div = styled.div
     `display: flex;
     flex-direction: column;
+    margin-right: 5px;
 
 `;
 
@@ -79,32 +80,7 @@ export  const  Div = styled.div
 export  const  Div2 = styled.div`
     display: flex;
     flex-direction: column;
-
+    margin-left: 5px;
 `;
 
-export  const  Div3 = styled.div`
-    display: flex;
-    flex-direction: column;
-
-`;
-export  const  Div4 = styled.div`
-    display: flex;
-    flex-direction: column;
-
-`;
-export  const  Div5 = styled.div`
-    display: flex;
-    flex-direction: column;
-
-`;
-export  const  Div6 = styled.div`
-    display: flex;
-    flex-direction: column;
-
-`;
-export  const  Div7 = styled.div`
-    display: flex;
-    flex-direction: column;
-
-`;
 
