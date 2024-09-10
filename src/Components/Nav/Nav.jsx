@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BurgerMenu , Menu , NavBar , Img  } from './Nav.style.jsx';
 import logo from "../../Resources/Images/Logo.png" ;
 
-const Nav = () => {
+export const Nav = () => {
     const [ open , setOpen ] = useState( false );
 
     return (
@@ -27,4 +27,3 @@ const Nav = () => {
     );
 };
 
-export default Nav;
