@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {Link} from 'react-router-dom'
+import { Link, } from 'react-router-dom'
 
 
 export const Form = styled.form`
@@ -62,10 +62,12 @@ export const Inscription = styled(Link)`
     }
 `
 
-export  const Mdp = styled(Link)`
+export const Mdp = styled(Link)`
     color: black;
     margin-left: 40px;
     &:hover {
         color: #775144;
     }
 `
+
+
