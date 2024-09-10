@@ -1,6 +1,6 @@
 import { Contact , FooterStyle , P } from './Footer.style.jsx';
 
-function Footer() {
+export const Footer = () =>{
     return (
         <>
         <FooterStyle>
@@ -14,4 +14,3 @@ function Footer() {
         </>
     )
 }
-export default Footer;
