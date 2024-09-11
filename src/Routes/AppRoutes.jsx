@@ -17,7 +17,7 @@ export const AppRoutes = () => {
                 <Route path="/messaging" element={<Messaging />} />
                 <Route path="/message" element={<Message />} />
                 <Route path="/Accueil" element={<Accueil />} />
-                <Route path="help" element={<Help />} />
+                <Route path="/help" element={<Help />} />
                 <Route path="*" element={<h1>404 Not Found</h1>} />
 
             </Routes>
