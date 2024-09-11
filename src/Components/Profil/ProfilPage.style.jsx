@@ -52,7 +52,7 @@ export const input = {
 
 export const select = {
     ...input,
-    width: '48%',
+    width: '80%',
     appearance: 'none', // Supprime la flèche par défaut sur certains navigateurs
     backgroundColor: '#fff',
     paddingRight: '30px',

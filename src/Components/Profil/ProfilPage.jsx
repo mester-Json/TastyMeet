@@ -6,6 +6,7 @@ const ProfilPage = () => {
         firstName: 'John',
         lastName: 'Doe',
         gender: 'Male',
+        orientation: 'Male',
         email: 'john.doe@example.com',
         phone: '0655321347',
         address: '123 Route de turin, Nice, France',
@@ -25,6 +26,7 @@ const ProfilPage = () => {
             [name]: value,
         });
     };
+    const [error, setError] = useState(null);
 
     // composant qui s'affiche ou se désafiche lorsque l'on clique sur "Modifier mdp"
     const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -41,34 +43,52 @@ const ProfilPage = () => {
     // afficher (ou désafficher) le composant pour modifier le mdp
     const togglePasswordForm = () => {
         event.preventDefault();
-        setShowPasswordForm(!showPasswordForm);
+        setError(null);
+        setShowEmailForm(false);
+        if (!showEmailForm) {
+            setShowPasswordForm(!showPasswordForm);
+
+        }
+
     };
 
     // Verifie si le nouveau mdp et le confirmer le nouveau mdp sont identitique, si ils le sont alors le composant se désafiche
     const handlePasswordChange = (e) => {
         if (newPassword !== confirmNewPassword) {
-            alert('Les mots de passe ne correspondent pas.');
+            event.preventDefault();
+            setError('Les mdp ne sont pas identique');
             return;
+        } else {
+            alert('Mot de passe modifié avec succès.');
+            setShowPasswordForm(false);
+            setError(null);
         }
-        alert('Mot de passe modifié avec succès.');
-        setShowPasswordForm(false);
     };
 
     // afficher (ou désafficher) le composant pour modifier l'email'
     const toggleEmailForm = () => {
         event.preventDefault();
-        setShowEmailForm(!showEmailForm);
+        setError(null);
+        setShowPasswordForm(false);
+        if (!showPasswordForm) {
+            setShowEmailForm(!showEmailForm);
+
+        }
+
+
     };
 
 
     // Verifie si le nouvel email et le confirmer le nouvel email sont identitique, si ils le sont alors le composant se désafiche
     const handleEmailChange = (e) => {
         if (newEmail !== confirmNewEmail) {
-            alert("les adresses ne correspondent pas.");
+            event.preventDefault();
+            setError('les adresses emails ne correspondent pas.');
             return;
         }
         alert("l'email modifié avec succès.");
         setShowEmailForm(false);
+        setError(null);
     };
 
 
@@ -118,17 +138,36 @@ const ProfilPage = () => {
                                 style={styles.input}
                             />
                         </div>
-                        <select
-                            name="gender"
-                            value={profile.gender}
-                            onChange={handleChange}
-                            style={styles.select}
-                        >
-                            <option value="Male">Homme</option>
-                            <option value="Female">Femme</option>
-                            <option value="Other">Autre</option>
-                        </select>
 
+                        <div style={styles.row}>
+                            <div style={{ width: '100%' }}>
+                                <p>Genre :</p>
+                                <select
+                                    name="gender"
+                                    value={profile.gender}
+                                    onChange={handleChange}
+                                    style={styles.select}
+                                >
+                                    <option value="Male">Homme</option>
+                                    <option value="Female">Femme</option>
+                                    <option value="Other">Autre</option>
+                                </select>
+                            </div>
+                            <div style={{ width: '100%' }}>
+                                <p>Orientation :</p>
+                                <select
+                                    name="orientation"
+                                    value={profile.orientation}
+                                    onChange={handleChange}
+                                    style={styles.select}
+                                >
+                                    <option value="Male">Homme</option>
+                                    <option value="Female">Femme</option>
+                                    <option value="Other">Autre</option>
+                                </select>
+
+                            </div>
+                        </div>
                         <textarea
                             name="description"
                             maxLength="200"
@@ -148,6 +187,9 @@ const ProfilPage = () => {
                             <button style={styles.button} type="submit" onClick={toggleEmailForm}>
                                 {showEmailForm ? 'Annuler' : "Modifier l'email"}
                             </button>
+                        </div>
+                        <div style={styles.rowButtons}>
+                            {error && <label style={{ color: 'red' }}>{error}</label>} {/* Display error message */}
                         </div>
                     </form>
                 </div>
@@ -213,7 +255,7 @@ const ProfilPage = () => {
                 <form onSubmit={handleEmailChange} style={styles.ShowForm}>
                     <div style={styles.row}>
                         <input
-                            type="password"
+                            type="email"
                             value={currentEmail}
                             onChange={(e) => setCurrentEmail(e.target.value)}
                             placeholder="email actuel"
@@ -223,20 +265,22 @@ const ProfilPage = () => {
                     </div>
                     <div style={styles.row}>
                         <input
-                            type="password"
+                            type="email"
                             value={newEmail}
                             onChange={(e) => setNewEmail(e.target.value)}
                             placeholder="Nouvel email"
                             style={styles.ShowInput}
                         />
                         <input
-                            type="password"
+                            type="email"
                             value={confirmNewEmail}
                             onChange={(e) => setConfirmNewEmail(e.target.value)}
                             placeholder="Confirmer le nouvel email"
                             style={styles.ShowInput}
                         />
                         <button type="submit" style={styles.button}>Changer l'email</button>
+
+
                     </div>
                 </form>
             )}
