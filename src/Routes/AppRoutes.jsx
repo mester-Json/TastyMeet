@@ -5,7 +5,7 @@ import { Messaging } from "../Pages/Messaging.jsx";
 import { Message } from "../Pages/Message.jsx";
 import { Accueil } from "../Pages/Accueil.jsx";
 import { ProfilPage } from '../Pages/ProfilePage.jsx';
-import { Help } from '../Pages/Hekp.jsx';
+import { Help } from '../Pages/Help.jsx';
 
 export const AppRoutes = () => {
     return (
