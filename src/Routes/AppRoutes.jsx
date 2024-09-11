@@ -5,6 +5,7 @@ import { Messaging } from "../Pages/Messaging.jsx";
 import { Message } from "../Pages/Message.jsx";
 import { Accueil } from "../Pages/Accueil.jsx";
 import { ProfilPage } from '../Pages/ProfilePage.jsx';
+import { Help } from '../Pages/Hekp.jsx';
 
 export const AppRoutes = () => {
     return (
@@ -16,6 +17,7 @@ export const AppRoutes = () => {
                 <Route path="/messaging" element={<Messaging />} />
                 <Route path="/message" element={<Message />} />
                 <Route path="/Accueil" element={<Accueil />} />
+                <Route path="help" element={<Help />} />
                 <Route path="*" element={<h1>404 Not Found</h1>} />
 
             </Routes>
