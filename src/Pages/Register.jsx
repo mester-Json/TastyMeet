@@ -1,9 +1,9 @@
-import FormRegister  from  '../Components/FormRegister/FormRegister.jsx'
+import { FormRegister } from  '../Components/FormRegister/FormRegister.jsx'
 import { Nav } from "../Components/Nav/Nav.jsx";
 import { Footer } from "../Components/Footer/Footer.jsx";
 
 
-function Register(){
+export  const Register =() =>{
     return (
         <>
             <Nav/>
@@ -13,4 +13,3 @@ function Register(){
     );
 }
 
-export default Register;

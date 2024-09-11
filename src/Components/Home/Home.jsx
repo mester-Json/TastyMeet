@@ -1,5 +1,18 @@
 import { useState, useRef } from 'react';
-import { Card, Name, Image, Container, Description } from "./Home.style.jsx";
+import {
+    Card,
+    Name,
+    RightArrow,
+    GenderAge,
+    LeftArrow,
+    ImageContainer,
+    Container,
+    Description,
+    DescriptionPersso
+} from "./Home.style.jsx";
+import { faHeart, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 
 const MAX_SWIPE_DISTANCE = 100;
 const MAX_ROTATION_DEGREE = 50;
@@ -71,30 +84,56 @@ export const Home = () => {
         document.addEventListener('mouseup', handleMouseUp);
     };
 
+
     const cardData = [
         {
             name: "John Doe",
-            description: "Lorem ipsum dolor sit amet...",
-            image: "path/to/your/image.jpg"
+            gender: "Homme",
+            age: "25 ans",
+            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            image: "/path/to/your/image.jpg"
         },
         {
             name: "Jane Smith",
-            description: "Lorem ipsum dolor sit amet...",
-            image: "path/to/another/image.jpg"
-        },
+            gender: "Femme",
+            age: "30 ans",
+            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            image: "/path/to/another/image.jpg"
+        }
     ];
 
+    const handleNext = () => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % cardData.length);
+    };
+
+    const handlePrev = () => {
+        setCurrentIndex((prevIndex) => (prevIndex - 1 + cardData.length) % cardData.length);
+    };
+
     return (
-        <>
-            <div>
-                <Container>
-                    <Card ref={cardRef} onMouseDown={handleMouseDown}>
-                        <Image style={{ backgroundImage: `url(${cardData[currentIndex].image})` }} />
-                        <Name>{cardData[currentIndex].name}</Name>
-                        <Description>{cardData[currentIndex].description}</Description>
-                    </Card>
-                </Container>
-            </div>
-        </>
+        <Container>
+            <LeftArrow onClick={handlePrev}   >
+                <FontAwesomeIcon icon={faHeart} />
+            </LeftArrow>
+            <Card ref={cardRef} onMouseDown={handleMouseDown}>
+                <ImageContainer>
+                    {/* Image */}
+                    <img src={cardData[currentIndex].image} alt="Profile" style={{ width: '80%', height: '80%', borderRadius: '50%' }} />
+                </ImageContainer>
+                <DescriptionPersso>
+                    <Name>{cardData[currentIndex].name}</Name>
+                    <GenderAge>
+                        <span>{cardData[currentIndex].gender}</span>
+                        <span>{cardData[currentIndex].age}</span>
+                    </GenderAge>
+
+                    <Description>{cardData[currentIndex].description}</Description>
+                </DescriptionPersso>
+            </Card>
+
+            <RightArrow onClick={handleNext} >
+                <FontAwesomeIcon icon={faCircleXmark} />
+            </RightArrow>
+        </Container>
     );
-}
+};

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AppContainer, NomConversation, MessagesContainer, MessageContainer, MessageBubble, UserContainer, InputContainer, Input, Button } from './ChatApp.style.jsx';
 import { Avatar, MessageContent } from '../Messaging/CartMessaging.style.jsx';
 
-function CountMessaging() {
+export const  ChatApp = ()  =>{
     //Conversation avec un autre utilisateur
     return (
         <>
@@ -74,4 +74,3 @@ function CountMessaging() {
     );
 }
 
-export default CountMessaging;

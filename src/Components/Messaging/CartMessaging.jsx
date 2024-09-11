@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { MessageBar, Avatar, MessageContent } from '../Messaging/CartMessaging.style.jsx';
 
-function CartMessaging() {
+export const  CartMessaging = () => {
 
     //Message reçu avec l'image de la personne, prenom et une partie du message reçu 
     return (
@@ -22,4 +22,3 @@ function CartMessaging() {
     );
 }
 
-export default CartMessaging;
