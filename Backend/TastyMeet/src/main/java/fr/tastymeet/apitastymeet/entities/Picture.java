@@ -1,4 +1,22 @@
 package fr.tastymeet.apitastymeet.entities;
 
+import jakarta.persistence.*;
+import lombok.*;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+@ToString
+@Entity
 public class Picture {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private long id;
+    @Version
+    private int version;
+    private byte[] picture;
+    private String pictureBase64;
+    @ManyToOne
+    private User user;
 }
