@@ -7,7 +7,7 @@ function CartMessaging() {
     return (
         <>
             <div>
-                <a href="http://localhost:5173/Message"><MessageBar>
+                <a style={{ textDecoration: 'none' }} href="http://localhost:5173/Message"><MessageBar>
                     <Avatar>
                         <img src="https://www.utopix.com/wp-content/uploads/2024/04/MjdmZjg0ZWMtNjE1OS00ZDQxLThhYzItNTg3YjQwYzc1MzVi_70f1467b-7a37-47d4-b2db-0eb0ce163b0f_profilhomme5-scaled.jpg" alt="Avatar de Jonathan" />
                     </Avatar>
