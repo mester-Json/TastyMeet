@@ -16,7 +16,7 @@ export const AppRoutes = () => {
                 <Route path="/messaging" element={<Messaging />} />
                 <Route path="/message" element={<Message />} />
                 <Route path="/profil" element={<Profil />} />
-                <Route path="/home" element={<Accueil />} />
+                <Route path="/accueil" element={<Accueil />} />
                 <Route path="*" element={<h1>404 Not Found</h1>} />
             </Routes>
         </BrowserRouter>
