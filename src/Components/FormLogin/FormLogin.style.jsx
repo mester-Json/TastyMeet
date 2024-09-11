@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {Link} from 'react-router-dom'
+import { Link, } from 'react-router-dom'
 
 
 export const Form = styled.form`
@@ -22,7 +22,7 @@ export const Form = styled.form`
 export const InputField = styled.input`
     width: calc(90% - 20px);
     padding: 10px;
-    margin-top: 15px;
+    margin-top: 20px;
     margin-bottom: 20px;
     margin-left: 25px;
     border: 1px solid #ccc;
@@ -45,6 +45,7 @@ export const Button = styled.button`
     border-radius: 20px;
     cursor: crosshair ;
     margin-left: 135px;
+    margin-top: 25px;
     margin-bottom: 20px;
     transition: transform 0.3s ease, background-color 0.3s ease;
 
@@ -62,10 +63,19 @@ export const Inscription = styled(Link)`
     }
 `
 
-export  const Mdp = styled(Link)`
+export const Mdp = styled(Link)`
     color: black;
     margin-left: 40px;
     &:hover {
         color: #775144;
     }
+<<<<<<< HEAD
+    
 `
+
+export  const Description = styled.textarea`
+=======
+>>>>>>> jonathan
+`
+
+

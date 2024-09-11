@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BurgerMenu , Menu , NavBar , Img  } from './Nav.style.jsx';
 import logo from "../../Resources/Images/Logo.png" ;
 
-const Nav = () => {
+export const Nav = () => {
     const [ open , setOpen ] = useState( false );
 
     return (
@@ -15,11 +15,10 @@ const Nav = () => {
                     <div/>
                 </BurgerMenu>
                 <Menu open={ open }>
-                    <li><a href="#">Accueil</a></li>
-                    <li><a href="#">Mon Profile</a></li>
-                    <li><a href="#">Crouncher</a></li>
-                    <li><a href="#">Tchacher</a></li>
-                    <li><a href="#">Help</a></li>
+                    <li><a href="/profile">Mon Profile</a></li>
+                    <li><a href="/accueil">Crouncher</a></li>
+                    <li><a href="/message">Tchacher</a></li>
+                    <li><a href="/help">Help</a></li>
                 </Menu>
 
             </NavBar>
@@ -27,4 +26,3 @@ const Nav = () => {
     );
 };
 
-export default Nav;
