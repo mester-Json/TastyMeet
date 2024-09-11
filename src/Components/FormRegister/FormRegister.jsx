@@ -383,4 +383,3 @@ function FormRegister () {
     );
 }
 
-export default FormRegister;
