@@ -45,6 +45,7 @@ export const Button = styled.button`
     border-radius: 20px;
     cursor: crosshair ;
     margin-left: 135px;
+    margin-top: 25px;
     margin-bottom: 20px;
     transition: transform 0.3s ease, background-color 0.3s ease;
 
@@ -68,6 +69,10 @@ export const Mdp = styled(Link)`
     &:hover {
         color: #775144;
     }
+    
+`
+
+export  const Description = styled.textarea`
 `
 
 

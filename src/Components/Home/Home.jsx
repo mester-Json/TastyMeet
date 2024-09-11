@@ -2,7 +2,8 @@ import { useState, useRef } from 'react';
 import { Card, Name, Image, Container, Description } from "./Home.style.jsx";
 
 const MAX_SWIPE_DISTANCE = 100;
-const MAX_ROTATION_DEGREE = 50; // Rotation maximale
+const MAX_ROTATION_DEGREE = 50;
+const HORIZONTAL_MARGIN = 700;
 
 export const Home = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -12,13 +13,21 @@ export const Home = () => {
         e.preventDefault();
         cardRef.current.style.cursor = 'grabbing';
         const startX = e.clientX;
+        const cardWidth = cardRef.current.offsetWidth;
+        const screenWidth = window.innerWidth;
 
         const handleMouseMove = (moveEvent) => {
             const deltaX = moveEvent.clientX - startX;
 
-            const rotation = Math.min(Math.max(deltaX / 10, -MAX_ROTATION_DEGREE), MAX_ROTATION_DEGREE);
+            // Limiter le déplacement avec une marge plus grande
+            const limitedDeltaX = Math.max(
+                Math.min(deltaX, (screenWidth / 2) - HORIZONTAL_MARGIN - (cardWidth / 2)),
+                -(screenWidth / 2) + HORIZONTAL_MARGIN + (cardWidth / 2)
+            );
 
-            cardRef.current.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
+            const rotation = Math.min(Math.max(limitedDeltaX / 10, -MAX_ROTATION_DEGREE), MAX_ROTATION_DEGREE);
+
+            cardRef.current.style.transform = `translateX(${limitedDeltaX}px) rotate(${rotation}deg)`;
         };
 
         const handleMouseUp = (upEvent) => {
@@ -76,12 +85,16 @@ export const Home = () => {
     ];
 
     return (
-        <Container>
-            <Card ref={cardRef} onMouseDown={handleMouseDown}>
-                <Image style={{ backgroundImage: `url(${cardData[currentIndex].image})` }} />
-                <Name>{cardData[currentIndex].name}</Name>
-                <Description>{cardData[currentIndex].description}</Description>
-            </Card>
-        </Container>
+        <>
+            <div>
+                <Container>
+                    <Card ref={cardRef} onMouseDown={handleMouseDown}>
+                        <Image style={{ backgroundImage: `url(${cardData[currentIndex].image})` }} />
+                        <Name>{cardData[currentIndex].name}</Name>
+                        <Description>{cardData[currentIndex].description}</Description>
+                    </Card>
+                </Container>
+            </div>
+        </>
     );
 };

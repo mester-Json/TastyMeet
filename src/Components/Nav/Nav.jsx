@@ -15,11 +15,10 @@ export const Nav = () => {
                     <div/>
                 </BurgerMenu>
                 <Menu open={ open }>
-                    <li><a href="#">Accueil</a></li>
-                    <li><a href="#">Mon Profile</a></li>
-                    <li><a href="#">Crouncher</a></li>
-                    <li><a href="#">Tchacher</a></li>
-                    <li><a href="#">Help</a></li>
+                    <li><a href="/profile">Mon Profile</a></li>
+                    <li><a href="/accueil">Crouncher</a></li>
+                    <li><a href="/message">Tchacher</a></li>
+                    <li><a href="/help">Help</a></li>
                 </Menu>
 
             </NavBar>

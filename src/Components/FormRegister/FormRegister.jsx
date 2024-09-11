@@ -8,7 +8,7 @@ import {
   Select,
 } from "./FormRegister.style.jsx";
 
-function FormRegister() {
+export const FormRegister = () => {
   const [errors, setErrors] = useState({
     nom: "",
     prenom: "",
@@ -148,4 +148,3 @@ function FormRegister() {
   );
 }
 
-export default FormRegister;

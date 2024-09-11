@@ -68,9 +68,9 @@ export const Menu = styled.ul`
     background: #2A0800;
     position: absolute;
     transform: ${({ open }) => open ? 'translateX(0)' : 'translateX(100%)'};
-    top: 5rem; 
+    top: 6.5rem; 
     right: 0;  
-    height: 20vh;
+    height: 17vh;
     width: 200px; 
     padding: 20px;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
@@ -80,6 +80,7 @@ export const Menu = styled.ul`
         margin-bottom: 1rem;
         font-size: 1.2rem;
         color: white;
+        margin-left: 15px;
 
         a {
             text-decoration: none;

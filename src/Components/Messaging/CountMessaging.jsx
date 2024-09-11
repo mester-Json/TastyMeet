@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CountText } from './CountMessaging.style.jsx';
 
-function CountMessaging() {
+export const  CountMessaging = ()  =>{
 
     //Nombre de nouveau message reçu
 
@@ -16,4 +16,3 @@ function CountMessaging() {
     );
 }
 
-export default CountMessaging;
