@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 /* -----------------Form-----------------------*/
-export const Form1 = styled.form
+export const FormularRegister = styled.form
 `
     display: flex;
     flex-wrap: wrap;
@@ -19,7 +19,7 @@ export const Form1 = styled.form
     }
     
 `;
-export const Form2 = styled.form
+export const FormMoreInfo = styled.form
 `
 display: flex;
     flex-wrap: wrap;
@@ -103,15 +103,38 @@ export const ImgAvatar = styled.img
 export const ImgEye = styled.img
 `
   position: absolute;
-  right: 350px;
-  top: 49.2%;
+  right: 640px;
+  top: 54.4%;
   transform: translateY(-50%);  // Aligne verticalement au centre
   cursor: pointer;
   width: 20px;
   height: 20px;
+  
 `;
 /* ----------------------------------------*/
 /* -----------------Text+Label-----------------------*/
+export const TitleForm1 = styled.h1
+` 
+    position: absolute;
+    font-size: xx-large;
+    color : white;
+    font-weight: bold;
+    
+    top: 150px;
+    align-items: center;
+    text-align: center;
+`;
+export const TitleForm2 = styled.h2
+`
+    position: absolute;
+    font-size: xx-large;
+    color : white;
+    font-weight: bold;
+
+    top: 150px;
+    align-items: center;
+    text-align: center;
+`;
 export const P = styled.p
 `
     font-size: 12px;
@@ -124,6 +147,11 @@ export const Description = styled.textarea
     max-height: 250px;
     height: 100px;
     overflow-y: auto;
+`;
+
+export const LabelError = styled.label
+`
+    color: red;
 `;
 /* ----------------------------------------*/
 /* -----------------Div-----------------------*/
@@ -139,5 +167,12 @@ export  const  Div2 = styled.div
     display: flex;
     flex-direction: column;
     margin-left: 5px;
+`;
+export  const  DivError = styled.div
+`
+    height: 25px;
+    text-align: left ;
+    margin-bottom: 5px;
+    margin-right: 5px;
 `;
 /* ----------------------------------------*/
