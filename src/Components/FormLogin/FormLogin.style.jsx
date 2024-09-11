@@ -22,7 +22,7 @@ export const Form = styled.form`
 export const InputField = styled.input`
     width: calc(90% - 20px);
     padding: 10px;
-    margin-top: 15px;
+    margin-top: 20px;
     margin-bottom: 20px;
     margin-left: 25px;
     border: 1px solid #ccc;
