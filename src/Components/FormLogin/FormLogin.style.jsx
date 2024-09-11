@@ -69,10 +69,13 @@ export const Mdp = styled(Link)`
     &:hover {
         color: #775144;
     }
+<<<<<<< HEAD
     
 `
 
 export  const Description = styled.textarea`
+=======
+>>>>>>> jonathan
 `
 
 
