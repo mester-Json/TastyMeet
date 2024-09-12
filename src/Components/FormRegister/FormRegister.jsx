@@ -28,20 +28,20 @@ export const FormRegister = () => {
     /*---------------------------- useState ------------------------------------------------*/
     const [errors, setErrors] = useState({
         firstName: "",
-        name: "",
+        lastName: "",
         email: "",
         password: "",
         gender: "",
-        birthDate: "",
+        age: "",
     });
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showError, setShowError] = useState(false);
     const [firstName, setFirstName] = useState("");
-    const [name, setName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [gender, setGender] = useState("");
-    const [birthDate, setBirthDate] = useState("");
+    const [age, setAge] = useState("");
     const [isAdult, setIsAdult] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [currentForm, setCurrentForm] = useState("formularRegister");
@@ -53,32 +53,49 @@ export const FormRegister = () => {
     /*---------------------------- useEffect ------------------------------------------------*/
     // fonction qui vérifie l'age
     useEffect(() => {
-        if (birthDate) {
+        if (age) {
             const today = new Date();
-            const birthDateObj = new Date(birthDate);
-            const age = today.getFullYear() - birthDateObj.getFullYear();
+            const birthDateObj = new Date(age);
+            const agePerson = today.getFullYear() - birthDateObj.getFullYear();
 
-            setIsAdult(age >= 18);
+            setIsAdult(agePerson >= 18);
         } else {
             setIsAdult(null);
         }
-    }, [birthDate]);
+    }, [age]);
     /*----------------------------------------------------------------------------*/
+
+    // const ReverseDateTime = () => {
+    //     console.log(age);
+    //     // Convert the date string (YYYY-MM-DD) into a Date object
+    //     const date = new Date(age);
+
+    //     // Extract day, month, and year from the date object
+    //     const day = date.getDate().toString().padStart(2, '0');
+    //     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+    //     const year = date.getFullYear();
+
+    //     // Format the date as DD-MM-YYYY
+    //     setAge(`${day}-${month}-${year}`);
+
+    // }; 
+
     /*---------------------------- handle... ------------------------------------------------*/
     // Fonction d'inscription
     const handleLogin = async () => {
+        console.log(age);
         const newErrors = {};
 
         switch (currentForm) {
             case "formularRegister":
-                if (!firstName) {
-                    newErrors.firstName = "Le nom est requis";
+                if (!lastName) {
+                    newErrors.lastName = "Le nom est requis";
                     setShowError(true);
                 } else {
                     setShowError(false);
                 }
-                if (!name) {
-                    newErrors.name = "Le prénom est requis";
+                if (!firstName) {
+                    newErrors.firstName = "Le prénom est requis";
                     setShowError(true);
                 } else {
                     setShowError(false);
@@ -104,14 +121,14 @@ export const FormRegister = () => {
                 } else {
                     setShowError(false);
                 }
-                if (!birthDate) {
-                    newErrors.birthDate = "La date de naissance est requise";
+                if (!age) {
+                    newErrors.age = "La date de naissance est requise";
                     setShowError(true);
                 } else {
                     setShowError(false);
                 }
                 if (isAdult === false) {
-                    newErrors.birthDate = "Vous devez être majeur pour vous inscrire";
+                    newErrors.age = "Vous devez être majeur pour vous inscrire";
                     setShowError(true);
                 } else {
                     setShowError(false);
@@ -142,19 +159,18 @@ export const FormRegister = () => {
         if (Object.keys(newErrors).length === 0) {
             // Si pas d'erreurs, effectuer la requête POST pour soumettre les données
             setIsLoading(true);
-            fetch("http://localhost:5173/register", {
+            fetch("http://localhost:9090/api/addUser", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     firstName,
-                    name,
-                    gender,
-                    email,
+                    lastName,
+                    age,
                     password,
-                    birthDate,
-                    phone,
                     description,
-                    avatar,
+                    email,
+                    phone,
+                    gender,
                 }),
             })
                 .then((response) => {
@@ -180,7 +196,7 @@ export const FormRegister = () => {
 
     // set la date de naissance
     const handleDateChange = (event) => {
-        setBirthDate(event.target.value);
+        setAge(event.target.value);
     };
 
     // Fonction test pour afficher le form2
@@ -230,18 +246,18 @@ export const FormRegister = () => {
                 <FormularRegister>
                     <TitleForm1>Inscription</TitleForm1>
                     <Div>
-                        {/*---------------------------- FIRSTNAME ------------------------------------------------*/}
+                        {/*---------------------------- lastName ------------------------------------------------*/}
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.firstName}
+                                {errors.lastName}
                             </LabelError>
                         </DivError>
                         <InputField
                             type="text"
                             placeholder="Nom"
-                            name="firstName" // Ajout du nom pour identifier le champ
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
+                            name="lastName" // Ajout du nom pour identifier le champ
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
                         {/*---------------------------- GENDER ------------------------------------------------*/}
@@ -256,10 +272,10 @@ export const FormRegister = () => {
                             onChange={(e) => setGender(e.target.value)}
                         >
                             <option value="">Veuillez Choisir un Genre</option>
-                            <option value="Homme">Homme</option>
-                            <option value="Femme">Femme</option>
-                            <option value="Furry">Furry</option>
-                            <option value="NonBinaire">Non Binaire</option>
+                            <option value="HOMME">Homme</option>
+                            <option value="FEMME">Femme</option>
+                            <option value="TRANS">Trans</option>
+                            <option value="NONBINAIRE">Non Binaire</option>
                         </Select>
                         {/* ----------------------------------------------------------------------------------- */}
                         {/*---------------------------- EMAIL ------------------------------------------------*/}
@@ -275,31 +291,31 @@ export const FormRegister = () => {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
-                        {/*---------------------------- NAME ------------------------------------------------*/}
+                        {/*---------------------------- FirstNAME ------------------------------------------------*/}
                     </Div>
                     <Div2>
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.name}
+                                {errors.firstName}
                             </LabelError>
                         </DivError>
                         <InputField
                             type="text"
                             placeholder="Prénom"
-                            name="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            name="firstName"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
-                        {/*---------------------------- BIRTHDATE ------------------------------------------------*/}
+                        {/*---------------------------- age ------------------------------------------------*/}
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.birthDate}
+                                {errors.age}
                             </LabelError>
                         </DivError>
                         <InputField
                             type="date"
-                            value={birthDate}
+                            value={age}
                             onChange={handleDateChange}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
