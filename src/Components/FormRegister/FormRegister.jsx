@@ -27,8 +27,8 @@ import eyeClose from "../../Resources/Images/eye-slash.svg";
 export const FormRegister = () => {
     /*---------------------------- useState ------------------------------------------------*/
     const [errors, setErrors] = useState({
+        lastName: "",
         firstName: "",
-        name: "",
         email: "",
         password: "",
         gender: "",
@@ -38,8 +38,8 @@ export const FormRegister = () => {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showError, setShowError] = useState(false);
+    const [lastName, setLastName] = useState("");
     const [firstName, setFirstName] = useState("");
-    const [name, setName] = useState("");
     const [gender, setGender] = useState("");
     const [birthDate, setBirthDate] = useState("");
     const [isAdult, setIsAdult] = useState(null);
@@ -71,14 +71,14 @@ export const FormRegister = () => {
 
         switch (currentForm) {
             case "formularRegister":
-                if (!firstName) {
-                    newErrors.firstName = "Le nom est requis";
+                if (!lastName) {
+                    newErrors.lastName = "Le nom est requis";
                     setShowError(true);
                 } else {
                     setShowError(false);
                 }
-                if (!name) {
-                    newErrors.name = "Le prénom est requis";
+                if (!firstName) {
+                    newErrors.firstName = "Le prénom est requis";
                     setShowError(true);
                 } else {
                     setShowError(false);
@@ -146,8 +146,8 @@ export const FormRegister = () => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
+                    lastName,
                     firstName,
-                    name,
                     gender,
                     email,
                     password,
@@ -230,18 +230,18 @@ export const FormRegister = () => {
                 <FormularRegister>
                     <TitleForm1>Inscription</TitleForm1>
                     <Div>
-                        {/*---------------------------- FIRSTNAME ------------------------------------------------*/}
+                        {/*---------------------------- LASTNAME ------------------------------------------------*/}
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.firstName}
+                                {errors.lastName}
                             </LabelError>
                         </DivError>
                         <InputField
                             type="text"
                             placeholder="Nom"
-                            name="firstName" // Ajout du nom pour identifier le champ
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
+                            name="lastName" // Ajout du nom pour identifier le champ
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
                         {/*---------------------------- GENDER ------------------------------------------------*/}
@@ -275,20 +275,20 @@ export const FormRegister = () => {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
-                        {/*---------------------------- NAME ------------------------------------------------*/}
+                        {/*---------------------------- FIRSTNAME ------------------------------------------------*/}
                     </Div>
                     <Div2>
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.name}
+                                {errors.firstName}
                             </LabelError>
                         </DivError>
                         <InputField
                             type="text"
                             placeholder="Prénom"
-                            name="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            name="firstName"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
                         {/*---------------------------- BIRTHDATE ------------------------------------------------*/}
