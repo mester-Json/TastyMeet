@@ -1,15 +1,18 @@
 import { Nav } from "../Components/Nav/Nav.jsx";
 import { Footer } from "../Components/Footer/Footer.jsx";
-import { ChatApp } from "../Components/Messaging/ChatApp.jsx";
+import ProfilPage from "../Components/Profil/ProfilPage.jsx";
 
 //Conversation 
 
-export const Message = () => {
+function Profil() {
     return (
         <>
             <Nav />
-            <ChatApp />
+            <ProfilPage />
             <Footer />
         </>
     );
 }
+
+
+export default Profil;

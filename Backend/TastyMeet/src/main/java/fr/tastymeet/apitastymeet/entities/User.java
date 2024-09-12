@@ -49,6 +49,7 @@ public class User {
     @Column(name = "admin")
     private boolean admin = false;
     @OneToMany(mappedBy = "user")
+    @Column(nullable = true)
     private List<Picture> pictures = new ArrayList<>();
 
 }

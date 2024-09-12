@@ -2,6 +2,7 @@ package fr.tastymeet.apitastymeet.dto;
 
 
 
+import jakarta.persistence.Lob;
 import jakarta.persistence.Version;
 import lombok.*;
 
@@ -13,7 +14,7 @@ import lombok.*;
 public class PictureDto {
     private long id;
     private int version;
-    private byte[] picture;
-    private String pictureBase64;
+    private String pathPicture;
+    private String pictureName;
     private Long userId;
 }
