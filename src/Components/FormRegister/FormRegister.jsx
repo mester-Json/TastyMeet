@@ -49,6 +49,7 @@ export const FormRegister = () => {
     const [phone, setPhone] = useState(null);
     const [avatar, setAvatar] = useState(avatarDefault);
     const [eye, setEye] = useState(eyeClose);
+    const [date, setDate] = useState("");
     /*----------------------------------------------------------------------------*/
     /*---------------------------- useEffect ------------------------------------------------*/
     // fonction qui vérifie l'age
@@ -64,59 +65,70 @@ export const FormRegister = () => {
         }
     }, [birthDate]);
     /*----------------------------------------------------------------------------*/
+
+    const InverserDate = () => {
+        // Séparer la date en trois parties: année, mois, jour
+        const [year, month, day] = birthDate.split('-');
+
+        // Réarranger dans le format voulu: DD-MM-YYYY
+       setDate(`${day}-${month}-${year}`);
+
+
+    };console.log(date);
+
     /*---------------------------- handle... ------------------------------------------------*/
     // Fonction d'inscription
     const handleLogin = async () => {
         const newErrors = {};
 
-        switch (currentForm) {
-            case "formularRegister":
-                if (!lastName) {
-                    newErrors.lastName = "Le nom est requis";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (!firstName) {
-                    newErrors.firstName = "Le prénom est requis";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (!email) {
-                    newErrors.email = "L'email est requis";
-                    setShowError(true);
-                } else if (! /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email)) {
-                    newErrors.email = "L'email n'est pas valide";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (!password) {
-                    newErrors.password = "Le mot de passe est requis";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (gender === "") {
-                    newErrors.gender = "Veuillez choisir un genre";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (!birthDate) {
-                    newErrors.birthDate = "La date de naissance est requise";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (isAdult === false) {
-                    newErrors.birthDate = "Vous devez être majeur pour vous inscrire";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                break;
+        switch (currentForm) { case "formularRegister":
+            if (!lastName) {
+                newErrors.lastName = "Le nom est requis";
+                setShowError(true);
+            } else {
+                setShowError(false);
+            }
+            if (!firstName) {
+                newErrors.firstName = "Le prénom est requis";
+                setShowError(true);
+            } else {
+                setShowError(false);
+            }
+            if (!email) {
+                newErrors.email = "L'email est requis";
+                setShowError(true);
+            } else if (! /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email)) {
+                newErrors.email = "L'email n'est pas valide";
+                setShowError(true);
+            } else {
+                setShowError(false);
+            }
+            if (!password) {
+                newErrors.password = "Le mot de passe est requis";
+                setShowError(true);
+            } else {
+                setShowError(false);
+            }
+            if (gender === "") {
+                newErrors.gender = "Veuillez choisir un genre";
+                setShowError(true);
+            } else {
+                setShowError(false);
+            }
+            if (!birthDate) {
+                newErrors.birthDate = "La date de naissance est requise";
+                setShowError(true);
+            } else {
+                setShowError(false);
+            }
+            if (isAdult === false) {
+                newErrors.birthDate = "Vous devez être majeur pour vous inscrire";
+                setShowError(true);
+            } else {
+                setShowError(false);
+            }
+            break;
+
             case "formMoreInfo":
                 if (avatar === avatarDefault) {
                     newErrors.avatar = "L'avatar est requis";
@@ -151,7 +163,7 @@ export const FormRegister = () => {
                     gender,
                     email,
                     password,
-                    birthDate,
+                    date,
                     phone,
                     description,
                     avatar,
@@ -185,7 +197,6 @@ export const FormRegister = () => {
 
     // Fonction test pour afficher le form2
     const handleNext = async () => {
-        handleLogin();
         handleFormSwitch("formMoreInfo");
     };
 
@@ -320,7 +331,7 @@ export const FormRegister = () => {
                         <ImgEye src={eye} onClick={handleShowPassword} />
                         {/* ----------------------------------------------------------------------------------- */}
                     </Div2>
-                    <Button type="button" onClick={handleLogin} disabled={isLoading}>
+                    <Button type="button" onClick={InverserDate} disabled={isLoading}>
                         {isLoading ? "Validation..." : "Suivant"}
                     </Button>
                 </FormularRegister>
