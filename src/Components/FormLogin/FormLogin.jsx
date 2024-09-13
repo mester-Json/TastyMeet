@@ -36,7 +36,7 @@ export const FormLogin = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('/api/java', {
+            const response = await fetch('http://localhost:9090/api/connection', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),

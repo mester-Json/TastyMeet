@@ -30,7 +30,7 @@ public class PictureController {
     private IPictureService pictureService;
 
     @PostMapping(value="/upload/{id}", consumes = "multipart/form-data" )
-    public ResponseEntity<String> uploadPhoto(@RequestParam("file") MultipartFile file, @PathVariable("id") long userId) {
+    public ResponseEntity<String> uploadPhoto(@RequestPart("file") MultipartFile file, @PathVariable("id") long userId) {
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Aucun fichier sélectionné.");
         }

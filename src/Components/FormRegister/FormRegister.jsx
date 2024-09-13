@@ -27,111 +27,119 @@ import eyeClose from "../../Resources/Images/eye-slash.svg";
 export const FormRegister = () => {
     /*---------------------------- useState ------------------------------------------------*/
     const [errors, setErrors] = useState({
-        lastName: "",
         firstName: "",
+        lastName: "",
         email: "",
         password: "",
         gender: "",
-        birthDate: "",
+        age: "",
     });
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showError, setShowError] = useState(false);
-    const [lastName, setLastName] = useState("");
     const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [gender, setGender] = useState("");
-    const [birthDate, setBirthDate] = useState("");
+    const [age, setAge] = useState("");
     const [isAdult, setIsAdult] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [currentForm, setCurrentForm] = useState("formularRegister");
     const [description, setDescription] = useState("");
     const [phone, setPhone] = useState(null);
-    const [avatar, setAvatar] = useState(avatarDefault);
+    const [file, setFile] = useState(avatarDefault);
     const [eye, setEye] = useState(eyeClose);
-    const [date, setDate] = useState("");
     /*----------------------------------------------------------------------------*/
     /*---------------------------- useEffect ------------------------------------------------*/
     // fonction qui vérifie l'age
     useEffect(() => {
-        if (birthDate) {
+        if (age) {
             const today = new Date();
-            const birthDateObj = new Date(birthDate);
-            const age = today.getFullYear() - birthDateObj.getFullYear();
+            const birthDateObj = new Date(age);
+            const agePerson = today.getFullYear() - birthDateObj.getFullYear();
 
-            setIsAdult(age >= 18);
+            setIsAdult(agePerson >= 18);
         } else {
             setIsAdult(null);
         }
-    }, [birthDate]);
+    }, [age]);
     /*----------------------------------------------------------------------------*/
 
-    const InverserDate = () => {
-        // Séparer la date en trois parties: année, mois, jour
-        const [year, month, day] = birthDate.split('-');
+    // const ReverseDateTime = () => {
+    //     console.log(age);
+    //     // Convert the date string (YYYY-MM-DD) into a Date object
+    //     const date = new Date(age);
 
-        // Réarranger dans le format voulu: DD-MM-YYYY
-       setDate(`${day}-${month}-${year}`);
+    //     // Extract day, month, and year from the date object
+    //     const day = date.getDate().toString().padStart(2, '0');
+    //     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+    //     const year = date.getFullYear();
+
+    //     // Format the date as DD-MM-YYYY
+    //     setAge(`${day}-${month}-${year}`);
+
+    // };
 
 
-    };console.log(date);
+
 
     /*---------------------------- handle... ------------------------------------------------*/
     // Fonction d'inscription
     const handleLogin = async () => {
+        console.log(age);
         const newErrors = {};
 
-        switch (currentForm) { case "formularRegister":
-            if (!lastName) {
-                newErrors.lastName = "Le nom est requis";
-                setShowError(true);
-            } else {
-                setShowError(false);
-            }
-            if (!firstName) {
-                newErrors.firstName = "Le prénom est requis";
-                setShowError(true);
-            } else {
-                setShowError(false);
-            }
-            if (!email) {
-                newErrors.email = "L'email est requis";
-                setShowError(true);
-            } else if (! /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email)) {
-                newErrors.email = "L'email n'est pas valide";
-                setShowError(true);
-            } else {
-                setShowError(false);
-            }
-            if (!password) {
-                newErrors.password = "Le mot de passe est requis";
-                setShowError(true);
-            } else {
-                setShowError(false);
-            }
-            if (gender === "") {
-                newErrors.gender = "Veuillez choisir un genre";
-                setShowError(true);
-            } else {
-                setShowError(false);
-            }
-            if (!birthDate) {
-                newErrors.birthDate = "La date de naissance est requise";
-                setShowError(true);
-            } else {
-                setShowError(false);
-            }
-            if (isAdult === false) {
-                newErrors.birthDate = "Vous devez être majeur pour vous inscrire";
-                setShowError(true);
-            } else {
-                setShowError(false);
-            }
-            break;
-
+        switch (currentForm) {
+            case "formularRegister":
+                if (!lastName) {
+                    newErrors.lastName = "Le nom est requis";
+                    setShowError(true);
+                } else {
+                    setShowError(false);
+                }
+                if (!firstName) {
+                    newErrors.firstName = "Le prénom est requis";
+                    setShowError(true);
+                } else {
+                    setShowError(false);
+                }
+                if (!email) {
+                    newErrors.email = "L'email est requis";
+                    setShowError(true);
+                } else if (! /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email)) {
+                    newErrors.email = "L'email n'est pas valide";
+                    setShowError(true);
+                } else {
+                    setShowError(false);
+                }
+                if (!password) {
+                    newErrors.password = "Le mot de passe est requis";
+                    setShowError(true);
+                } else {
+                    setShowError(false);
+                }
+                if (gender === "") {
+                    newErrors.gender = "Veuillez choisir un genre";
+                    setShowError(true);
+                } else {
+                    setShowError(false);
+                }
+                if (!age) {
+                    newErrors.age = "La date de naissance est requise";
+                    setShowError(true);
+                } else {
+                    setShowError(false);
+                }
+                if (isAdult === false) {
+                    newErrors.age = "Vous devez être majeur pour vous inscrire";
+                    setShowError(true);
+                } else {
+                    setShowError(false);
+                }
+                break;
             case "formMoreInfo":
-                if (avatar === avatarDefault) {
-                    newErrors.avatar = "L'avatar est requis";
+                if (file === avatarDefault) {
+                    newErrors.file = "L'avatar est requis";
                     setShowError(true);
                 } else {
                     setShowError(false);
@@ -150,24 +158,27 @@ export const FormRegister = () => {
                 break;
         }
 
+        const formData = new FormData();
+        formData.append("firstName", firstName);
+        formData.append("lastName", lastName);
+        formData.append("age", age);
+        formData.append("password", password);
+        formData.append("description", description);
+        formData.append("email", email);
+        formData.append("phone", phone);
+        formData.append("gender", gender);
+        formData.append("file", file); // fichier ajouté ici
+
+
+
         // Si pas d'erreurs, soumettre le formulaire
         if (Object.keys(newErrors).length === 0) {
             // Si pas d'erreurs, effectuer la requête POST pour soumettre les données
             setIsLoading(true);
-            fetch("http://localhost:5173/register", {
+
+            fetch("http://localhost:9090/api/addUser", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    lastName,
-                    firstName,
-                    gender,
-                    email,
-                    password,
-                    date,
-                    phone,
-                    description,
-                    avatar,
-                }),
+                body: formData,
             })
                 .then((response) => {
                     if (!response.ok) {
@@ -189,10 +200,20 @@ export const FormRegister = () => {
             setErrors(newErrors);
         }
     };
-
+    console.log("Data to be sent:", {
+        firstName,
+        lastName,
+        age,
+        password,
+        description,
+        email,
+        phone,
+        gender,
+        file,
+    });
     // set la date de naissance
     const handleDateChange = (event) => {
-        setBirthDate(event.target.value);
+        setAge(event.target.value);
     };
 
     // Fonction test pour afficher le form2
@@ -200,15 +221,11 @@ export const FormRegister = () => {
         handleFormSwitch("formMoreInfo");
     };
 
-    // Changement de l'avatar par défaut, par le nouvelle avatar
+    // Changement de l'file par défaut, par le nouvelle file
     const handlePictureChange = (e) => {
-        const file = e.target.files[0]; // Sélectionne le premier fichier
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setAvatar(reader.result); // Stocke l'URL de l'image dans l'état
-            };
-            reader.readAsDataURL(file); // Lit le fichier comme une URL de données
+        const selectedFile = e.target.files[0]; // Sélectionne le premier fichier
+        if (selectedFile) {
+            setFile(selectedFile); // Stocke l'objet File dans l'état
         }
     };
 
@@ -238,10 +255,10 @@ export const FormRegister = () => {
     return (
         <>
             {currentForm === "formularRegister" && (
-                <FormularRegister>
+                <FormularRegister method="post" encType="multipart/form-data">
                     <TitleForm1>Inscription</TitleForm1>
                     <Div>
-                        {/*---------------------------- LASTNAME ------------------------------------------------*/}
+                        {/*---------------------------- lastName ------------------------------------------------*/}
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
                                 {errors.lastName}
@@ -267,10 +284,10 @@ export const FormRegister = () => {
                             onChange={(e) => setGender(e.target.value)}
                         >
                             <option value="">Veuillez Choisir un Genre</option>
-                            <option value="Homme">Homme</option>
-                            <option value="Femme">Femme</option>
-                            <option value="Furry">Furry</option>
-                            <option value="NonBinaire">Non Binaire</option>
+                            <option value="MALE">Homme</option>
+                            <option value="FEMALE">Femme</option>
+                            <option value="TRANS">Trans</option>
+                            <option value="NONBINAIRE">Non Binaire</option>
                         </Select>
                         {/* ----------------------------------------------------------------------------------- */}
                         {/*---------------------------- EMAIL ------------------------------------------------*/}
@@ -286,7 +303,7 @@ export const FormRegister = () => {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
-                        {/*---------------------------- FIRSTNAME ------------------------------------------------*/}
+                        {/*---------------------------- FirstNAME ------------------------------------------------*/}
                     </Div>
                     <Div2>
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
@@ -302,15 +319,15 @@ export const FormRegister = () => {
                             onChange={(e) => setFirstName(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
-                        {/*---------------------------- BIRTHDATE ------------------------------------------------*/}
+                        {/*---------------------------- age ------------------------------------------------*/}
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.birthDate}
+                                {errors.age}
                             </LabelError>
                         </DivError>
                         <InputField
                             type="date"
-                            value={birthDate}
+                            value={age}
                             onChange={handleDateChange}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
@@ -331,27 +348,27 @@ export const FormRegister = () => {
                         <ImgEye src={eye} onClick={handleShowPassword} />
                         {/* ----------------------------------------------------------------------------------- */}
                     </Div2>
-                    <Button type="button" onClick={InverserDate} disabled={isLoading}>
+                    <Button type="button" onClick={handleNext} disabled={isLoading}>
                         {isLoading ? "Validation..." : "Suivant"}
                     </Button>
                 </FormularRegister>
             )}
 
             {currentForm === "formMoreInfo" && (
-                <FormMoreInfo>
+                <FormMoreInfo method="post" encType="multipart/form-data">
                     <TitleForm2>Informations supplémentaires</TitleForm2>
                     <Div>
-                        {/*---------------------------- AVATAR ------------------------------------------------*/}
+                        {/*---------------------------- file ------------------------------------------------*/}
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.avatar}
+                                {errors.file}
                             </LabelError>
                         </DivError>
-                        <ImgAvatar src={avatar} />
+                        <ImgAvatar src={file} />
                         <InputAvatar
                             type="file" // Input de type file
-                            name="avatar"
-                            accept=".jpg, .jpeg, .png" // extension avatar accepter
+                            name="file"
+                            accept=".jpg, .jpeg, .png" // extension file accepter
                             onChange={handlePictureChange}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
@@ -374,6 +391,7 @@ export const FormRegister = () => {
                         {/* ----------------------------------------------------------------------------------- */}
                         {/*---------------------------- DESCRIPTION ------------------------------------------------*/}
                         <Description
+                            type="text"
                             name="description"
                             onChange={(e) => setDescription(e.target.value)}
                             onInput={handleAutoRedimText}
