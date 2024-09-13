@@ -14,7 +14,7 @@ import lombok.*;
 public class PictureDto {
     private long id;
     private int version;
-    private String pathPicture;
+    //private String pathPicture;
     private String pictureName;
     private Long userId;
 }

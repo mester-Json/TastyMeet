@@ -1,31 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as styles from './Profil.style.jsx';
 
 export const Profil = () => {
-    const [profile, setProfile] = useState({
-        firstName: 'John',
-        lastName: 'Doe',
-        gender: 'Male',
-        orientation: 'Male',
-        email: 'john.doe@example.com',
-        phone: '0655321347',
-        address: '123 Route de turin, Nice, France',
-        description: 'Ceci est ma description',
-        photos: [
-            'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-            'https://swello.com/fr/blog/wp-content/uploads/2018/07/profil-personnel.jpg',
-            'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-        ],
-    });
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [gender, setGender] = useState('');
+    const [age, setAge] = useState('');
+    const [orientation, setOrientation] = useState('');
+    const [description, setDescription] = useState('');
+    const [phone, setPhone] = useState('');
+    const [location, setLocation] = useState('');
+    const [city, setCity] = useState('');
+    const [pictures, setPictures] = useState([]);
 
+
+    useEffect(() => {
+        // Chargement des données du profil utilisateur
+        const fetchProfileData = async () => {
+            try {
+                const response = await fetch('http://localhost:9090/api/profile/22');
+                if (response.ok) {
+                    const data = await response.json();
+                    // Mettez à jour les états avec les données récupérées
+                    setEmail(data.email);
+                    setFirstName(data.firstName);
+                    setLastName(data.lastName);
+                    setGender(data.gender);
+                    setAge(data.age);
+                    setOrientation(data.orientation || '');
+                    setDescription(data.description);
+                    setPhone(data.phone);
+                    setLocation(data.location || '');
+                    setCity(data.city || '');
+                    setPictures(data.pictures);
+                } else {
+                    setError('Erreur lors de la récupération des données.');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                setError('Une erreur est survenue lors de la récupération des données.');
+            }
+        };
+
+        fetchProfileData();
+    }, []);
     //gère les modif des champs du formulaire
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setProfile({
-            ...profile,
-            [name]: value,
-        });
-    };
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setProfile({
+    //         ...profile,
+    //         [name]: value,
+    //     });
+    // };
     const [error, setError] = useState(null);
 
     // composant qui s'affiche ou se désafiche lorsque l'on clique sur "Modifier mdp"
@@ -102,39 +130,38 @@ export const Profil = () => {
                 <div style={styles.leftColumn}>
                     <form>
                         <div style={styles.row}>
-
                             <input
                                 type="text"
                                 name="firstName"
-                                value={profile.firstName}
-                                onChange={handleChange}
+                                value={firstName}
                                 placeholder="Prénom"
+                                onChange={(e) => setFirstName(e.target.value)}
                                 style={styles.input}
                             />
                             <input
                                 type="text"
                                 name="lastName"
-                                value={profile.lastName}
-                                onChange={handleChange}
+                                value={lastName}
                                 placeholder="Nom"
+                                onChange={(e) => setLastName(e.target.value)}
                                 style={styles.input}
                             />
                         </div>
                         <div style={styles.row}>
                             <input
                                 type="text"
-                                name="address"
-                                value={profile.address}
-                                onChange={handleChange}
+                                name="location"
+                                value={location}
                                 placeholder="Adresse"
+                                onChange={(e) => setLocation(e.target.value)}
                                 style={{ ...styles.input, marginTop: '10px' }}
                             />
                             <input
                                 type="tel"
                                 name="phone"
-                                value={profile.phone}
-                                onChange={handleChange}
+                                value={phone}
                                 placeholder="Téléphone"
+                                onChange={(e) => setPhone(e.target.value)}
                                 style={styles.input}
                             />
                         </div>
@@ -144,69 +171,71 @@ export const Profil = () => {
                                 <p>Genre :</p>
                                 <select
                                     name="gender"
-                                    value={profile.gender}
-                                    onChange={handleChange}
+                                    value={gender}
+                                    onChange={(e) => setGender(e.target.value)}
                                     style={styles.select}
                                 >
-                                    <option value="Male">Homme</option>
-                                    <option value="Female">Femme</option>
-                                    <option value="Other">Autre</option>
+                                    <option value="MALE">Homme</option>
+                                    <option value="FEMALE">Femme</option>
+                                    <option value="TRANS">trans</option>
+                                    <option value="NONBINAIRE">Non binaire</option>
                                 </select>
                             </div>
                             <div style={{ width: '100%' }}>
                                 <p>Orientation :</p>
                                 <select
                                     name="orientation"
-                                    value={profile.orientation}
-                                    onChange={handleChange}
+                                    value={orientation}
+                                    onChange={(e) => setOrientation(e.target.value)}
                                     style={styles.select}
                                 >
-                                    <option value="Male">Homme</option>
-                                    <option value="Female">Femme</option>
-                                    <option value="Other">Autre</option>
+                                    <option value="MALE">Homme</option>
+                                    <option value="FEMALE">Femme</option>
+                                    <option value="TRANS">trans</option>
+                                    <option value="NONBINAIRE">Non binaire</option>
                                 </select>
-
                             </div>
                         </div>
                         <textarea
                             name="description"
                             maxLength="200"
-                            value={profile.description}
-                            onChange={handleChange}
+                            value={description}
                             placeholder="Description"
+                            onChange={(e) => setDescription(e.target.value)}
                             style={{ ...styles.input, ...styles.textarea, marginTop: '10px' }}
                         ></textarea>
 
-                        <button style={styles.buttonModif} onClick={handleChange}>
+                        <button style={styles.buttonModif}>
                             Accepter les modifications
                         </button>
                         <div style={styles.rowButtons}>
                             <button style={styles.button} onClick={togglePasswordForm}>
                                 {showPasswordForm ? 'Annuler' : 'Modifier le mot de passe'}
                             </button>
-                            <button style={styles.button} type="submit" onClick={toggleEmailForm}>
+                            <button style={styles.button} onClick={toggleEmailForm}>
                                 {showEmailForm ? 'Annuler' : "Modifier l'email"}
                             </button>
                         </div>
-                        <div style={styles.rowButtons}>
-                            {error && <label style={{ color: 'red' }}>{error}</label>} {/* Display error message */}
-                        </div>
+                        {error && (
+                            <div style={styles.rowButtons}>
+                                <label style={{ color: 'red' }}>{error}</label> {/* Affiche le message d'erreur */}
+                            </div>
+                        )}
                     </form>
                 </div>
-
 
                 <div style={styles.rightColumn}>
                     <h2 style={styles.photoGalleryHeader}>Galerie de Photos</h2>
                     <div style={styles.photos}>
-                        {profile.photos.slice(0, 4).map((photo, index) => (
+                        {pictures.slice(0, 4).map((photo, index) => (
                             <img
                                 key={index}
-                                src={photo}
+                                src={`http://localhost:9090/api/show/${photo.pictureName}`}
                                 alt={`Photo ${index + 1}`}
                                 style={styles.photo}
                             />
                         ))}
-                        {profile.photos.length < 4 && (
+                        {pictures.length < 4 && (
                             <label style={styles.photo}>
                                 <input
                                     type="file"
@@ -219,6 +248,7 @@ export const Profil = () => {
                     </div>
                 </div>
             </div>
+
             {showPasswordForm && (
                 <form onSubmit={handlePasswordChange} style={styles.ShowForm}>
                     <div style={styles.row}>
@@ -229,7 +259,6 @@ export const Profil = () => {
                             placeholder="Mot de passe actuel"
                             style={styles.ShowInput}
                         />
-
                     </div>
                     <div style={styles.row}>
                         <input
@@ -258,10 +287,9 @@ export const Profil = () => {
                             type="email"
                             value={currentEmail}
                             onChange={(e) => setCurrentEmail(e.target.value)}
-                            placeholder="email actuel"
+                            placeholder="Email actuel"
                             style={styles.ShowInput}
                         />
-
                     </div>
                     <div style={styles.row}>
                         <input
@@ -279,8 +307,6 @@ export const Profil = () => {
                             style={styles.ShowInput}
                         />
                         <button type="submit" style={styles.button}>Changer l'email</button>
-
-
                     </div>
                 </form>
             )}

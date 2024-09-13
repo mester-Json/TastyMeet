@@ -5,6 +5,9 @@ import fr.tastymeet.apitastymeet.services.IPictureService;
 import fr.tastymeet.apitastymeet.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -57,29 +60,29 @@ public class PictureController {
         }
     }
 
-    @GetMapping(value="display/images/{id}", produces = "application/json")
-    public ResponseEntity<List<Path>> displayImage(@PathVariable("id") long userId) {
-        List<PictureDto> dtos = pictureService.getPictureByUserId(userId);
-        List<Path> paths= new ArrayList<>();
-        for(PictureDto dto: dtos){
-            paths.add(Path.of(dto.getPathPicture()));
-        }
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(paths);
+//    @GetMapping(value="display/images/{id}", produces = "application/json")
+//    public ResponseEntity<List<Path>> displayImage(@PathVariable("id") long userId) {
+//        List<PictureDto> dtos = pictureService.getPictureByUserId(userId);
+//        List<Path> paths= new ArrayList<>();
+//        for(PictureDto dto: dtos){
+//            paths.add(Path.of(dto.getPathPicture()));
+//        }
+//        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(paths);
+//
+//    }
 
-    }
-
-   /* @GetMapping("/show")
-    public ResponseEntity<byte[]> getImage() throws IOException {
+    @GetMapping("/show/{imageName}")
+    public ResponseEntity<Resource> getImage(@PathVariable String imageName) throws IOException {
         // Chemin vers l'image dans le dossier resources/images
-        Resource imgFile = new ClassPathResource("images/your-image.jpg");
+        Resource imgFile = new ClassPathResource("images/"+imageName);
 
         // Lire le fichier d'image sous forme de tableau de bytes
-        byte[] imageBytes = Files.readAllBytes(Path.of(imgFile.getURI()));
+        // byte[] imageBytes = Files.readAllBytes(Path.of(imgFile.getURI()));
 
         // Ajouter les en-têtes nécessaires
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "image/jpeg");  // Ou "image/png" selon le type d'image
 
-        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
-    }*/
+        return new ResponseEntity<>(imgFile, headers, HttpStatus.OK);
+    }
 }

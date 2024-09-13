@@ -84,6 +84,10 @@ export const Home = () => {
         document.addEventListener('mouseup', handleMouseUp);
     };
 
+    // user.gender  MALe
+    // user.orientation female
+
+    
 
     const cardData = [
         {

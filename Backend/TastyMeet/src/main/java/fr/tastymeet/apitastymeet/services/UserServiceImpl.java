@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -80,4 +81,9 @@ public class UserServiceImpl implements IUserService {
         return DtoTool.convert(u, UserDto.class);
     }
 
+    public UserDto getById(long id){
+        Optional<User> u= userRepository.findById(id);
+
+        return DtoTool.convert(u, UserDto.class);
+    }
 }
