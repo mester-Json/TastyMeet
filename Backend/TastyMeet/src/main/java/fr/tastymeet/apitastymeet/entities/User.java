@@ -41,7 +41,7 @@ public class User {
     private Gender gender;
     @Column(name = "orientation", nullable = true)
     private Gender orientation;
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone", nullable = true)
     private long phone;
     @Column(name = "location", nullable = true)
     private String location;

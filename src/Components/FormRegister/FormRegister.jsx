@@ -47,7 +47,7 @@ export const FormRegister = () => {
     const [currentForm, setCurrentForm] = useState("formularRegister");
     const [description, setDescription] = useState("");
     const [phone, setPhone] = useState(null);
-    const [avatar, setAvatar] = useState(avatarDefault);
+    const [file, setFile] = useState(avatarDefault);
     const [eye, setEye] = useState(eyeClose);
     /*----------------------------------------------------------------------------*/
     /*---------------------------- useEffect ------------------------------------------------*/
@@ -79,6 +79,9 @@ export const FormRegister = () => {
     //     setAge(`${day}-${month}-${year}`);
 
     // }; 
+
+
+
 
     /*---------------------------- handle... ------------------------------------------------*/
     // Fonction d'inscription
@@ -135,8 +138,8 @@ export const FormRegister = () => {
                 }
                 break;
             case "formMoreInfo":
-                if (avatar === avatarDefault) {
-                    newErrors.avatar = "L'avatar est requis";
+                if (file === avatarDefault) {
+                    newErrors.file = "L'avatar est requis";
                     setShowError(true);
                 } else {
                     setShowError(false);
@@ -155,23 +158,27 @@ export const FormRegister = () => {
                 break;
         }
 
+        const formData = new FormData();
+        formData.append("firstName", firstName);
+        formData.append("lastName", lastName);
+        formData.append("age", age);
+        formData.append("password", password);
+        formData.append("description", description);
+        formData.append("email", email);
+        formData.append("phone", phone);
+        formData.append("gender", gender);
+        formData.append("file", file); // fichier ajouté ici
+
+
+
         // Si pas d'erreurs, soumettre le formulaire
         if (Object.keys(newErrors).length === 0) {
             // Si pas d'erreurs, effectuer la requête POST pour soumettre les données
             setIsLoading(true);
+
             fetch("http://localhost:9090/api/addUser", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    firstName,
-                    lastName,
-                    age,
-                    password,
-                    description,
-                    email,
-                    phone,
-                    gender,
-                }),
+                body: formData,
             })
                 .then((response) => {
                     if (!response.ok) {
@@ -193,7 +200,17 @@ export const FormRegister = () => {
             setErrors(newErrors);
         }
     };
-
+    console.log("Data to be sent:", {
+        firstName,
+        lastName,
+        age,
+        password,
+        description,
+        email,
+        phone,
+        gender,
+        file,
+    });
     // set la date de naissance
     const handleDateChange = (event) => {
         setAge(event.target.value);
@@ -201,19 +218,14 @@ export const FormRegister = () => {
 
     // Fonction test pour afficher le form2
     const handleNext = async () => {
-        handleLogin();
         handleFormSwitch("formMoreInfo");
     };
 
-    // Changement de l'avatar par défaut, par le nouvelle avatar
+    // Changement de l'file par défaut, par le nouvelle file
     const handlePictureChange = (e) => {
-        const file = e.target.files[0]; // Sélectionne le premier fichier
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setAvatar(reader.result); // Stocke l'URL de l'image dans l'état
-            };
-            reader.readAsDataURL(file); // Lit le fichier comme une URL de données
+        const selectedFile = e.target.files[0]; // Sélectionne le premier fichier
+        if (selectedFile) {
+            setFile(selectedFile); // Stocke l'objet File dans l'état
         }
     };
 
@@ -243,7 +255,7 @@ export const FormRegister = () => {
     return (
         <>
             {currentForm === "formularRegister" && (
-                <FormularRegister>
+                <FormularRegister method="post" encType="multipart/form-data">
                     <TitleForm1>Inscription</TitleForm1>
                     <Div>
                         {/*---------------------------- lastName ------------------------------------------------*/}
@@ -272,8 +284,8 @@ export const FormRegister = () => {
                             onChange={(e) => setGender(e.target.value)}
                         >
                             <option value="">Veuillez Choisir un Genre</option>
-                            <option value="HOMME">Homme</option>
-                            <option value="FEMME">Femme</option>
+                            <option value="MALE">Homme</option>
+                            <option value="FEMALE">Femme</option>
                             <option value="TRANS">Trans</option>
                             <option value="NONBINAIRE">Non Binaire</option>
                         </Select>
@@ -336,27 +348,27 @@ export const FormRegister = () => {
                         <ImgEye src={eye} onClick={handleShowPassword} />
                         {/* ----------------------------------------------------------------------------------- */}
                     </Div2>
-                    <Button type="button" onClick={handleLogin} disabled={isLoading}>
+                    <Button type="button" onClick={handleNext} disabled={isLoading}>
                         {isLoading ? "Validation..." : "Suivant"}
                     </Button>
                 </FormularRegister>
             )}
 
             {currentForm === "formMoreInfo" && (
-                <FormMoreInfo>
+                <FormMoreInfo method="post" encType="multipart/form-data">
                     <TitleForm2>Informations supplémentaires</TitleForm2>
                     <Div>
-                        {/*---------------------------- AVATAR ------------------------------------------------*/}
+                        {/*---------------------------- file ------------------------------------------------*/}
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.avatar}
+                                {errors.file}
                             </LabelError>
                         </DivError>
-                        <ImgAvatar src={avatar} />
+                        <ImgAvatar src={file} />
                         <InputAvatar
                             type="file" // Input de type file
-                            name="avatar"
-                            accept=".jpg, .jpeg, .png" // extension avatar accepter
+                            name="file"
+                            accept=".jpg, .jpeg, .png" // extension file accepter
                             onChange={handlePictureChange}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
@@ -379,6 +391,7 @@ export const FormRegister = () => {
                         {/* ----------------------------------------------------------------------------------- */}
                         {/*---------------------------- DESCRIPTION ------------------------------------------------*/}
                         <Description
+                            type="text"
                             name="description"
                             onChange={(e) => setDescription(e.target.value)}
                             onInput={handleAutoRedimText}

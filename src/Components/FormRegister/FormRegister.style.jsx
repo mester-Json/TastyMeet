@@ -59,7 +59,7 @@ export const InputAvatar = styled.input
     `;
 /* ----------------------------------------*/
 /* -----------------Button+Select-----------------------*/
-export const  Select = styled.select
+export const Select = styled.select
     `
         width: 320px;
         padding: 10px;
@@ -155,20 +155,20 @@ export const LabelError = styled.label
     `;
 /* ----------------------------------------*/
 /* -----------------Div-----------------------*/
-export  const  Div = styled.div
+export const Div = styled.div
     `
         display: flex;
         flex-direction: column;
         margin-right: 5px;
 
     `;
-export  const  Div2 = styled.div
+export const Div2 = styled.div
     `
         display: flex;
         flex-direction: column;
         margin-left: 5px;
     `;
-export  const  DivError = styled.div
+export const DivError = styled.div
     `
         height: 25px;
         text-align: left ;
