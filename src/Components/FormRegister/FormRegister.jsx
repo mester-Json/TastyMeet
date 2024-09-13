@@ -48,6 +48,7 @@ export const FormRegister = () => {
     const [description, setDescription] = useState("");
     const [phone, setPhone] = useState(null);
     const [file, setFile] = useState(avatarDefault);
+    const [urlFile, setUrlFile] = useState(avatarDefault);
     const [eye, setEye] = useState(eyeClose);
     /*----------------------------------------------------------------------------*/
     /*---------------------------- useEffect ------------------------------------------------*/
@@ -83,12 +84,10 @@ export const FormRegister = () => {
 
 
 
-    /*---------------------------- handle... ------------------------------------------------*/
-    // Fonction d'inscription
-    const handleLogin = async () => {
-        console.log(age);
+    /*********************** handleNext************************/
+    // Fonction test pour afficher le form2
+    const handleNext = async () => {
         const newErrors = {};
-
         switch (currentForm) {
             case "formularRegister":
                 if (!lastName) {
@@ -137,6 +136,28 @@ export const FormRegister = () => {
                     setShowError(false);
                 }
                 break;
+            default:
+                console.error("Formulaire non reconnu");
+                break;
+        }
+        // Si pas d'erreurs, soumettre le formulaire
+        if (Object.keys(newErrors).length === 0) {
+
+            handleFormSwitch("formMoreInfo");
+        } else {
+            setErrors(newErrors);
+        }
+
+    };
+
+    /*****************************************************************************/
+    /*****************************handleLogin**********************************/
+    // Fonction d'inscription
+    const handleLogin = async () => {
+        console.log(age);
+        const newErrors = {};
+
+        switch (currentForm) {
             case "formMoreInfo":
                 if (file === avatarDefault) {
                     newErrors.file = "L'avatar est requis";
@@ -170,7 +191,6 @@ export const FormRegister = () => {
         formData.append("file", file); // fichier ajouté ici
 
 
-
         // Si pas d'erreurs, soumettre le formulaire
         if (Object.keys(newErrors).length === 0) {
             // Si pas d'erreurs, effectuer la requête POST pour soumettre les données
@@ -200,34 +220,35 @@ export const FormRegister = () => {
             setErrors(newErrors);
         }
     };
-    console.log("Data to be sent:", {
-        firstName,
-        lastName,
-        age,
-        password,
-        description,
-        email,
-        phone,
-        gender,
-        file,
-    });
     // set la date de naissance
     const handleDateChange = (event) => {
         setAge(event.target.value);
     };
 
     // Fonction test pour afficher le form2
-    const handleNext = async () => {
-        handleFormSwitch("formMoreInfo");
-    };
 
-    // Changement de l'file par défaut, par le nouvelle file
+
     const handlePictureChange = (e) => {
         const selectedFile = e.target.files[0]; // Sélectionne le premier fichier
         if (selectedFile) {
             setFile(selectedFile); // Stocke l'objet File dans l'état
         }
+        handlePictureDisplay(e);
     };
+
+    // Changement de l'file par défaut, par le nouvelle file
+    const handlePictureDisplay = (e) => {
+        const file = e.target.files[0]; // Sélectionne le premier fichier
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setUrlFile(reader.result); // Stocke l'URL de l'image dans l'état
+            };
+            reader.readAsDataURL(file); // Lit le fichier comme une URL de données
+        }
+    };
+
+
 
     // Affiche ou non me mot de passe et changer l'oeil
     const handleShowPassword = () => {
@@ -364,7 +385,7 @@ export const FormRegister = () => {
                                 {errors.file}
                             </LabelError>
                         </DivError>
-                        <ImgAvatar src={file} />
+                        <ImgAvatar src={urlFile} />
                         <InputAvatar
                             type="file" // Input de type file
                             name="file"
