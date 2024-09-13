@@ -1,49 +1,93 @@
 import styled from 'styled-components';
 
+/*export const DivPage = styled.div`
+    display: flex;
+    justify-content: center;    /!* Centrer horizontalement *!/
+    align-items: center;        /!* Centrer verticalement *!/
+    height: 100vh;              /!* Prend toute la hauteur de la fenêtre *!/
+    width: 100vw;               /!* Prend toute la largeur de la fenêtre *!/
+`;*/
 /* -----------------Form-----------------------*/
-export const FormularRegister = styled.form
-    `
-        display: flex;
-        flex-wrap: wrap;
-        background-color: rgba(207, 206, 206, 0.5);
-        padding: 20px;
-        max-width: 700px;
-        height: auto;
-        border-radius: 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        justify-content: center;
-        align-items: center;
-        margin: 250px 0 0 600px ;
-        @media (max-width: 768px) {
-            width: 90%;
-        }
-
+export const FormularRegister = styled.form`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(207, 206, 206, 0.5);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+    margin-top:5%; /* Centrer horizontalement en cas de besoin */
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 36.5vw;       /* Taille maximale sur les grands écrans */
+    
+    @media (max-width: 768px) {
+        max-width: 45vw;
+    }
+    
+    @media (max-width: 339px) {
+        max-width: 55vw;
+    }
+    
     `;
-export const FormMoreInfo = styled.form
-    `
-        display: flex;
+export const FormMoreInfo = styled.form`
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(207, 206, 206, 0.5);
+    padding: 20px;
+    border-radius: 20px;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top:5%; /* Centrer horizontalement en cas de besoin */
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 40vw;       /* Taille maximale sur les grands écrans */
+
+/*   @media (max-width: 1610px){
+        max-width: 40vw;
+    }
+    @media (max-width: 1530px){
+        max-width: 45vw;
+    }*/
+    
+    @media (max-width: 1366px) {
+        max-width: 45vw;
+    }
+
+    @media (max-width: 1100px) {
+        max-width: 52vw;
+    }
+    @media (max-width: 830px) {
+        max-width: 58vw;
+    }
+
+    @media (max-width: 339px) {
+        max-width: 55vw;
+    }
+    
+    /*display: flex;
         flex-wrap: wrap;
         background-color: rgba(207, 206, 206, 0.5);
         padding: 20px;
-        max-width: 700px;
+        max-width: 36.5vw;
         height: auto;
         border-radius: 20px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         justify-content: center;
         align-items: center;
-        margin: 250px 0 0 600px ;
-        @media (max-width: 768px) {
-            width: 90%;
-        }
+        margin: 250px 0 0 600px ;*/
     `;
 /* ----------------------------------------*/
 /* -----------------Input-----------------------*/
-export const InputField = styled.input
-    `
-        width: 300px;
+export const InputField = styled.input`
+        width: 14.5vw;
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 20px;
+        font-size: 16px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: box-shadow 0.3s ease;
         margin-bottom: 20px;
@@ -51,61 +95,93 @@ export const InputField = styled.input
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             outline: none;
         }
+    
+    @media (max-width: 1366px){
+        font-size: 12px;
+    }
+    @media (max-width: 768px) {
+        font-size: 10px;
+    }
+    @media (max-width: 411px) {
+        font-size: 8px;
+    }
     `;
-export const InputAvatar = styled.input
-    `
+export const InputAvatar = styled.input`
         padding: 10px;
-        border-radius: 100px;
+        width: 10vw;
+        height: 10vw;  
+        display: none;
+        
     `;
 /* ----------------------------------------*/
 /* -----------------Button+Select-----------------------*/
-export const Select = styled.select
-    `
-        width: 320px;
-        padding: 10px;
-        border-radius: 20px;
-        border: 1px solid #ccc;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transition: box-shadow 0.3s ease;
-        margin-bottom: 20px;
-        &:focus {
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            outline: none;
-        }
-    `;
-export const Button = styled.button
-    `
-        width: 200px;
-        height: 30px;
-        background: #2A0800;
-        color: white;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer ;
+export const Select = styled.select`
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 20px;
+    width: 15.5vw;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s ease;
+    margin-bottom: 20px;
 
-        transition: transform 0.3s ease, background-color 0.3s ease;
+    &:focus {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        outline: none;
+    }
+    @media (max-width: 1366px){
+        font-size: 12px;
+        width: 15.8vw;
+    }
+    @media (max-width: 768px) {
+        font-size: 10px;
+        width: 17.1vw;
+    }
+    @media (max-width: 411px) {
+        width: 20vw;
+        font-size: 7px;
+    }
+`;
+export const Button = styled.button`
 
-        &:hover {
-            background-color: #775144;
-            transform: translateY(5px);
-        }
-    `;
+    height: 30px;
+    background: #2A0800;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    width: 10vw;
+
+    transition: transform 0.3s ease, background-color 0.3s ease;
+
+    &:hover {
+        background-color: #775144;
+        transform: translateY(5px);
+    }
+    @media (max-width: 1366px){
+        font-size: 12px;
+    }
+    @media (max-width: 768px) {
+        font-size: 10px;
+    }
+    @media (max-width: 411px) {
+        font-size: 6px;
+    }
+`;
 /* ----------------------------------------*/
 /* -----------------Img-----------------------*/
-export const ImgAvatar = styled.img
-    `
-        width: 150px;
-        height: 150px;
+export const ImgAvatar = styled.img`
+        width: 10vw;
+        height: 10vw;
         border-radius: 50%;
         box-shadow: 0 5px 10px rgba(0, 0.2, 0.2, 0.8);
         margin-bottom: 10px;
     `;
-export const ImgEye = styled.img
-    `
+export const ImgEye = styled.img`
         position: absolute;
-        right: 640px;
-        top: 54.4%;
-        transform: translateY(-50%);  // Aligne verticalement au centre
+        right: 35.5%;
+        top: 56.4%;
         cursor: pointer;
         width: 20px;
         height: 20px;
@@ -113,63 +189,55 @@ export const ImgEye = styled.img
     `;
 /* ----------------------------------------*/
 /* -----------------Text+Label-----------------------*/
-export const TitleForm1 = styled.h1
-    `
-        position: absolute;
-        font-size: xx-large;
-        color : white;
-        font-weight: bold;
-
-        top: 150px;
-        align-items: center;
-        text-align: center;
-    `;
-export const TitleForm2 = styled.h2
-    `
-        position: absolute;
-        font-size: xx-large;
-        color : white;
-        font-weight: bold;
-
-        top: 150px;
-        align-items: center;
-        text-align: center;
-    `;
-export const P = styled.p
-    `
+export const TitleForm1 = styled.h1`
+    color: white;
+    font-weight: bold;
+    font-size: 35px;
+    text-align: center;
+    margin-top: 20vh;
+`;
+export const P = styled.p`
         font-size: 12px;
-        margin-left: 200px;
+        margin-left: 50%;
+    
+        @media (max-width: 1366px) {
+            font-size: 10px;
+        }
+    
+        @media (max-width: 768px) {
+            font-size: 8px;
+        }
+    
     `;
-export const Description = styled.textarea
-    `
+export const Description = styled.textarea`
         border-radius: 20px;
         padding: 10px;
-        max-height: 250px;
-        height: 100px;
+        height: 14.5vh;
+        width: 14.5vw;
         overflow-y: auto;
+        
     `;
 
-export const LabelError = styled.label
-    `
+export const LabelError = styled.label`
         color: red;
     `;
+
+export  const LabelPhoto = styled.label`
+
+`;
 /* ----------------------------------------*/
 /* -----------------Div-----------------------*/
-export const Div = styled.div
-    `
+export const Div = styled.div`
         display: flex;
         flex-direction: column;
         margin-right: 5px;
-
     `;
-export const Div2 = styled.div
-    `
+export const Div2 = styled.div`
         display: flex;
         flex-direction: column;
         margin-left: 5px;
     `;
-export const DivError = styled.div
-    `
+export const DivError = styled.div`
         height: 25px;
         text-align: left ;
         margin-bottom: 5px;
