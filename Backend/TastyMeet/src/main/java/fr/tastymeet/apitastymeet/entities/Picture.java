@@ -15,7 +15,6 @@ public class Picture {
         private long id;
     @Version
     private int version;
-    //private String pathPicture;
     private String pictureName;
     @ManyToOne
     private User user;

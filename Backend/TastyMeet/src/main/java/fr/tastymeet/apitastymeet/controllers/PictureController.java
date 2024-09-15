@@ -2,14 +2,12 @@ package fr.tastymeet.apitastymeet.controllers;
 
 import fr.tastymeet.apitastymeet.dto.PictureDto;
 import fr.tastymeet.apitastymeet.services.IPictureService;
-import fr.tastymeet.apitastymeet.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,8 +17,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -46,7 +42,6 @@ public class PictureController {
 
             PictureDto dto = new PictureDto();
             dto.setPictureName(file.getOriginalFilename());
-            dto.setPathPicture(String.valueOf(path));
             dto.setUserId(userId);
             pictureService.save(dto);
 
@@ -60,16 +55,6 @@ public class PictureController {
         }
     }
 
-//    @GetMapping(value="display/images/{id}", produces = "application/json")
-//    public ResponseEntity<List<Path>> displayImage(@PathVariable("id") long userId) {
-//        List<PictureDto> dtos = pictureService.getPictureByUserId(userId);
-//        List<Path> paths= new ArrayList<>();
-//        for(PictureDto dto: dtos){
-//            paths.add(Path.of(dto.getPathPicture()));
-//        }
-//        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(paths);
-//
-//    }
 
     @GetMapping("/show/{imageName}")
     public ResponseEntity<Resource> getImage(@PathVariable String imageName) throws IOException {
@@ -84,5 +69,16 @@ public class PictureController {
         headers.add("Content-Type", "image/jpeg");  // Ou "image/png" selon le type d'image
 
         return new ResponseEntity<>(imgFile, headers, HttpStatus.OK);
+    }
+
+    @DeleteMapping(value="delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable("id") long id) throws Exception{
+        PictureDto dto = pictureService.getById(id);
+        if(dto !=null) {
+            pictureService.deleteById(id);
+            return ResponseEntity.status(HttpStatus.OK).body("picture with id = " +id+" deleted.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No picture to delete.");
+        }
     }
 }
