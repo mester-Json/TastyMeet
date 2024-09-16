@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, InputField, Button, Inscription, Mdp } from './FormLogin.style.jsx';
+import { Form, InputField, Button, Inscription, Mdp, Div } from './FormLogin.style.jsx';
 
 export const FormLogin = () => {
     const [email, setEmail] = useState('');
@@ -62,65 +62,67 @@ export const FormLogin = () => {
 
     return (
         <>
-            <Form>
-                <InputField
-                    type="email"
-                    placeholder="Adresse e-mail"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <div style={{
-                    visibility: emailError ? 'visible' : 'hidden',
-                    opacity: emailError ? 1 : 0,
-                    height: '10px',
-                    color: 'red',
-                    textAlign: 'center',
-                    transition: 'opacity 0.3s ease-in-out'
-                }}>
-                    {emailError}
-                </div>
-                <InputField
-                    type="password"
-                    placeholder="Mot de passe"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <div style={{
-                    visibility: passwordError ? 'visible' : 'hidden',
-                    opacity: passwordError ? 1 : 0,
-                    height: '5px',
-                    color: 'red',
-                    textAlign: 'center',
-                    transition: 'opacity 0.3s ease-in-out'
-                }}>
-                    {passwordError}
-                </div>
+            <Div>
+                <Form>
+                    <InputField
+                        type="email"
+                        placeholder="Adresse e-mail"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <div style={{
+                        visibility: emailError ? 'visible' : 'hidden',
+                        opacity: emailError ? 1 : 0,
+                        height: '10px',
+                        color: 'red',
+                        textAlign: 'center',
+                        transition: 'opacity 0.3s ease-in-out'
+                    }}>
+                        {emailError}
+                    </div>
+                    <InputField
+                        type="password"
+                        placeholder="Mot de passe"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <div style={{
+                        visibility: passwordError ? 'visible' : 'hidden',
+                        opacity: passwordError ? 1 : 0,
+                        height: '5px',
+                        color: 'red',
+                        textAlign: 'center',
+                        transition: 'opacity 0.3s ease-in-out'
+                    }}>
+                        {passwordError}
+                    </div>
 
-                {/* Message d'erreur global */}
-                <div style={{
-                    visibility: showError ? 'visible' : 'hidden',
-                    opacity: showError ? 1 : 0,
-                    height: '5px',
-                    textAlign: 'center',
-                    transition: 'opacity 0.3s ease-in-out'
-                }}>
-                    <label style={{ color: 'red' }}>
-                        {error}
-                    </label>
-                </div>
+                    {/* Message d'erreur global */}
+                    <div style={{
+                        visibility: showError ? 'visible' : 'hidden',
+                        opacity: showError ? 1 : 0,
+                        height: '5px',
+                        textAlign: 'center',
+                        transition: 'opacity 0.3s ease-in-out'
+                    }}>
+                        <label style={{ color: 'red' }}>
+                            {error}
+                        </label>
+                    </div>
 
-                <Button type="button" onClick={handleLogin} disabled={isLoading}>
-                    {isLoading ? 'Connexion...' : 'Se connecter'}
-                </Button>
-                <div>
-                    <Inscription to={"/register"}>
-                        Inscription
-                    </Inscription>
-                    <Mdp>
-                        Mot de passe Oublié
-                    </Mdp>
-                </div>
-            </Form>
+                    <Button type="button" onClick={handleLogin} disabled={isLoading}>
+                        {isLoading ? 'Connexion...' : 'Se connecter'}
+                    </Button>
+                    <div>
+                        <Inscription to={"/register"}>
+                            Inscription
+                        </Inscription>
+                        <Mdp>
+                            Mot de passe Oublié
+                        </Mdp>
+                    </div>
+                </Form>
+            </Div>
         </>
     );
 };
