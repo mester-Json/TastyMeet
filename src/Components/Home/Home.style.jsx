@@ -6,7 +6,7 @@ export const Container = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 150px;
+    margin-top:100px;
     height: 70vh;
 `;
 
@@ -33,14 +33,16 @@ export const Card = styled.div`
 `;
 
 export const ImageContainer = styled.div`
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background-color: #333;
-  display: flex;
-  flex-wrap:wrap;
-  justify-content: space-around;
+    width: 100px; 
+    height: 100px;
+    border-radius: 50%;
+    background-color: #333;
+    margin-top:50px;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
 `;
+
 
 export const Name = styled.h2`
     font-size: 1.5em;
@@ -131,11 +133,5 @@ height: 200px ;
 `
 
 export const PictureSlider = styled(Slider)`
-    width:100%;
-    
+    width: 100%;
 `;
-
-export const Div = styled.div`
-    background-color:red;
-    height:45px;
-`
