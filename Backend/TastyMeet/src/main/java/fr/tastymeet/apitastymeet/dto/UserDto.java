@@ -5,6 +5,7 @@ import fr.tastymeet.apitastymeet.entities.Gender;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +23,11 @@ public class UserDto {
     private String phone;
     private String password;
     private String firstName;
+    private String lastName;
     private String city;
     private String location;
     private LocalDate age;
     private List<PictureDto> pictures = new ArrayList<>();
     private GenderDto gender;
     private GenderDto orientation;
-
 }

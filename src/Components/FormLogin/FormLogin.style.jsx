@@ -7,7 +7,8 @@ export const Form = styled.form`
   background-color: rgba(207, 206, 206, 0.5);
   padding: 20px;
   width: 80%;
-  max-width: 450px;
+  max-width: 550px;
+  min-width:150px;
   height: auto;
   margin: 20px auto;
   border-radius: 20px;
@@ -16,8 +17,8 @@ export const Form = styled.form`
 `;
 
 export const InputField = styled.input`
-  width: calc(100% - 20px);
-  padding: 10px;
+  width: calc(100% - 35px);
+  padding: 12px;
   margin: 25px 15px 0 0;
   border: 1px solid #ccc;
   border-radius: 20px;
@@ -28,10 +29,11 @@ export const InputField = styled.input`
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     outline: none;
   }
+
 `;
 
 export const Button = styled.button`
-  width: calc(100% - 20px);
+  width: calc(100% - auto);
   padding: 10px ;
   background: #2A0800;
   color: white;
@@ -54,6 +56,11 @@ export const Inscription = styled(Link)`
 
   &:hover {
     color: #775144;
+  }  
+  @media(max-width:425px;) {
+    font-size:5px;
+    margin: 5px  ;
+
   }
 `;
 
@@ -64,6 +71,11 @@ export const Mdp = styled(Link)`
 
   &:hover {
     color: #775144;
+  }
+  @media(max-width:425px;) {
+    font-size:5px;
+    margin: 5px  ;
+
   }
 `;
 

@@ -15,8 +15,7 @@ public class Picture {
         private long id;
     @Version
     private int version;
-    private byte[] picture;
-    private String pictureBase64;
+    private String pictureName;
     @ManyToOne
     private User user;
 }

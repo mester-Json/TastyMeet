@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Slider from 'react-slick';
 
 
 export const Container = styled.div`
@@ -10,7 +11,7 @@ export const Container = styled.div`
 `;
 
 
-export  const Card = styled.div`
+export const Card = styled.div`
     width: 350px;
     height: 450px;
     background-color: dodgerblue; 
@@ -23,23 +24,22 @@ export  const Card = styled.div`
     position: relative;
     cursor: grab;
     user-select: none;
-    transition: transform 0.3s ease-in-out;
+    /* transition: transform 0.3s ease-in-out;
     &:hover {
         transform: scale(1.1);
         transition-duration: 0.5s;
-    } 
+    }  */
 
 `;
 
-export  const  ImageContainer = styled.div`
+export const ImageContainer = styled.div`
   width: 100px;
   height: 100px;
   border-radius: 50%;
   background-color: #333;
   display: flex;
-  justify-content: center;
-  align-items: center;
-    margin-top: 70px;
+  flex-wrap:wrap;
+  justify-content: space-around;
 `;
 
 export const Name = styled.h2`
@@ -128,4 +128,14 @@ export const DescriptionPersso = styled.div`
 height: 200px ;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
+`
+
+export const PictureSlider = styled(Slider)`
+    width:100%;
+    
+`;
+
+export const Div = styled.div`
+    background-color:red;
+    height:45px;
 `

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,9 +39,9 @@ public class User {
     private String password;
     @Column(name = "gender", nullable = false)
     private Gender gender;
-    @Column(name = "orientation", nullable = false)
+    @Column(name = "orientation", nullable = true)
     private Gender orientation;
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone", nullable = true)
     private long phone;
     @Column(name = "location", nullable = true)
     private String location;
@@ -49,6 +50,7 @@ public class User {
     @Column(name = "admin")
     private boolean admin = false;
     @OneToMany(mappedBy = "user")
+    @Column(nullable = true)
     private List<Picture> pictures = new ArrayList<>();
 
 }
