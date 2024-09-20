@@ -17,14 +17,11 @@ export const Card = styled.div`
 `;
 
 export const DivImage = styled.div`
-    width: 350px;
+    width: 450px;
     height: 400px;
     border-radius: 20px;
-    /* box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
     position: relative;
     cursor: grab;
     user-select: none;
@@ -37,7 +34,6 @@ export const DivImage = styled.div`
 
 export const DivDescriptionPersso = styled.div`
 margin-top :-50px;
-width:auto;
 
 `
 
@@ -140,11 +136,12 @@ export const DescriptionPersso = styled.div`
 `
 
 
+
+
 export const Img = styled.img`
-    width: calc(100% );
+    width:450px;
     height: 350px;
     boxShadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ; 
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
 
