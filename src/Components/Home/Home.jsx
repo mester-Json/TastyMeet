@@ -5,11 +5,12 @@ import {
     RightArrow,
     GenderAge,
     LeftArrow,
-    ImageContainer,
+    Img,
     Container,
     Description,
     DescriptionPersso,
-    PictureSlider,
+    DivImage,
+    DivDescriptionPersso
 } from "./Home.style.jsx";
 import { faHeart, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,21 +19,20 @@ import Slider from 'react-slick';
 export const Home = () => {
     const [profiles, setProfiles] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [imageIndex, setImageIndex] = useState(0);
     const currentProfile = profiles[currentIndex] || { pictures: [] };
     const sliderRef = useRef(null);
-    const [imageIndex, setImageIndex] = useState(0);
+    const autoPlayRef = useRef(null);
 
 
     const settings = {
         dots: false,
         infinite: false, // Pour permettre un défilement infini
-        speed: 500,
+        speed: 1,
         slidesToShow: 1,
         slidesToScroll: 1,
-        arrows: true, // Retire les boutons de navigation
+        arrows: false, // Retire les boutons de navigation
         autoplay: true, // Active le défilement automatique
-        autoplaySpeed: 100,
-        beforeChange: (current, next) => setImageIndex(next),
     };
 
 
@@ -64,6 +64,29 @@ export const Home = () => {
 
         fetchProfileData();
     }, []);
+
+    useEffect(() => {
+
+        setImageIndex(0);
+    }, [currentIndex]);
+
+    useEffect(() => {
+        autoPlayRef.current = setInterval(() => {
+            setImageIndex((prev) => {
+                if (prev + 1 < currentProfile.pictures.length) {
+                    return prev + 1;
+                } else {
+                    return 0;
+                }
+            });
+        }, 10000);
+
+        return () => {
+            clearInterval(autoPlayRef.current);
+        };
+    }, [currentProfile.pictures.length]);
+
+
 
     const cardRef = useRef(null);
 
@@ -111,38 +134,35 @@ export const Home = () => {
                 <FontAwesomeIcon icon={faHeart} />
             </LeftArrow>
             <Card ref={cardRef} onMouseDown={handleMouseDown}>
-                <ImageContainer>
-
-                    <PictureSlider ref={sliderRef} {...settings}>
+                <DivImage>
+                    {/* <ImageContainer> */}
+                    <Slider ref={sliderRef} {...settings}>
                         {currentProfile.pictures.length > 0 ? (
-
                             <div key={imageIndex}>
-
-                                <img
+                                <Img
                                     src={currentProfile.pictures[imageIndex].imageUrl}
                                     alt="Profile"
-                                    style={{ width: '100%', height: 'auto', borderRadius: '90%' }}
                                 />
-
                             </div>
-
                         ) : (
                             <p>Aucune image disponible</p>
                         )}
-                    </PictureSlider>
+                    </Slider>
 
 
+                    {/* </ImageContainer> */}
+                </DivImage>
+                <DivDescriptionPersso>
 
-
-                </ImageContainer>
-                <DescriptionPersso>
-                    <Name>{currentProfile.firstName}</Name>
-                    <GenderAge>
-                        <span>{currentProfile.gender}</span>
-                        <span>{currentProfile.age}</span>
-                    </GenderAge>
-                    <Description>{currentProfile.description}</Description>
-                </DescriptionPersso>
+                    <DescriptionPersso>
+                        <Name>{currentProfile.firstName}</Name>
+                        <GenderAge>
+                            <span>{currentProfile.gender}</span>
+                            <span>{currentProfile.age}</span>
+                        </GenderAge>
+                        <Description>{currentProfile.description}</Description>
+                    </DescriptionPersso>
+                </DivDescriptionPersso>
             </Card>
             <RightArrow onClick={() => setCurrentIndex((prevIndex) => (prevIndex + 1) % profiles.length)}>
                 <FontAwesomeIcon icon={faCircleXmark} />

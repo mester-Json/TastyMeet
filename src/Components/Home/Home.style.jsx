@@ -12,11 +12,15 @@ export const Container = styled.div`
 
 
 export const Card = styled.div`
+
+
+`;
+
+export const DivImage = styled.div`
     width: 350px;
-    height: 450px;
-    background-color: dodgerblue; 
+    height: 400px;
     border-radius: 20px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -29,18 +33,22 @@ export const Card = styled.div`
         transform: scale(1.1);
         transition-duration: 0.5s;
     }  */
+`
 
-`;
+export const DivDescriptionPersso = styled.div`
+margin-top :-50px;
+width:auto;
+
+`
 
 export const ImageContainer = styled.div`
-    width: 100px; 
-    height: 100px;
+    width: 100%; 
+    height: 100%;
     border-radius: 50%;
     background-color: #333;
-    margin-top:50px;
+    margin:auto;
     display: flex;
-    justify-content: center; 
-    align-items: center; 
+
 `;
 
 
@@ -52,7 +60,7 @@ export const Name = styled.h2`
 
 export const Description = styled.p`
     text-align: center;
-    margin-top: 15px;
+
     
 `;
 
@@ -124,14 +132,20 @@ export const GenderAge = styled.div`
 
 export const DescriptionPersso = styled.div`
     background-color: white;
-    margin-top: 20px;
     width: 100%;
     border-top: 9px solid black;
-height: 200px ;
+    height: 200px ;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
 `
 
-export const PictureSlider = styled(Slider)`
-    width: 100%;
-`;
+
+export const Img = styled.img`
+    width: calc(100% );
+    height: 350px;
+    boxShadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ; 
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+
+`
