@@ -17,10 +17,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.1",
     "react-slick": "^0.30.2",
-<<<<<<< HEAD
-=======
     "slick-carousel": "^1.8.1",
->>>>>>> 59db37cd2682d070dd3b652c182b5e64e835a3b2
     "styled-components": "^6.1.13"
   },
   "devDependencies": {
