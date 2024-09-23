@@ -176,7 +176,7 @@ export const Home = () => {
         const token = localStorage.getItem('token'); // Assure-toi de récupérer correctement le token JWT
 
         // Effectuer la requête POST pour le like
-        const likeResponse = await fetch(`http://localhost:9090/api/like/${userId}/${currentProfile.id}/1`, {
+        const likeResponse = await fetch(`http://localhost:9090/api/${userId}/like/${currentProfile.id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -190,7 +190,7 @@ export const Home = () => {
         }
 
         // Vérification du match après le like
-        const matchResponse = await fetch(`http://localhost:9090/api/matches/${userId}`, {
+        const matchResponse = await fetch(`http://localhost:9090/api/${userId}/matches`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -202,7 +202,7 @@ export const Home = () => {
             const matches = await matchResponse.json();
 
             // Vérifie si le profil actuel fait partie des matches
-            const matched = matches.find(match => match.likedUser.id === currentProfile.id);
+            const matched = matches.find(match => match.likedUserId.id === currentProfile.id);
 
             if (matched) {
                 alert(`Vous avez un match avec ${currentProfile.firstName} !`);
