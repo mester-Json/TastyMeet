@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import * as styles from './Profil.style.jsx';
 
+const getUserIdFromToken = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1])); // Décoder le payload
+        return payload.id; // Assurez-vous que l'ID est dans le payload
+    }
+    return null;
+};
+
 export const Profil = () => {
     // Déclaration des états pour les données du profil utilisateur
     const [email, setEmail] = useState('');
@@ -33,7 +42,8 @@ export const Profil = () => {
         // Utilisation du hook useEffect pour charger les données du profil utilisateur au montage du composant
         const fetchProfileData = async () => {
             try {
-                const response = await fetch('http://localhost:9090/api/profile/22');
+                const userId = getUserIdFromToken(); // Récupérer l'ID de l'utilisateur connecté (depuis le token ou l'état global)
+                const response = await fetch(`http://localhost:9090/api/profile/${userId}`);
                 if (response.ok) {
                     const data = await response.json();
                     // Mise à jour des états avec les données récupérées
@@ -42,7 +52,7 @@ export const Profil = () => {
                     setEmail(data.email);
                     setFirstName(data.firstName);
                     setLastName(data.lastName);
-                    setPassword(data.lastName);
+                    setPassword(data.password); // Ne pas stocker le mot de passe en état
                     setGender(data.gender);
                     setAge(data.age);
                     setOrientation(data.orientation || '');
@@ -51,7 +61,6 @@ export const Profil = () => {
                     setLocation(data.location || '');
                     setCity(data.city || '');
                     setPictures(data.pictures);
-                    console.log(id, version);
                 } else {
                     setError('Erreur lors de la récupération des données.');
                 }
@@ -62,7 +71,7 @@ export const Profil = () => {
         };
 
         fetchProfileData(); // Appel de la fonction de récupération des données
-    }, []); // Le tableau vide signifie que cette fonction s'exécute uniquement au montage du composant
+    }, []);// Le tableau vide signifie que cette fonction s'exécute uniquement au montage du composant
 
     const [error, setError] = useState(null);
 
@@ -80,6 +89,7 @@ export const Profil = () => {
         formData.append("password", password);
         formData.append("age", age);
         formData.append("description", description);
+        formData.append("orientation", orientation);
         formData.append("email", email);
         formData.append("phone", phone);
         formData.append("gender", gender);
@@ -149,7 +159,7 @@ export const Profil = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    id: 22,
+                    id: id,
                     currentPassword: currentPassword,
                     newPassword: newPassword,
                     confirmNewPassword: confirmNewPassword,
@@ -203,7 +213,7 @@ export const Profil = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    id: 22,
+                    id: id,
                     currentEmail: currentEmail,
                     newEmail: newEmail,
                     confirmNewEmail: confirmNewEmail,
