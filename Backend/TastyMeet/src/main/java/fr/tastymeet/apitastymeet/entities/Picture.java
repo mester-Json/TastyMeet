@@ -1,5 +1,6 @@
 package fr.tastymeet.apitastymeet.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import lombok.*;
 public class Picture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private long id;
+    private long id;
     @Version
     private int version;
     private String pictureName;

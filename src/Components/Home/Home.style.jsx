@@ -100,6 +100,7 @@ export const LeftArrow = styled(NavArrow)`
     left: 625px;
     color: red;
     font-size: 2em;
+    user-select: none;
 
     &::before {
         box-shadow: 0 0 8px 4px red;
@@ -110,6 +111,7 @@ export const RightArrow = styled(NavArrow)`
     right: 625px; 
     color: mediumspringgreen;
     font-size: 2em;
+    user-select: none;
 
     &::before {
         box-shadow: 0 0 8px 4px mediumspringgreen;
@@ -124,6 +126,8 @@ export const GenderAge = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
+  user-select: none;
+
 `;
 
 export const DescriptionPersso = styled.div`
@@ -133,16 +137,27 @@ export const DescriptionPersso = styled.div`
     height: 200px ;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
+    user-select: none;
+
 `
-
-
 
 
 export const Img = styled.img`
     width:450px;
     height: 350px;
-    boxShadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
 
+
 `
+
+export const SliderStyle = styled(Slider)`
+    user-select: none;
+    outline: none; 
+    border: none;
+    pointer-events: none;
+
+    &:focus {
+        outline: none; /* Supprime le contour lors du focus */
+    }
+`;
