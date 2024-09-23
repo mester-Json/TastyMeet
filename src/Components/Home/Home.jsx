@@ -6,6 +6,7 @@ import {
     GenderAge,
     LeftArrow,
     Img,
+    SliderStyle,
     Container,
     Description,
     DescriptionPersso,
@@ -23,6 +24,7 @@ export const Home = () => {
     const currentProfile = profiles[currentIndex] || { pictures: [] };
     const sliderRef = useRef(null);
     const autoPlayRef = useRef(null);
+    const [dislikedProfiles, setDislikedProfiles] = useState([]);
 
 
     const settings = {
@@ -42,8 +44,14 @@ export const Home = () => {
 
     useEffect(() => {
         const fetchProfileData = async () => {
+            const token = localStorage.getItem('token');
             try {
-                const response = await fetch('http://localhost:9090/api/display/MALE/FEMALE');
+                const response = await fetch('http://localhost:9090/api/display', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 if (response.ok) {
                     const data = await response.json();
                     const profilesWithSlides = data.map(profile => ({
@@ -61,14 +69,16 @@ export const Home = () => {
                 console.error('Erreur:', error);
             }
         };
-
         fetchProfileData();
     }, []);
 
     useEffect(() => {
-
+        console.log('Changement d\'index de profil :', currentIndex);
+        console.log('Profil actuel :', currentProfile);
         setImageIndex(0);
     }, [currentIndex]);
+
+
 
     useEffect(() => {
         autoPlayRef.current = setInterval(() => {
@@ -111,13 +121,23 @@ export const Home = () => {
             cardRef.current.style.cursor = 'grab';
             document.removeEventListener('mouseup', handleMouseUp);
             document.removeEventListener('mousemove', handleMouseMove);
+
             const deltaX = upEvent.clientX - startX;
             const absDeltaX = Math.abs(deltaX);
             const isSwipeValid = absDeltaX > MAX_SWIPE_DISTANCE;
 
             if (isSwipeValid) {
-                setCurrentIndex((prevIndex) => (deltaX < 0 ? (prevIndex + 1) % profiles.length : (prevIndex - 1 + profiles.length) % profiles.length));
+                setCurrentIndex((prevIndex) => {
+                    let nextIndex = deltaX < 0 ? (prevIndex + 1) % profiles.length : (prevIndex + 1 + profiles.length) % profiles.length;
+
+                    // Cherche un profil qui n'est pas dans les profils rejetés
+                    while (dislikedProfiles.includes(nextIndex)) {
+                        nextIndex = (nextIndex + (deltaX < 0 ? 1 : +1) + profiles.length) % profiles.length;
+                    }
+                    return nextIndex;
+                });
             }
+
             cardRef.current.style.transform = '';
         };
 
@@ -125,18 +145,37 @@ export const Home = () => {
         document.addEventListener('mouseup', handleMouseUp);
     };
 
+    const handleDislike = () => {
+        setDislikedProfiles((prev) => [...prev, currentIndex]);
+        setCurrentIndex((prevIndex) => {
+            let nextIndex = (prevIndex + 1) % profiles.length;
+            while (dislikedProfiles.includes(nextIndex)) {
+                nextIndex = (nextIndex + 1) % profiles.length;
+            }
+            return nextIndex;
+        });
+    };
+
+
     console.log(currentProfile)
 
 
     return (
         <Container>
-            <LeftArrow onClick={() => setCurrentIndex((prevIndex) => (prevIndex - 1 + profiles.length) % profiles.length)}>
+            <LeftArrow onClick={() => {
+                const nextIndex = (currentIndex + 1 + profiles.length) % profiles.length;
+                setCurrentIndex(dislikedProfiles.includes(nextIndex) ? currentIndex : nextIndex);
+            }}>
                 <FontAwesomeIcon icon={faHeart} />
             </LeftArrow>
             <Card ref={cardRef} onMouseDown={handleMouseDown}>
                 <DivImage>
-                    {/* <ImageContainer> */}
-                    <Slider ref={sliderRef} {...settings}>
+                    <SliderStyle
+                        ref={sliderRef}
+                        {...settings}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={(e) => e.preventDefault()}
+                    >
                         {currentProfile.pictures.length > 0 ? (
                             <div key={imageIndex}>
                                 <Img
@@ -147,13 +186,9 @@ export const Home = () => {
                         ) : (
                             <p>Aucune image disponible</p>
                         )}
-                    </Slider>
-
-
-                    {/* </ImageContainer> */}
+                    </SliderStyle>
                 </DivImage>
                 <DivDescriptionPersso>
-
                     <DescriptionPersso>
                         <Name>{currentProfile.firstName}</Name>
                         <GenderAge>
@@ -164,7 +199,7 @@ export const Home = () => {
                     </DescriptionPersso>
                 </DivDescriptionPersso>
             </Card>
-            <RightArrow onClick={() => setCurrentIndex((prevIndex) => (prevIndex + 1) % profiles.length)}>
+            <RightArrow onClick={handleDislike}>
                 <FontAwesomeIcon icon={faCircleXmark} />
             </RightArrow>
         </Container>

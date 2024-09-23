@@ -28,57 +28,76 @@ export const FormRegister = () => {
     /*---------------------------- useState ------------------------------------------------*/
     const [errors, setErrors] = useState({
         firstName: "",
-        name: "",
+        lastName: "",
         email: "",
         password: "",
         gender: "",
-        birthDate: "",
+        age: "",
     });
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showError, setShowError] = useState(false);
     const [firstName, setFirstName] = useState("");
-    const [name, setName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [gender, setGender] = useState("");
-    const [birthDate, setBirthDate] = useState("");
+    const [age, setAge] = useState("");
     const [isAdult, setIsAdult] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [currentForm, setCurrentForm] = useState("formularRegister");
     const [description, setDescription] = useState("");
     const [phone, setPhone] = useState(null);
-    const [avatar, setAvatar] = useState(avatarDefault);
+    const [file, setFile] = useState(avatarDefault);
+    const [urlFile, setUrlFile] = useState(avatarDefault);
     const [eye, setEye] = useState(eyeClose);
     /*----------------------------------------------------------------------------*/
     /*---------------------------- useEffect ------------------------------------------------*/
     // fonction qui vérifie l'age
     useEffect(() => {
-        if (birthDate) {
+        if (age) {
             const today = new Date();
-            const birthDateObj = new Date(birthDate);
-            const age = today.getFullYear() - birthDateObj.getFullYear();
+            const birthDateObj = new Date(age);
+            const agePerson = today.getFullYear() - birthDateObj.getFullYear();
 
-            setIsAdult(age >= 18);
+            setIsAdult(agePerson >= 18);
         } else {
             setIsAdult(null);
         }
-    }, [birthDate]);
+    }, [age]);
     /*----------------------------------------------------------------------------*/
-    /*---------------------------- handle... ------------------------------------------------*/
-    // Fonction d'inscription
-    const handleLogin = async () => {
-        const newErrors = {};
 
+    // const ReverseDateTime = () => {
+    //     console.log(age);
+    //     // Convert the date string (YYYY-MM-DD) into a Date object
+    //     const date = new Date(age);
+
+    //     // Extract day, month, and year from the date object
+    //     const day = date.getDate().toString().padStart(2, '0');
+    //     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+    //     const year = date.getFullYear();
+
+    //     // Format the date as DD-MM-YYYY
+    //     setAge(`${day}-${month}-${year}`);
+
+    // }; 
+
+
+
+
+    /*********************** handleNext************************/
+    // Fonction test pour afficher le form2
+    const handleNext = async () => {
+        const newErrors = {};
         switch (currentForm) {
             case "formularRegister":
-                if (!firstName) {
-                    newErrors.firstName = "Le nom est requis";
+                if (!lastName) {
+                    newErrors.lastName = "Le nom est requis";
                     setShowError(true);
                 } else {
                     setShowError(false);
                 }
-                if (!name) {
-                    newErrors.name = "Le prénom est requis";
+                if (!firstName) {
+                    newErrors.firstName = "Le prénom est requis";
                     setShowError(true);
                 } else {
                     setShowError(false);
@@ -104,22 +123,44 @@ export const FormRegister = () => {
                 } else {
                     setShowError(false);
                 }
-                if (!birthDate) {
-                    newErrors.birthDate = "La date de naissance est requise";
+                if (!age) {
+                    newErrors.age = "La date de naissance est requise";
                     setShowError(true);
                 } else {
                     setShowError(false);
                 }
                 if (isAdult === false) {
-                    newErrors.birthDate = "Vous devez être majeur pour vous inscrire";
+                    newErrors.age = "Vous devez être majeur pour vous inscrire";
                     setShowError(true);
                 } else {
                     setShowError(false);
                 }
                 break;
+            default:
+                console.error("Formulaire non reconnu");
+                break;
+        }
+        // Si pas d'erreurs, soumettre le formulaire
+        if (Object.keys(newErrors).length === 0) {
+
+            handleFormSwitch("formMoreInfo");
+        } else {
+            setErrors(newErrors);
+        }
+
+    };
+
+    /*****************************************************************************/
+    /*****************************handleLogin**********************************/
+    // Fonction d'inscription
+    const handleLogin = async () => {
+        console.log(age);
+        const newErrors = {};
+
+        switch (currentForm) {
             case "formMoreInfo":
-                if (avatar === avatarDefault) {
-                    newErrors.avatar = "L'avatar est requis";
+                if (file === avatarDefault) {
+                    newErrors.file = "L'avatar est requis";
                     setShowError(true);
                 } else {
                     setShowError(false);
@@ -138,24 +179,26 @@ export const FormRegister = () => {
                 break;
         }
 
+        const formData = new FormData();
+        formData.append("firstName", firstName);
+        formData.append("lastName", lastName);
+        formData.append("age", age);
+        formData.append("password", password);
+        formData.append("description", description);
+        formData.append("email", email);
+        formData.append("phone", phone);
+        formData.append("gender", gender);
+        formData.append("file", file); // fichier ajouté ici
+
+
         // Si pas d'erreurs, soumettre le formulaire
         if (Object.keys(newErrors).length === 0) {
             // Si pas d'erreurs, effectuer la requête POST pour soumettre les données
             setIsLoading(true);
-            fetch("http://localhost:5173/register", {
+
+            fetch("http://localhost:9090/api/addUser", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    firstName,
-                    name,
-                    gender,
-                    email,
-                    password,
-                    birthDate,
-                    phone,
-                    description,
-                    avatar,
-                }),
+                body: formData,
             })
                 .then((response) => {
                     if (!response.ok) {
@@ -177,29 +220,35 @@ export const FormRegister = () => {
             setErrors(newErrors);
         }
     };
-
     // set la date de naissance
     const handleDateChange = (event) => {
-        setBirthDate(event.target.value);
+        setAge(event.target.value);
     };
 
     // Fonction test pour afficher le form2
-    const handleNext = async () => {
-        handleLogin();
-        handleFormSwitch("formMoreInfo");
+
+
+    const handlePictureChange = (e) => {
+        const selectedFile = e.target.files[0]; // Sélectionne le premier fichier
+        if (selectedFile) {
+            setFile(selectedFile); // Stocke l'objet File dans l'état
+        }
+        handlePictureDisplay(e);
     };
 
-    // Changement de l'avatar par défaut, par le nouvelle avatar
-    const handlePictureChange = (e) => {
+    // Changement de l'file par défaut, par le nouvelle file
+    const handlePictureDisplay = (e) => {
         const file = e.target.files[0]; // Sélectionne le premier fichier
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setAvatar(reader.result); // Stocke l'URL de l'image dans l'état
+                setUrlFile(reader.result); // Stocke l'URL de l'image dans l'état
             };
             reader.readAsDataURL(file); // Lit le fichier comme une URL de données
         }
     };
+
+
 
     // Affiche ou non me mot de passe et changer l'oeil
     const handleShowPassword = () => {
@@ -227,21 +276,21 @@ export const FormRegister = () => {
     return (
         <>
             {currentForm === "formularRegister" && (
-                <FormularRegister>
+                <FormularRegister method="post" encType="multipart/form-data">
                     <TitleForm1>Inscription</TitleForm1>
                     <Div>
-                        {/*---------------------------- FIRSTNAME ------------------------------------------------*/}
+                        {/*---------------------------- lastName ------------------------------------------------*/}
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.firstName}
+                                {errors.lastName}
                             </LabelError>
                         </DivError>
                         <InputField
                             type="text"
                             placeholder="Nom"
-                            name="firstName" // Ajout du nom pour identifier le champ
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
+                            name="lastName" // Ajout du nom pour identifier le champ
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
                         {/*---------------------------- GENDER ------------------------------------------------*/}
@@ -256,10 +305,10 @@ export const FormRegister = () => {
                             onChange={(e) => setGender(e.target.value)}
                         >
                             <option value="">Veuillez Choisir un Genre</option>
-                            <option value="Homme">Homme</option>
-                            <option value="Femme">Femme</option>
-                            <option value="Furry">Furry</option>
-                            <option value="NonBinaire">Non Binaire</option>
+                            <option value="MALE">Homme</option>
+                            <option value="FEMALE">Femme</option>
+                            <option value="TRANS">Trans</option>
+                            <option value="NONBINAIRE">Non Binaire</option>
                         </Select>
                         {/* ----------------------------------------------------------------------------------- */}
                         {/*---------------------------- EMAIL ------------------------------------------------*/}
@@ -275,31 +324,31 @@ export const FormRegister = () => {
                             onChange={(e) => setEmail(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
-                        {/*---------------------------- NAME ------------------------------------------------*/}
+                        {/*---------------------------- FirstNAME ------------------------------------------------*/}
                     </Div>
                     <Div2>
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.name}
+                                {errors.firstName}
                             </LabelError>
                         </DivError>
                         <InputField
                             type="text"
                             placeholder="Prénom"
-                            name="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            name="firstName"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
-                        {/*---------------------------- BIRTHDATE ------------------------------------------------*/}
+                        {/*---------------------------- age ------------------------------------------------*/}
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.birthDate}
+                                {errors.age}
                             </LabelError>
                         </DivError>
                         <InputField
                             type="date"
-                            value={birthDate}
+                            value={age}
                             onChange={handleDateChange}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
@@ -320,27 +369,27 @@ export const FormRegister = () => {
                         <ImgEye src={eye} onClick={handleShowPassword} />
                         {/* ----------------------------------------------------------------------------------- */}
                     </Div2>
-                    <Button type="button" onClick={handleLogin} disabled={isLoading}>
+                    <Button type="button" onClick={handleNext} disabled={isLoading}>
                         {isLoading ? "Validation..." : "Suivant"}
                     </Button>
                 </FormularRegister>
             )}
 
             {currentForm === "formMoreInfo" && (
-                <FormMoreInfo>
+                <FormMoreInfo method="post" encType="multipart/form-data">
                     <TitleForm2>Informations supplémentaires</TitleForm2>
                     <Div>
-                        {/*---------------------------- AVATAR ------------------------------------------------*/}
+                        {/*---------------------------- file ------------------------------------------------*/}
                         <DivError visibility={showError ? 'visible' : 'hidden'}>
                             <LabelError>
-                                {errors.avatar}
+                                {errors.file}
                             </LabelError>
                         </DivError>
-                        <ImgAvatar src={avatar} />
+                        <ImgAvatar src={urlFile} />
                         <InputAvatar
                             type="file" // Input de type file
-                            name="avatar"
-                            accept=".jpg, .jpeg, .png" // extension avatar accepter
+                            name="file"
+                            accept=".jpg, .jpeg, .png" // extension file accepter
                             onChange={handlePictureChange}
                         />
                         {/* ----------------------------------------------------------------------------------- */}
@@ -363,6 +412,7 @@ export const FormRegister = () => {
                         {/* ----------------------------------------------------------------------------------- */}
                         {/*---------------------------- DESCRIPTION ------------------------------------------------*/}
                         <Description
+                            type="text"
                             name="description"
                             onChange={(e) => setDescription(e.target.value)}
                             onInput={handleAutoRedimText}

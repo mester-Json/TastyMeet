@@ -28,6 +28,7 @@ public class UserDto {
     private String location;
     private LocalDate age;
     private List<PictureDto> pictures = new ArrayList<>();
-    private GenderDto gender;
-    private GenderDto orientation;
+    private Gender gender;
+    private Gender orientation;
+
 }

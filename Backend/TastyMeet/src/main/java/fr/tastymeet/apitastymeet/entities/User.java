@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 @NoArgsConstructor
@@ -47,10 +48,11 @@ public class User {
     private String location;
     @Column(name = "city" , nullable = true)
     private String city;
-    @Column(name = "admin")
-    private boolean admin = false;
+    @ElementCollection
+    private Set<Roles> roles = Set.of(Roles.PUBLIC);
     @OneToMany(mappedBy = "user")
     @Column(nullable = true)
     private List<Picture> pictures = new ArrayList<>();
+
 
 }
