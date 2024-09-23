@@ -18,7 +18,7 @@ export const AppRoutes = () => {
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/messaging" element={isAuthenticated() ? <Messaging /> : <Navigate to="/message" replace />} />
+                <Route path="/messaging" element={isAuthenticated() ? <Messaging /> : <Navigate to="/login" replace />} />
                 <Route path="/message" element={isAuthenticated() ? <Message /> : <Navigate to="/login" replace />} />
                 <Route path="/accueil" element={isAuthenticated() ? <Accueil /> : <Navigate to="/login" replace />} />
                 <Route path="/profile" element={isAuthenticated() ? <ProfilPage /> : <Navigate to="/login" replace />} />

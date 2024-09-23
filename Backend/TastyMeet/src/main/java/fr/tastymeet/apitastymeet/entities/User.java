@@ -1,5 +1,6 @@
 package fr.tastymeet.apitastymeet.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @NoArgsConstructor
@@ -50,9 +52,14 @@ public class User {
     private String city;
     @ElementCollection
     private Set<Roles> roles = Set.of(Roles.PUBLIC);
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Column(nullable = true)
     private List<Picture> pictures = new ArrayList<>();
 
+    @ManyToMany
+    private Set<User> liked;
 
+    public Set<User> getMatches() {
+        return liked.stream().filter(like -> like.liked.stream().anyMatch(user -> user.id == id)).collect(Collectors.toSet());
+    }
 }
