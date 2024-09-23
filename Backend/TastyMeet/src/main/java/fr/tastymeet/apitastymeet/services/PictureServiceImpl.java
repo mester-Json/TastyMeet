@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PictureServiceImpl implements IPictureService {
@@ -52,6 +53,18 @@ public class PictureServiceImpl implements IPictureService {
     @Override
     public void deleteById(long id) {
         pictureRepository.deleteById(id);
+    }
+
+    @Override
+    public PictureDto getById(long id) {
+       Optional<Picture> optional= pictureRepository.findById(id);
+       if(optional.isPresent()){
+           Picture p = optional.get();
+           return DtoTool.convert(p, PictureDto.class);
+       }else {
+           return null;
+       }
+
     }
 
 }

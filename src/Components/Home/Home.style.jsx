@@ -1,46 +1,52 @@
 import styled from "styled-components";
+import Slider from 'react-slick';
 
 
 export const Container = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 150px;
+    margin-top:100px;
     height: 70vh;
 `;
 
 
-export  const Card = styled.div`
-    width: 350px;
-    height: 450px;
-    background-color: dodgerblue; 
+export const Card = styled.div`
+
+
+`;
+
+export const DivImage = styled.div`
+    width: 450px;
+    height: 400px;
     border-radius: 20px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
     position: relative;
     cursor: grab;
     user-select: none;
-    transition: transform 0.3s ease-in-out;
+    /* transition: transform 0.3s ease-in-out;
     &:hover {
         transform: scale(1.1);
         transition-duration: 0.5s;
-    } 
+    }  */
+`
+
+export const DivDescriptionPersso = styled.div`
+margin-top :-50px;
+
+`
+
+export const ImageContainer = styled.div`
+    width: 100%; 
+    height: 100%;
+    border-radius: 50%;
+    background-color: #333;
+    margin:auto;
+    display: flex;
 
 `;
 
-export  const  ImageContainer = styled.div`
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background-color: #333;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-    margin-top: 70px;
-`;
 
 export const Name = styled.h2`
     font-size: 1.5em;
@@ -50,7 +56,7 @@ export const Name = styled.h2`
 
 export const Description = styled.p`
     text-align: center;
-    margin-top: 15px;
+
     
 `;
 
@@ -122,10 +128,21 @@ export const GenderAge = styled.div`
 
 export const DescriptionPersso = styled.div`
     background-color: white;
-    margin-top: 20px;
     width: 100%;
     border-top: 9px solid black;
-height: 200px ;
+    height: 200px ;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
+`
+
+
+
+
+export const Img = styled.img`
+    width:450px;
+    height: 350px;
+    boxShadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+
 `

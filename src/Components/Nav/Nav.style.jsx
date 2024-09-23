@@ -1,16 +1,21 @@
 import styled from 'styled-components';
 
 
-
 export const NavBar = styled.nav`
-    display: inline-flex;
-    justify-content: space-between;
-    background: #2A0800;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 124px; 
+  display: flex;
+  width: 100%;
+  background: #2A0800;
+  justify-content: space-between;
+`
+
+
+export const NavDiv = styled.div`
+ display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 20px; 
+
+
 `;
 
 export const BurgerMenu = styled.button`
@@ -46,7 +51,7 @@ export const BurgerMenu = styled.button`
 
         :first-child {
             transform: ${({ open }) => open
-    ? 'rotate(45deg)' : 'rotate(0)'};
+        ? 'rotate(45deg)' : 'rotate(0)'};
         }
 
         :nth-child(2) {
@@ -56,9 +61,10 @@ export const BurgerMenu = styled.button`
 
         :last-child {
             transform: ${({ open }) => open
-    ? 'rotate(-45deg)' : 'rotate(0)'};
+        ? 'rotate(-45deg)' : 'rotate(0)'};
         }
     }
+    
 `;
 
 export const Menu = styled.ul`
@@ -69,6 +75,7 @@ export const Menu = styled.ul`
     position: absolute;
     transform: ${({ open }) => open ? 'translateX(0)' : 'translateX(100%)'};
     top: 6.5rem; 
+    z-index:100;
     right: 0;  
     height: 17vh;
     width: 200px; 
@@ -93,8 +100,8 @@ export const Menu = styled.ul`
 `;
 
 export const Img = styled.img`
-    width: 85px ;
-    height: 85px;
-    display: flex;
-    padding: 20px;
-`
+  width: 85px;
+  height: 85px;
+  padding: 20px;
+  margin-left: 20px;
+`;

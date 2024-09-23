@@ -1,12 +1,6 @@
 import styled from 'styled-components';
 
-/*export const DivPage = styled.div`
-    display: flex;
-    justify-content: center;    /!* Centrer horizontalement *!/
-    align-items: center;        /!* Centrer verticalement *!/
-    height: 100vh;              /!* Prend toute la hauteur de la fenêtre *!/
-    width: 100vw;               /!* Prend toute la largeur de la fenêtre *!/
-`;*/
+
 /* -----------------Form-----------------------*/
 export const FormularRegister = styled.form`
     display: flex;
@@ -17,11 +11,10 @@ export const FormularRegister = styled.form`
     border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     flex-wrap: wrap;
-    margin-top:5%; /* Centrer horizontalement en cas de besoin */
     margin-left: auto;
     margin-right: auto;
     max-width: 36.5vw;       /* Taille maximale sur les grands écrans */
-    
+    margin-bottom: 10vh;
     @media (max-width: 768px) {
         max-width: 45vw;
     }

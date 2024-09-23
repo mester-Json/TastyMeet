@@ -1,10 +1,10 @@
 package fr.tastymeet.apitastymeet.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.tastymeet.apitastymeet.dto.EmailUpdateRequestDto;
+import fr.tastymeet.apitastymeet.dto.PasswordRequestDto;
 import fr.tastymeet.apitastymeet.dto.PictureDto;
-import fr.tastymeet.apitastymeet.repositories.UserRepository;
-import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpStatus;
 import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.entities.Gender;
@@ -55,7 +55,8 @@ public class UserController {
     public List<UserDto> display(){
         return userService.getByAll();
     }
-   /* @PostMapping(value="/addUser", consumes = "application/json", produces = "application/json")
+
+  /*  @PostMapping(value="/addUser", consumes = "application/json", produces = "application/json")
     public ResponseEntity<UserDto> save(@RequestBody UserDto userDto) throws Exception {
 
         UserDto dto = userService.save(userDto);
@@ -64,46 +65,41 @@ public class UserController {
 
     }*/
 
-    @PostMapping(value="/addUser", consumes = "multipart/form-data", produces = "application/json")
-    public ResponseEntity<UserDto> save(@ModelAttribute UserDto userDto, @RequestPart("file") MultipartFile file) throws Exception {
+    @PostMapping(value = "/addUser", consumes = "multipart/form-data", produces = "application/json")
+    public ResponseEntity<UserDto> save(@ModelAttribute UserDto userDto,
+                                        @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
 
+        // Sauvegarde des données utilisateur
         UserDto dto = userService.save(userDto);
 
-        try {
-            // Chemin où le fichier sera sauvegardé
-            Path path = Paths.get(uploadDir + File.separator + file.getOriginalFilename());
+        if (file != null && !file.isEmpty()) {
+            try {
+                // Chemin où le fichier sera sauvegardé
+                Path path = Paths.get(uploadDir + File.separator + file.getOriginalFilename());
 
-            PictureDto picturedto = new PictureDto();
-            picturedto.setPictureName(file.getOriginalFilename());
-            picturedto.setPathPicture(String.valueOf(path));
-            picturedto.setUserId(dto.getId());
-            pictureService.save(picturedto);
+                PictureDto picturedto = new PictureDto();
+                picturedto.setPictureName(file.getOriginalFilename());
+                picturedto.setUserId(dto.getId());
+                pictureService.save(picturedto);
 
-            // Sauvegarde le fichier sur le système de fichiers
-            Files.write(path, file.getBytes());
+                // Sauvegarde le fichier sur le système de fichiers
+                Files.write(path, file.getBytes());
 
-            return ResponseEntity.status(HttpStatus.OK).body(dto);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(dto);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(dto);
+            }
         }
+
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 
-   /* @CrossOrigin(origins = "http://localhost:5173")
-    @PostMapping(value="/connection", consumes="multipart/form-data", produces="text/plain")
-    public ResponseEntity<String> connection(@RequestParam("email") String email, @RequestParam("password") String password) throws Exception {
+    @GetMapping(value="/profile/{id}", produces = "application/json")
+    public UserDto displayProfileId(@PathVariable("id") long id) {
 
-        UserDto dto = userService.getByEmail(email);
-        System.out.println(dto.getPassword());
-        System.out.println(password);
-
-        if(dto.getPassword().equals(password)) {
-            return ResponseEntity.status(HttpStatus.OK).body("Vous êtes connectés.");
-        }else{
-            return ResponseEntity.status(HttpStatus.OK).body("Votre email ou votre mot de passe est éronné.");
-        }
-    }*/
-
+        UserDto user = userService.getById(id);
+        return user;
+    }
 
     @PostMapping(value = "/connection", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Map<String, String>> connection(@RequestBody Map<String, String> payload) throws Exception {
@@ -123,5 +119,70 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
+
+    @PostMapping("/verifyPassword")
+    public ResponseEntity<String> verifyPassword(@RequestBody PasswordRequestDto passwordRequest) {
+        try {
+            // Extraire les informations de la requête
+            String currentPassword = passwordRequest.getCurrentPassword();
+            long id = passwordRequest.getId();
+
+            UserDto user = userService.getById(id);
+
+            // Vérification du mot de passe actuel
+            if (user != null && user.getPassword().equals(currentPassword)) {
+                if(passwordRequest.getNewPassword().equals(passwordRequest.getConfirmNewPassword())) {
+
+                    user.setPassword(passwordRequest.getNewPassword());
+                    userService.save(user);
+                    return ResponseEntity.ok().body("Mot de passe mis à jour avec succès");
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Les nouveaux mot de passe ne correspondent pas.");
+                }
+
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Mot de passe actuel est incorrect");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la mise à jour du mot de passe");
+        }
+    }
+
+    @PostMapping(value = "/updateEmail", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<String> updateEmail(@RequestBody EmailUpdateRequestDto emailUpdateRequest) {
+        try {
+            UserDto user = userService.getById(emailUpdateRequest.getId());
+
+            // Vérifiez que l'email actuel correspond à celui stocké
+            if (user != null && user.getEmail().equals(emailUpdateRequest.getCurrentEmail())) {
+                // Vérifiez que les nouveaux emails sont identiques
+                if (emailUpdateRequest.getNewEmail().equals(emailUpdateRequest.getConfirmNewEmail())) {
+                    // Mettre à jour l'email de l'utilisateur
+                    user.setEmail(emailUpdateRequest.getNewEmail());
+                    userService.save(user);
+                    return ResponseEntity.ok("Email mis à jour avec succès.");
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Les nouveaux emails ne correspondent pas.");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("L'email actuel est incorrect.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la mise à jour de l'email.");
+        }
+    }
+
+
+    @PostMapping(value = "/update", consumes = "multipart/form-data", produces = "application/json")
+    public ResponseEntity<UserDto> update(@ModelAttribute UserDto userDto) throws Exception {
+
+        // Sauvegarde des données utilisateur
+        UserDto dto = userService.save(userDto);
+
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
+    }
+
 
 }

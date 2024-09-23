@@ -6,16 +6,12 @@ export const FooterStyle = styled.footer`
     background-color: #775144; 
     color: #fff;
     justify-content: flex-start;
- 
-    position: absolute;
     bottom: 0;
     left: 0;
-
     display: flex;
     align-items: center;    
-
     font-family: sans-serif;
-    font-style: 12px;
+    font-style: 12px;   
 `;
 
 
@@ -24,5 +20,5 @@ margin-left: 90px;
 `
 
 export const P = styled.p`
-    margin-left: 750px ;
-`
+    text-align: center;
+    `

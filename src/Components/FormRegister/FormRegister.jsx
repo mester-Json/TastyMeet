@@ -23,7 +23,6 @@ import eyeOpen from "../../Resources/Images/eye.svg";
 import eyeClose from "../../Resources/Images/eye-slash.svg";
 
 /*----------------------------------------------------------------------------*/
-
 export const FormRegister = () => {
     /*---------------------------- useState ------------------------------------------------*/
     const [ errors , setErrors ] = useState ( {
@@ -124,8 +123,7 @@ export const FormRegister = () => {
             }
             // Si pas d'erreurs, soumettre le formulaire
             if (Object.keys ( newErrors ).length === 0) {
-
-                handleFormSwitch ( "formMoreInfo" );
+                setCurrentForm("formMoreInfo");
                 setTitle ( true );
             } else {
                 setErrors ( newErrors );
@@ -161,18 +159,12 @@ export const FormRegister = () => {
                     console.error ( "Formulaire non reconnu" );
                     break;
             }
-
+           
+            let fields = {firstName, lastName, age, password, description, email, phone, gender, file};
             const formData = new FormData ();
-            formData.append ( "firstName" , firstName );
-            formData.append ( "lastName" , lastName );
-            formData.append ( "age" , age );
-            formData.append ( "password" , password );
-            formData.append ( "description" , description );
-            formData.append ( "email" , email );
-            formData.append ( "phone" , phone );
-            formData.append ( "gender" , gender );
-            formData.append ( "file" , file ); // fichier ajouté ici
-
+            for (let key in fields) {
+                formData.append(key, fields[key]);
+            }
 
             // Si pas d'erreurs, soumettre le formulaire
             if (Object.keys ( newErrors ).length === 0) {
@@ -209,8 +201,6 @@ export const FormRegister = () => {
     };
 
     // Fonction test pour afficher le form2
-
-
     const handlePictureChange = (e) => {
         const selectedFile = e.target.files[0]; // Sélectionne le premier fichier
         if (selectedFile) {
@@ -248,13 +238,7 @@ export const FormRegister = () => {
         e.target.style.height = "auto";
         e.target.style.height = e.target.scrollHeight + "px";
     };
-
-    // Changement de formulaire sur la même page
-    const handleFormSwitch = (formName) => {
-        setCurrentForm ( formName );
-    };
     /*----------------------------------------------------------------------------*/
-
     return (
         <>
             <TitleForm1>{ title ? "Information supplémentaires" : "Inscription" }</TitleForm1>
@@ -348,7 +332,7 @@ export const FormRegister = () => {
                             value={ password }
                             onChange={ (e) => setPassword ( e.target.value ) }
                         />
-                        <ImgEye src={ eye } onClick={ handleShowPassword }/>
+                        <ImgEye src={ eye } onClick={handleShowPassword}/>
                         {/* ----------------------------------------------------------------------------------- */ }
                     </Div2>
                     <Button type="button" onClick={ handleNext } disabled={ isLoading }>
