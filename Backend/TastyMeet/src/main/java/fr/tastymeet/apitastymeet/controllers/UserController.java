@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.tastymeet.apitastymeet.dto.EmailUpdateRequestDto;
 import fr.tastymeet.apitastymeet.dto.PasswordRequestDto;
 import fr.tastymeet.apitastymeet.dto.PictureDto;
+import fr.tastymeet.apitastymeet.tools.JwtUtils;
+import io.jsonwebtoken.Claims;
 import org.springframework.http.HttpStatus;
 import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.entities.Gender;
@@ -21,9 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -31,6 +31,9 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Autowired
     private IPictureService pictureService;
@@ -44,26 +47,22 @@ public class UserController {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    @GetMapping(value="/display/{gender}/{orientation}", produces ="application/json")
-    public List<UserDto> display(@PathVariable("gender") Gender gender, @PathVariable("orientation") Gender orientation) {
 
-        List<UserDto> users = userService.getByGenderAndOrientation(gender,orientation);
+    @GetMapping(value="/display", produces ="application/json")
+    public List<UserDto> display(@RequestHeader("Authorization") String token) {
+        // Retirer le préfixe "Bearer " du token
+        String jwtToken = token.substring(7);
+
+        // Décoder le token pour obtenir les informations
+        Claims claims = jwtUtils.decodeToken(jwtToken);
+        Gender gender = Gender.valueOf(claims.get("gender").toString());
+        Gender orientation = Gender.valueOf(claims.get("orientation").toString());
+
+
+        // Récupérer les utilisateurs par genre et orientation
+        List<UserDto> users = userService.getByGenderAndOrientation(orientation, gender);
         return users;
     }
-
-    @GetMapping(value="/display", produces="application/json")
-    public List<UserDto> display(){
-        return userService.getByAll();
-    }
-
-  /*  @PostMapping(value="/addUser", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<UserDto> save(@RequestBody UserDto userDto) throws Exception {
-
-        UserDto dto = userService.save(userDto);
-
-        return ResponseEntity.status(HttpStatus.OK).body(dto);
-
-    }*/
 
     @PostMapping(value = "/addUser", consumes = "multipart/form-data", produces = "application/json")
     public ResponseEntity<UserDto> save(@ModelAttribute UserDto userDto,
@@ -72,6 +71,7 @@ public class UserController {
         // Sauvegarde des données utilisateur
         UserDto dto = userService.save(userDto);
 
+        String token = jwtUtils.generateToken(userDto.getEmail(), userDto.getId(), userDto.getGender(), userDto.getOrientation());
         if (file != null && !file.isEmpty()) {
             try {
                 // Chemin où le fichier sera sauvegardé
@@ -99,25 +99,6 @@ public class UserController {
 
         UserDto user = userService.getById(id);
         return user;
-    }
-
-    @PostMapping(value = "/connection", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Map<String, String>> connection(@RequestBody Map<String, String> payload) throws Exception {
-
-        String email = payload.get("email");
-        String password = payload.get("password");
-
-        UserDto dto = userService.getByEmail(email);
-
-        Map<String, String> response = new HashMap<>();
-
-        if (dto.getPassword().equals(password)) {
-            response.put("message", "vous êtes connectés.");
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } else {
-            response.put("message", "votre email ou votre mot de passe est erroné.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
     }
 
     @PostMapping("/verifyPassword")
@@ -178,9 +159,6 @@ public class UserController {
 
         // Sauvegarde des données utilisateur
         UserDto dto = userService.save(userDto);
-
-
-
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 

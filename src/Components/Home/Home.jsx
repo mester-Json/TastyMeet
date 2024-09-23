@@ -42,8 +42,14 @@ export const Home = () => {
 
     useEffect(() => {
         const fetchProfileData = async () => {
+            const token = localStorage.getItem('token'); // Ou là où vous stockez votre token
             try {
-                const response = await fetch('http://localhost:9090/api/display/MALE/FEMALE');
+                const response = await fetch('http://localhost:9090/api/display', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 if (response.ok) {
                     const data = await response.json();
                     const profilesWithSlides = data.map(profile => ({
@@ -61,7 +67,6 @@ export const Home = () => {
                 console.error('Erreur:', error);
             }
         };
-
         fetchProfileData();
     }, []);
 

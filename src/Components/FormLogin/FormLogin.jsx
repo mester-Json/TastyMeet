@@ -36,16 +36,22 @@ export const FormLogin = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:9090/api/connection', {
+            const response = await fetch('http://localhost:9090/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
             });
 
             if (response.ok) {
-                const data = await response.json();
-                console.log('Login successful:', data);
-                navigate('/');
+                // Ici, on récupère le token comme une chaîne de texte
+                const token = await response.text(); // Pas response.json()
+                console.log('Login successful, token:', token);
+
+                // Sauvegardez le token (localStorage, cookie, etc.)
+                localStorage.setItem('token', token);
+
+                // Redirection après connexion
+                navigate('/accueil');
             } else {
                 const errorData = await response.json();
                 setError(errorData.message || 'Erreur de connexion.');
