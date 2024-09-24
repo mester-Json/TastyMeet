@@ -6,10 +6,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -57,9 +54,12 @@ public class User {
     private List<Picture> pictures = new ArrayList<>();
 
     @ManyToMany
-    private Set<User> liked;
+    private Set<User> liked = new HashSet<>();
 
     public Set<User> getMatches() {
         return liked.stream().filter(like -> like.liked.stream().anyMatch(user -> user.id == id)).collect(Collectors.toSet());
+    }
+    public void like(User user) {
+        liked.add(user);
     }
 }
