@@ -30,95 +30,96 @@ export const Home = () => {
     const [profiles, setProfiles] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(null);
     const [imageIndex, setImageIndex] = useState(0);
-    const currentProfile = currentIndex !== null ? profiles[currentIndex] : { pictures: [] };
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [fetchingProfiles, setFetchingProfiles] = useState(false); // Nouvel état pour gérer la récupération
     const sliderRef = useRef(null);
     const autoPlayRef = useRef(null);
     const [dislikedProfiles, setDislikedProfiles] = useState([]);
 
-
     const settings = {
         dots: false,
-        infinite: false, // Pour permettre un défilement infini
+        infinite: false,
         speed: 1,
         slidesToShow: 1,
         slidesToScroll: 1,
-        arrows: false, // Retire les boutons de navigation
-        autoplay: true, // Active le défilement automatique
+        arrows: false,
+        autoplay: true,
     };
-
 
     const MAX_SWIPE_DISTANCE = 100;
     const MAX_ROTATION_DEGREE = 50;
     const HORIZONTAL_MARGIN = 700;
 
+    const fetchProfileData = async () => {
+        // Vérifiez si une récupération est déjà en cours
+        if (fetchingProfiles) return;
 
+        setFetchingProfiles(true); // Début de la récupération
+        const token = localStorage.getItem('token');
 
-    useEffect(() => {
-
-        const fetchProfileData = async () => {
-            const token = localStorage.getItem('token');
-
-            try {
-                const response = await fetch('http://localhost:9090/api/display', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const profilesWithSlides = data.map(profile => ({
-                        ...profile,
-                        pictures: profile.pictures.map(picture => ({
-                            pictureName: picture.pictureName,
-                            imageUrl: `http://localhost:9090/api/show/${picture.pictureName}`,
-                        }))
-                    }));
-                    setProfiles(profilesWithSlides);
-                    if (profilesWithSlides.length > 0) {
-                        setCurrentIndex(0);
-                    }
-                } else {
-                    console.error('Erreur lors de la récupération des données.');
+        try {
+            const response = await fetch('http://localhost:9090/api/display', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
+            });
 
-            } catch (error) {
-                console.error('Erreur:', error);
+            if (response.ok) {
+                const data = await response.json();
+                const profilesWithSlides = data.map(profile => ({
+                    ...profile,
+                    pictures: profile.pictures.map(picture => ({
+                        pictureName: picture.pictureName,
+                        imageUrl: `http://localhost:9090/api/show/${picture.pictureName}`,
+                    }))
+                }));
+                setProfiles(profilesWithSlides);
+                if (profilesWithSlides.length > 0) {
+                    setCurrentIndex(0);
+                } else {
+                    setCurrentIndex(null); // Pas de profils disponibles
+                }
+            } else {
+                console.error('Erreur lors de la récupération des données.');
             }
 
-        };
-        fetchProfileData();
+        } catch (error) {
+            console.error('Erreur:', error);
+        } finally {
+            setFetchingProfiles(false); // Fin de la récupération
+        }
+    };
+
+    useEffect(() => {
+        fetchProfileData(); // Appel initial pour charger les profils
     }, []);
 
     useEffect(() => {
         console.log('Changement d\'index de profil :', currentIndex);
-        console.log('Profil actuel :', currentProfile);
         setImageIndex(0);
     }, [currentIndex]);
 
-
-
     useEffect(() => {
         autoPlayRef.current = setInterval(() => {
-            setImageIndex((prev) => {
-                if (prev + 1 < currentProfile.pictures.length) {
-                    return prev + 1;
-                } else {
-                    return 0;
-                }
-            });
+            if (!isProcessing && currentIndex !== null) {
+                setImageIndex((prev) => {
+                    if (prev + 1 < profiles[currentIndex]?.pictures.length) {
+                        return prev + 1;
+                    } else {
+                        return 0;
+                    }
+                });
+            }
         }, 10000);
 
         return () => {
             clearInterval(autoPlayRef.current);
         };
-    }, [currentProfile.pictures.length]);
-
-
+    }, [currentIndex, profiles, isProcessing]);
 
     const cardRef = useRef(null);
-    // Fonction pour obtenir un index aléatoire qui n'est pas rejeté
+
     const getNextRandomIndex = () => {
         const availableProfiles = profiles.filter((_, index) => !dislikedProfiles.includes(index));
         if (availableProfiles.length === 0) {
@@ -149,8 +150,7 @@ export const Home = () => {
             cardRef.current.style.transform = `translateX(${limitedDeltaX}px) rotate(${rotation}deg)`;
         };
 
-        const handleMouseUp = (upEvent) => {
-
+        const handleMouseUp = async (upEvent) => {
             cardRef.current.style.cursor = 'grab';
             document.removeEventListener('mouseup', handleMouseUp);
             document.removeEventListener('mousemove', handleMouseMove);
@@ -160,37 +160,32 @@ export const Home = () => {
             const isSwipeValid = absDeltaX > MAX_SWIPE_DISTANCE;
 
             if (isSwipeValid) {
-                const nextIndex = getNextRandomIndex();
-                if (nextIndex !== null) {
-                    setCurrentIndex(nextIndex);
-                } else {
-                    console.log("Il n'y a plus de profils disponibles.");
-                }
+                setIsProcessing(true);
+                await handleLike(); // Appelle la fonction de like ou dislike directement
             }
             cardRef.current.style.transform = '';
-            handleLike();
         };
 
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
     };
 
-    const handleDislike = () => {
+    const handleDislike = async () => {
         setDislikedProfiles((prev) => [...prev, currentIndex]);
         const nextIndex = getNextRandomIndex();
         if (nextIndex !== null) {
             setCurrentIndex(nextIndex);
         } else {
             console.log("Il n'y a plus de profils disponibles.");
+            setCurrentIndex(null); // Aucune profil disponible
         }
+        setIsProcessing(false);
     };
 
     const handleLike = async () => {
-
         const userId = getUserIdFromToken();
-        const token = localStorage.getItem('token'); // Assure-toi de récupérer correctement le token JWT
+        const token = localStorage.getItem('token');
 
-        // Effectuer la requête POST pour le like
         const likeResponse = await fetch(`http://localhost:9090/api/${userId}/like/${currentProfile.id}`, {
             method: 'POST',
             headers: {
@@ -201,10 +196,10 @@ export const Home = () => {
 
         if (!likeResponse.ok) {
             console.error("Erreur lors du like.");
+            setIsProcessing(false);
             return;
         }
 
-        // Vérification du match après le like
         const matchResponse = await fetch(`http://localhost:9090/api/${userId}/matches`, {
             method: 'GET',
             headers: {
@@ -216,11 +211,8 @@ export const Home = () => {
         if (matchResponse.ok) {
             const matches = await matchResponse.json();
             console.log("Matches reçus :", matches);
-            console.log("currentProfile.id :", currentProfile.id);
 
-            // Vérifie si le profil actuel fait partie des matches
             const matched = matches.find(match => match.likedUserId === currentProfile.id);
-            console.log(matched)
             if (matched) {
                 alert(`Vous avez un match avec ${currentProfile.firstName} !`);
             } else {
@@ -230,54 +222,78 @@ export const Home = () => {
             console.error("Erreur lors de la récupération des matches.");
         }
 
-        const nextIndex = getNextRandomIndex();
-        setCurrentIndex(nextIndex);
+        // Appel à fetchProfileData après un like
+        await fetchProfileData(); // Rafraîchit la liste des profils après le like
     };
 
+    const currentProfile = currentIndex !== null && profiles.length > 0
+        ? profiles[currentIndex]
+        : { pictures: [] }; // Assurez-vous que pictures est toujours défini comme un tableau
 
-
-    //const nextIndex = (currentIndex + 1 + profiles.length) % profiles.length;
-    //setCurrentIndex(dislikedProfiles.includes(nextIndex) ? currentIndex : nextIndex);
     return (
         <Container>
-
-            <LeftArrow onClick={handleLike}>
-                <FontAwesomeIcon icon={faHeart} />
-            </LeftArrow>
-            <Card ref={cardRef} onMouseDown={handleMouseDown}>
-                <DivImage>
-                    <SliderStyle
-                        ref={sliderRef}
-                        {...settings}
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={(e) => e.preventDefault()}
-                    >
-                        {currentProfile.pictures.length > 0 ? (
-                            <div key={imageIndex}>
-                                <Img
-                                    src={currentProfile.pictures[imageIndex].imageUrl}
-                                    alt="Profile"
-                                />
-                            </div>
-                        ) : (
-                            <p>Aucune image disponible</p>
-                        )}
-                    </SliderStyle>
-                </DivImage>
-                <DivDescriptionPersso>
-                    <DescriptionPersso>
-                        <Name>{currentProfile.firstName}</Name>
-                        <GenderAge>
-                            <span>{currentProfile.gender}</span>
-                            <span>{currentProfile.age}</span>
-                        </GenderAge>
-                        <Description>{currentProfile.description}</Description>
-                    </DescriptionPersso>
-                </DivDescriptionPersso>
-            </Card>
-            <RightArrow onClick={handleDislike}>
-                <FontAwesomeIcon icon={faCircleXmark} />
-            </RightArrow>
+            {profiles.length === 0 ? (
+                <Card ref={cardRef} onMouseDown={handleMouseDown} style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}>
+                    <DivImage>
+                        <SliderStyle>
+                            <Img
+                                src=""
+                                alt="Profile"
+                            />
+                        </SliderStyle>
+                    </DivImage>
+                    <DivDescriptionPersso>
+                        <DescriptionPersso>
+                            <Name>Plus aucun utilisateur est disponible</Name>
+                            <GenderAge>
+                                <span></span>
+                                <span></span>
+                            </GenderAge>
+                            <Description></Description>
+                        </DescriptionPersso>
+                    </DivDescriptionPersso>
+                </Card> // Affiche un message lorsque la liste est vide
+            ) : (
+                <>
+                    <LeftArrow onClick={handleLike} disabled={isProcessing}>
+                        <FontAwesomeIcon icon={faHeart} />
+                    </LeftArrow>
+                    <Card ref={cardRef} onMouseDown={handleMouseDown} style={{ pointerEvents: isProcessing ? 'none' : 'auto' }}>
+                        <DivImage>
+                            <SliderStyle
+                                ref={sliderRef}
+                                {...settings}
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClick={(e) => e.preventDefault()}
+                            >
+                                {currentProfile.pictures.length > 0 ? (
+                                    <div key={imageIndex}>
+                                        <Img
+                                            src={currentProfile.pictures[imageIndex].imageUrl}
+                                            alt="Profile"
+                                        />
+                                    </div>
+                                ) : (
+                                    <p>Aucune image disponible</p>
+                                )}
+                            </SliderStyle>
+                        </DivImage>
+                        <DivDescriptionPersso>
+                            <DescriptionPersso>
+                                <Name>{currentProfile.firstName}</Name>
+                                <GenderAge>
+                                    <span>{currentProfile.gender}</span>
+                                    <span>{currentProfile.age}</span>
+                                </GenderAge>
+                                <Description>{currentProfile.description}</Description>
+                            </DescriptionPersso>
+                        </DivDescriptionPersso>
+                    </Card>
+                    <RightArrow onClick={handleDislike} disabled={isProcessing}>
+                        <FontAwesomeIcon icon={faCircleXmark} />
+                    </RightArrow>
+                </>
+            )}
         </Container>
     );
 };

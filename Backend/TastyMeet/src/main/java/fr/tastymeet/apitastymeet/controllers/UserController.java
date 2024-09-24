@@ -3,7 +3,6 @@ package fr.tastymeet.apitastymeet.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.tastymeet.apitastymeet.dto.*;
-import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.services.IMatchService;
 import fr.tastymeet.apitastymeet.tools.JwtUtils;
 import io.jsonwebtoken.Claims;
@@ -65,13 +64,11 @@ public class UserController {
 
         // Récupérer la liste des utilisateurs que cet utilisateur a liké
         Set<UserLikeDto> likedUsers = matchService.getLikes(userId);
-        likedUsers.forEach(likedUser -> System.out.println("Liked userId: " + likedUser.getUserId()));
 
         // Récupérer les utilisateurs qui correspondent au genre et à l'orientation, en excluant les utilisateurs likés
         List<UserDto> users = userService.getByGenderAndOrientation(orientation, gender).stream()
                 .filter(user -> likedUsers.stream().noneMatch(likedUser -> likedUser.getLikedUserId() == user.getId())) // Exclure les utilisateurs likés
                 .collect(Collectors.toList());
-
         return users;
     }
 
