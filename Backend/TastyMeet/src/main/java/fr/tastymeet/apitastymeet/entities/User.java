@@ -53,6 +53,11 @@ public class User {
     @OneToMany(mappedBy = "user")
     @Column(nullable = true)
     private List<Picture> pictures = new ArrayList<>();
+    @ManyToMany
+    private List<User> liked;
 
+    public List<User> getMatches() {
+        return liked.stream().filter(like -> like.liked.stream().anyMatch(user -> user.id == id)).toList();
+    }
 
 }

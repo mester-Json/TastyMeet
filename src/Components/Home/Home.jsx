@@ -19,9 +19,9 @@ import Slider from 'react-slick';
 
 export const Home = () => {
     const [profiles, setProfiles] = useState([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const [currentIndex, setCurrentIndex] = useState(null);
     const [imageIndex, setImageIndex] = useState(0);
-    const currentProfile = profiles[currentIndex] || { pictures: [] };
+    const currentProfile = currentIndex !== null ? profiles[currentIndex] : { pictures: [] };
     const sliderRef = useRef(null);
     const autoPlayRef = useRef(null);
     const [dislikedProfiles, setDislikedProfiles] = useState([]);
@@ -100,6 +100,21 @@ export const Home = () => {
 
     const cardRef = useRef(null);
 
+
+    // Fonction pour obtenir un index aléatoire qui n'est pas rejeté
+    const getNextRandomIndex = () => {
+        const availableProfiles = profiles.filter((_, index) => !dislikedProfiles.includes(index));
+        if (availableProfiles.length === 0) {
+            console.log('Tous les profils ont été rejetés.');
+            return null; // Tous les profils ont été rejetés
+        }
+        let nextIndex;
+        do {
+            nextIndex = Math.floor(Math.random() * profiles.length);
+        } while (dislikedProfiles.includes(nextIndex));
+        return nextIndex;
+    };
+
     const handleMouseDown = (e) => {
         e.preventDefault();
         cardRef.current.style.cursor = 'grabbing';
@@ -127,15 +142,12 @@ export const Home = () => {
             const isSwipeValid = absDeltaX > MAX_SWIPE_DISTANCE;
 
             if (isSwipeValid) {
-                setCurrentIndex((prevIndex) => {
-                    let nextIndex = deltaX < 0 ? (prevIndex + 1) % profiles.length : (prevIndex + 1 + profiles.length) % profiles.length;
-
-                    // Cherche un profil qui n'est pas dans les profils rejetés
-                    while (dislikedProfiles.includes(nextIndex)) {
-                        nextIndex = (nextIndex + (deltaX < 0 ? 1 : +1) + profiles.length) % profiles.length;
-                    }
-                    return nextIndex;
-                });
+                const nextIndex = getNextRandomIndex();
+                if (nextIndex !== null) {
+                    setCurrentIndex(nextIndex);
+                } else {
+                    console.log("Il n'y a plus de profils disponibles.");
+                }
             }
 
             cardRef.current.style.transform = '';
@@ -147,24 +159,23 @@ export const Home = () => {
 
     const handleDislike = () => {
         setDislikedProfiles((prev) => [...prev, currentIndex]);
-        setCurrentIndex((prevIndex) => {
-            let nextIndex = (prevIndex + 1) % profiles.length;
-            while (dislikedProfiles.includes(nextIndex)) {
-                nextIndex = (nextIndex + 1) % profiles.length;
-            }
-            return nextIndex;
-        });
+        const nextIndex = getNextRandomIndex();
+        if (nextIndex !== null) {
+            setCurrentIndex(nextIndex);
+        } else {
+            console.log("Il n'y a plus de profils disponibles.");
+        }
     };
+
 
 
     console.log(currentProfile)
 
-
     return (
         <Container>
             <LeftArrow onClick={() => {
-                const nextIndex = (currentIndex + 1 + profiles.length) % profiles.length;
-                setCurrentIndex(dislikedProfiles.includes(nextIndex) ? currentIndex : nextIndex);
+                const nextIndex = getNextRandomIndex();
+                setCurrentIndex(nextIndex);
             }}>
                 <FontAwesomeIcon icon={faHeart} />
             </LeftArrow>
@@ -205,3 +216,4 @@ export const Home = () => {
         </Container>
     );
 };
+
