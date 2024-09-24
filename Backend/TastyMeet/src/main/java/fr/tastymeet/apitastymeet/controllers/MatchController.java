@@ -1,9 +1,7 @@
 package fr.tastymeet.apitastymeet.controllers;
 
 import fr.tastymeet.apitastymeet.dto.UserLikeDto;
-import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.services.IMatchService;
-import fr.tastymeet.apitastymeet.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,6 +1,5 @@
 package fr.tastymeet.apitastymeet.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
