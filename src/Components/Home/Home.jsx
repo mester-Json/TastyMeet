@@ -28,11 +28,9 @@ const getUserIdFromToken = () => {
 
 export const Home = () => {
     const [profiles, setProfiles] = useState([]);
-    const [userId, setUserId] = useState([]);
-    const [likedUserId, setLikedUserId] = useState([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const [currentIndex, setCurrentIndex] = useState(null);
     const [imageIndex, setImageIndex] = useState(0);
-    const currentProfile = profiles[currentIndex] || { pictures: [] };
+    const currentProfile = currentIndex !== null ? profiles[currentIndex] : { pictures: [] };
     const sliderRef = useRef(null);
     const autoPlayRef = useRef(null);
     const [dislikedProfiles, setDislikedProfiles] = useState([]);
@@ -53,9 +51,13 @@ export const Home = () => {
     const MAX_ROTATION_DEGREE = 50;
     const HORIZONTAL_MARGIN = 700;
 
+
+
     useEffect(() => {
+
         const fetchProfileData = async () => {
             const token = localStorage.getItem('token');
+
             try {
                 const response = await fetch('http://localhost:9090/api/display', {
                     method: 'GET',
@@ -63,6 +65,7 @@ export const Home = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
                 if (response.ok) {
                     const data = await response.json();
                     const profilesWithSlides = data.map(profile => ({
@@ -72,9 +75,10 @@ export const Home = () => {
                             imageUrl: `http://localhost:9090/api/show/${picture.pictureName}`,
                         }))
                     }));
-                    //http://localhost:9090/api/like/${profile.id}/${currentProfile.id}/1
-                    //LikeUrl: `http://localhost:9090/api/like/${profile.id}/${currentProfile.id}/1`
                     setProfiles(profilesWithSlides);
+                    if (profilesWithSlides.length > 0) {
+                        setCurrentIndex(0);
+                    }
                 } else {
                     console.error('Erreur lors de la récupération des données.');
                 }
@@ -82,6 +86,7 @@ export const Home = () => {
             } catch (error) {
                 console.error('Erreur:', error);
             }
+
         };
         fetchProfileData();
     }, []);
@@ -113,6 +118,19 @@ export const Home = () => {
 
 
     const cardRef = useRef(null);
+    // Fonction pour obtenir un index aléatoire qui n'est pas rejeté
+    const getNextRandomIndex = () => {
+        const availableProfiles = profiles.filter((_, index) => !dislikedProfiles.includes(index));
+        if (availableProfiles.length === 0) {
+            console.log('Tous les profils ont été rejetés.');
+            return null; // Tous les profils ont été rejetés
+        }
+        let nextIndex;
+        do {
+            nextIndex = Math.floor(Math.random() * profiles.length);
+        } while (dislikedProfiles.includes(nextIndex));
+        return nextIndex;
+    };
 
     const handleMouseDown = (e) => {
         e.preventDefault();
@@ -132,6 +150,7 @@ export const Home = () => {
         };
 
         const handleMouseUp = (upEvent) => {
+
             cardRef.current.style.cursor = 'grab';
             document.removeEventListener('mouseup', handleMouseUp);
             document.removeEventListener('mousemove', handleMouseMove);
@@ -141,18 +160,15 @@ export const Home = () => {
             const isSwipeValid = absDeltaX > MAX_SWIPE_DISTANCE;
 
             if (isSwipeValid) {
-                setCurrentIndex((prevIndex) => {
-                    let nextIndex = deltaX < 0 ? (prevIndex + 1) % profiles.length : (prevIndex + 1 + profiles.length) % profiles.length;
-
-                    // Cherche un profil qui n'est pas dans les profils rejetés
-                    while (dislikedProfiles.includes(nextIndex)) {
-                        nextIndex = (nextIndex + (deltaX < 0 ? 1 : +1) + profiles.length) % profiles.length;
-                    }
-                    return nextIndex;
-                });
+                const nextIndex = getNextRandomIndex();
+                if (nextIndex !== null) {
+                    setCurrentIndex(nextIndex);
+                } else {
+                    console.log("Il n'y a plus de profils disponibles.");
+                }
             }
-
             cardRef.current.style.transform = '';
+            handleLike();
         };
 
         document.addEventListener('mousemove', handleMouseMove);
@@ -161,13 +177,12 @@ export const Home = () => {
 
     const handleDislike = () => {
         setDislikedProfiles((prev) => [...prev, currentIndex]);
-        setCurrentIndex((prevIndex) => {
-            let nextIndex = (prevIndex + 1) % profiles.length;
-            while (dislikedProfiles.includes(nextIndex)) {
-                nextIndex = (nextIndex + 1) % profiles.length;
-            }
-            return nextIndex;
-        });
+        const nextIndex = getNextRandomIndex();
+        if (nextIndex !== null) {
+            setCurrentIndex(nextIndex);
+        } else {
+            console.log("Il n'y a plus de profils disponibles.");
+        }
     };
 
     const handleLike = async () => {
@@ -200,10 +215,12 @@ export const Home = () => {
 
         if (matchResponse.ok) {
             const matches = await matchResponse.json();
+            console.log("Matches reçus :", matches);
+            console.log("currentProfile.id :", currentProfile.id);
 
             // Vérifie si le profil actuel fait partie des matches
-            const matched = matches.find(match => match.likedUserId.id === currentProfile.id);
-
+            const matched = matches.find(match => match.likedUserId === currentProfile.id);
+            console.log(matched)
             if (matched) {
                 alert(`Vous avez un match avec ${currentProfile.firstName} !`);
             } else {
@@ -212,8 +229,9 @@ export const Home = () => {
         } else {
             console.error("Erreur lors de la récupération des matches.");
         }
-        const nextIndex = (currentIndex + 1 + profiles.length) % profiles.length;
-        setCurrentIndex(dislikedProfiles.includes(nextIndex) ? currentIndex : nextIndex);
+
+        const nextIndex = getNextRandomIndex();
+        setCurrentIndex(nextIndex);
     };
 
 

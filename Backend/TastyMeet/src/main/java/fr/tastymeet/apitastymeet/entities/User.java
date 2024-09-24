@@ -62,4 +62,7 @@ public class User {
     public void like(User user) {
         liked.add(user);
     }
+    public Set<User> getLiked() {
+        return liked;
+    }
 }

@@ -2,13 +2,12 @@ package fr.tastymeet.apitastymeet.controllers;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.tastymeet.apitastymeet.dto.EmailUpdateRequestDto;
-import fr.tastymeet.apitastymeet.dto.PasswordRequestDto;
-import fr.tastymeet.apitastymeet.dto.PictureDto;
+import fr.tastymeet.apitastymeet.dto.*;
+import fr.tastymeet.apitastymeet.entities.User;
+import fr.tastymeet.apitastymeet.services.IMatchService;
 import fr.tastymeet.apitastymeet.tools.JwtUtils;
 import io.jsonwebtoken.Claims;
 import org.springframework.http.HttpStatus;
-import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.entities.Gender;
 import fr.tastymeet.apitastymeet.services.IPictureService;
 import fr.tastymeet.apitastymeet.services.IUserService;
@@ -24,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -44,6 +45,9 @@ public class UserController {
     @Autowired
     private PictureController pictureController;
 
+    @Autowired
+    private IMatchService matchService;
+
     @Value("${file.upload-dir}")
     private String uploadDir;
 
@@ -55,12 +59,19 @@ public class UserController {
 
         // Décoder le token pour obtenir les informations
         Claims claims = jwtUtils.decodeToken(jwtToken);
+        long userId = Long.parseLong(claims.get("id").toString());
         Gender gender = Gender.valueOf(claims.get("gender").toString());
         Gender orientation = Gender.valueOf(claims.get("orientation").toString());
 
+        // Récupérer la liste des utilisateurs que cet utilisateur a liké
+        Set<UserLikeDto> likedUsers = matchService.getLikes(userId);
+        likedUsers.forEach(likedUser -> System.out.println("Liked userId: " + likedUser.getUserId()));
 
-        // Récupérer les utilisateurs par genre et orientation
-        List<UserDto> users = userService.getByGenderAndOrientation(orientation, gender);
+        // Récupérer les utilisateurs qui correspondent au genre et à l'orientation, en excluant les utilisateurs likés
+        List<UserDto> users = userService.getByGenderAndOrientation(orientation, gender).stream()
+                .filter(user -> likedUsers.stream().noneMatch(likedUser -> likedUser.getLikedUserId() == user.getId())) // Exclure les utilisateurs likés
+                .collect(Collectors.toList());
+
         return users;
     }
 
