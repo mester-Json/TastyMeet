@@ -17,7 +17,6 @@ export const NavDiv = styled.div`
 
 
 `;
-
 export const BurgerMenu = styled.button`
     display: flex;
     flex-direction: column;
@@ -31,23 +30,21 @@ export const BurgerMenu = styled.button`
     z-index: 10; 
     margin: 40px 25px 0 0;
     transition: transform 0.3s ease-in-out;
-    
+
     &:focus {
         outline: none;
     }
 
     &:hover div {
-        background: Grey; 
+        background-color: #E5EAFE;
+        transform: scale(1.5); 
     }
 
     div {
-        width: 2rem;
-        height: 0.25rem;
-        background: white;
-        border-radius: 10px;
-        transition: all 0.3s linear;
-        position: relative;
-        transform-origin: 1px;
+        width: 100%; 
+        height: 0.25rem; 
+        background: #ffffff; 
+        transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out; 
 
         :first-child {
             transform: ${({ open }) => open
@@ -77,11 +74,11 @@ export const Menu = styled.ul`
     top: 6.5rem; 
     z-index:100;
     right: 0;  
-    height: 17vh;
+    height: 20vh;
     width: 200px; 
     padding: 20px;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    box-shadow: ${({ open }) => open ? '0 4px 8px rgba(0, 0, 0, 0.3)' : 'none'}; // Ombre lors de l'ouverture
+    box-shadow: ${({ open }) => open ? '0 4px 8px rgba(0, 0, 0, 0.3)' : 'none'}; 
 
     li {
         margin-bottom: 1rem;
@@ -90,10 +87,14 @@ export const Menu = styled.ul`
         margin-left: 15px;
 
         a {
+            cursor: help;
             text-decoration: none;
             color: white;
+            transition: color 0.3s ease; 
+
             &:hover {
-                color: #775144 ;
+               color:#4FFFE3;
+                /* text-decoration: underline solid red;  */
             }
         }
     }

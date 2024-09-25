@@ -2,13 +2,12 @@ package fr.tastymeet.apitastymeet.controllers;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.tastymeet.apitastymeet.dto.EmailUpdateRequestDto;
-import fr.tastymeet.apitastymeet.dto.PasswordRequestDto;
-import fr.tastymeet.apitastymeet.dto.PictureDto;
+import fr.tastymeet.apitastymeet.dto.*;
+import fr.tastymeet.apitastymeet.entities.User;
+import fr.tastymeet.apitastymeet.services.IMatchService;
 import fr.tastymeet.apitastymeet.tools.JwtUtils;
 import io.jsonwebtoken.Claims;
 import org.springframework.http.HttpStatus;
-import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.entities.Gender;
 import fr.tastymeet.apitastymeet.services.IPictureService;
 import fr.tastymeet.apitastymeet.services.IUserService;
@@ -24,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -44,6 +45,9 @@ public class UserController {
     @Autowired
     private PictureController pictureController;
 
+    @Autowired
+    private IMatchService matchService;
+
     @Value("${file.upload-dir}")
     private String uploadDir;
 
@@ -55,23 +59,31 @@ public class UserController {
 
         // Décoder le token pour obtenir les informations
         Claims claims = jwtUtils.decodeToken(jwtToken);
+        long userId = Long.parseLong(claims.get("id").toString());
         Gender gender = Gender.valueOf(claims.get("gender").toString());
         Gender orientation = Gender.valueOf(claims.get("orientation").toString());
 
+        // Récupérer la liste des utilisateurs que cet utilisateur a liké
+        Set<UserLikeDto> likedUsers = matchService.getLikes(userId);
+        likedUsers.forEach(likedUser -> System.out.println("Liked userId: " + likedUser.getUserId()));
 
-        // Récupérer les utilisateurs par genre et orientation
-        List<UserDto> users = userService.getByGenderAndOrientation(orientation, gender);
+        // Récupérer les utilisateurs qui correspondent au genre et à l'orientation, en excluant les utilisateurs likés
+        List<UserDto> users = userService.getByGenderAndOrientation(orientation, gender).stream()
+                .filter(user -> likedUsers.stream().noneMatch(likedUser -> likedUser.getLikedUserId() == user.getId())) // Exclure les utilisateurs likés
+                .collect(Collectors.toList());
+
         return users;
     }
 
-    @PostMapping(value = "/addUser", consumes = "multipart/form-data", produces = "application/json")
-    public ResponseEntity<UserDto> save(@ModelAttribute UserDto userDto,
-                                        @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
-
+    @PostMapping(value = "/addUser", consumes = "multipart/form-data")
+    public ResponseEntity<?> addUser(@ModelAttribute UserDto userDto,
+                                     @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
         // Sauvegarde des données utilisateur
         UserDto dto = userService.save(userDto);
 
+        // Génération du token
         String token = jwtUtils.generateToken(userDto.getEmail(), userDto.getId(), userDto.getGender(), userDto.getOrientation());
+
         if (file != null && !file.isEmpty()) {
             try {
                 // Chemin où le fichier sera sauvegardé
@@ -84,7 +96,6 @@ public class UserController {
 
                 // Sauvegarde le fichier sur le système de fichiers
                 Files.write(path, file.getBytes());
-
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(dto);
@@ -93,7 +104,6 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
-
     @GetMapping(value="/profile/{id}", produces = "application/json")
     public UserDto displayProfileId(@PathVariable("id") long id) {
 

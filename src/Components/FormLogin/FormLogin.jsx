@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Div, Form, InputField, Button, Inscription, Mdp } from './FormLogin.style.jsx';
+import { SignIn } from '../../Axios/Axios.js';
 
 export const FormLogin = () => {
     const [email, setEmail] = useState('');
@@ -36,31 +37,11 @@ export const FormLogin = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:9090/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (response.ok) {
-                // Ici, on récupère le token comme une chaîne de texte
-                const token = await response.text(); // Pas response.json()
-                console.log('Login successful, token:', token);
-
-                // Sauvegardez le token (localStorage, cookie, etc.)
-                localStorage.setItem('token', token);
-                console.log('Navigating to /accueil');
-
-                // Redirection après connexion
-                navigate('/accueil');
-            } else {
-                const errorData = await response.json();
-                setError(errorData.message || 'Erreur de connexion.');
-                setShowError(true);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            setError('Une erreur est survenue. Veuillez réessayer.');
+            await SignIn(email, password);
+            navigate('/acceuil');
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || 'Erreur lors de la connexion.');
             setShowError(true);
         } finally {
             setIsLoading(false);
@@ -68,68 +49,66 @@ export const FormLogin = () => {
     };
 
     return (
-        <>
-            <Div>
-                <Form>
-                    <InputField
-                        type="email"
-                        placeholder="Adresse e-mail"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <div style={{
-                        visibility: emailError ? 'visible' : 'hidden',
-                        opacity: emailError ? 1 : 0,
-                        height: '10px',
-                        color: 'red',
-                        textAlign: 'center',
-                        transition: 'opacity 0.3s ease-in-out'
-                    }}>
-                        {emailError}
-                    </div>
-                    <InputField
-                        type="password"
-                        placeholder="Mot de passe"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <div style={{
-                        visibility: passwordError ? 'visible' : 'hidden',
-                        opacity: passwordError ? 1 : 0,
-                        height: '5px',
-                        color: 'red',
-                        textAlign: 'center',
-                        transition: 'opacity 0.3s ease-in-out'
-                    }}>
-                        {passwordError}
-                    </div>
+        <Div>
+            <Form>
+                <InputField
+                    type="email"
+                    placeholder="Adresse e-mail"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <div style={{
+                    visibility: emailError ? 'visible' : 'hidden',
+                    opacity: emailError ? 1 : 0,
+                    height: '10px',
+                    color: 'red',
+                    textAlign: 'center',
+                    transition: 'opacity 0.3s ease-in-out'
+                }}>
+                    {emailError}
+                </div>
+                <InputField
+                    type="password"
+                    placeholder="Mot de passe"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <div style={{
+                    visibility: passwordError ? 'visible' : 'hidden',
+                    opacity: passwordError ? 1 : 0,
+                    height: '5px',
+                    color: 'red',
+                    textAlign: 'center',
+                    transition: 'opacity 0.3s ease-in-out'
+                }}>
+                    {passwordError}
+                </div>
 
-                    {/* Message d'erreur global */}
-                    <div style={{
-                        visibility: showError ? 'visible' : 'hidden',
-                        opacity: showError ? 1 : 0,
-                        height: '5px',
-                        textAlign: 'center',
-                        transition: 'opacity 0.3s ease-in-out'
-                    }}>
-                        <label style={{ color: 'red' }}>
-                            {error}
-                        </label>
-                    </div>
+                {/* Message d'erreur global */}
+                <div style={{
+                    visibility: showError ? 'visible' : 'hidden',
+                    opacity: showError ? 1 : 0,
+                    height: '5px',
+                    textAlign: 'center',
+                    transition: 'opacity 0.3s ease-in-out'
+                }}>
+                    <label style={{ color: 'red' }}>
+                        {error}
+                    </label>
+                </div>
 
-                    <Button type="button" onClick={handleLogin} disabled={isLoading}>
-                        {isLoading ? 'Connexion...' : 'Se connecter'}
-                    </Button>
-                    <div>
-                        <Inscription to={"/register"}>
-                            Inscription
-                        </Inscription>
-                        <Mdp>
-                            Mot de passe Oublié
-                        </Mdp>
-                    </div>
-                </Form>
-            </Div>
-        </>
+                <Button type="button" onClick={handleLogin} disabled={isLoading}>
+                    {isLoading ? 'Connexion...' : 'Se connecter'}
+                </Button>
+                <div>
+                    <Inscription to="/register">
+                        Inscription
+                    </Inscription>
+                    <Mdp>
+                        Mot de passe Oublié
+                    </Mdp>
+                </div>
+            </Form>
+        </Div>
     );
 };

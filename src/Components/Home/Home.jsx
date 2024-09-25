@@ -16,6 +16,10 @@ import {
 import { faHeart, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Slider from 'react-slick';
+import { UserData, HandleLike, CheckMatch } from '../../Axios/Axios.js';
+
+
+
 
 export const Home = () => {
     const [profiles, setProfiles] = useState([]);
@@ -25,6 +29,15 @@ export const Home = () => {
     const sliderRef = useRef(null);
     const autoPlayRef = useRef(null);
     const [dislikedProfiles, setDislikedProfiles] = useState([]);
+
+    const getUserIdFromToken = () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.id;
+        }
+        return null;
+    };
 
 
     const settings = {
@@ -42,35 +55,6 @@ export const Home = () => {
     const MAX_ROTATION_DEGREE = 50;
     const HORIZONTAL_MARGIN = 700;
 
-    useEffect(() => {
-        const fetchProfileData = async () => {
-            const token = localStorage.getItem('token');
-            try {
-                const response = await fetch('http://localhost:9090/api/display', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    const profilesWithSlides = data.map(profile => ({
-                        ...profile,
-                        pictures: profile.pictures.map(picture => ({
-                            pictureName: picture.pictureName,
-                            imageUrl: `http://localhost:9090/api/show/${picture.pictureName}`
-                        }))
-                    }));
-                    setProfiles(profilesWithSlides);
-                } else {
-                    console.error('Erreur lors de la récupération des données.');
-                }
-            } catch (error) {
-                console.error('Erreur:', error);
-            }
-        };
-        fetchProfileData();
-    }, []);
 
     useEffect(() => {
         console.log('Changement d\'index de profil :', currentIndex);
@@ -99,14 +83,11 @@ export const Home = () => {
 
 
     const cardRef = useRef(null);
-
-
-    // Fonction pour obtenir un index aléatoire qui n'est pas rejeté
     const getNextRandomIndex = () => {
         const availableProfiles = profiles.filter((_, index) => !dislikedProfiles.includes(index));
         if (availableProfiles.length === 0) {
             console.log('Tous les profils ont été rejetés.');
-            return null; // Tous les profils ont été rejetés
+            return null;
         }
         let nextIndex;
         do {
@@ -133,6 +114,7 @@ export const Home = () => {
         };
 
         const handleMouseUp = (upEvent) => {
+
             cardRef.current.style.cursor = 'grab';
             document.removeEventListener('mouseup', handleMouseUp);
             document.removeEventListener('mousemove', handleMouseMove);
@@ -149,14 +131,60 @@ export const Home = () => {
                     console.log("Il n'y a plus de profils disponibles.");
                 }
             }
-
             cardRef.current.style.transform = '';
+            handleLike();
         };
 
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
     };
 
+    const fetchProfileData = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No authentication token found. User might not be logged in.');
+            return;
+        }
+        try {
+            const profilesData = await UserData(token);
+            console.log('Fetched profiles:', profilesData); // Log fetched data for debugging
+            setProfiles(profilesData);
+            if (profilesData.length > 0) {
+                setCurrentIndex(0);
+            }
+        } catch (error) {
+            console.error('Error fetching profiles:', error); // Log errors for debugging
+        }
+    };
+
+    useEffect(() => {
+        fetchProfileData();
+    }, []);
+
+    const handleLike = async () => {
+        const userId = getUserIdFromToken();
+        const token = localStorage.getItem('token');
+
+        if (!userId || !currentProfile) return;
+
+        try {
+            await HandleLike(userId, currentProfile.id, token);
+
+            const matches = await CheckMatch(userId, token);
+            const matched = matches.find(match => match.likedUserId === currentProfile.id);
+
+            if (matched) {
+                alert(`Vous avez un match avec ${currentProfile.firstName} !`);
+            } else {
+                console.log('Pas de match trouvé avec ce profil.');
+            }
+
+            const nextIndex = getNextRandomIndex();
+            setCurrentIndex(nextIndex);
+        } catch (error) {
+            console.error('Erreur lors du like ou de la récupération des matches :', error);
+        }
+    };
     const handleDislike = () => {
         setDislikedProfiles((prev) => [...prev, currentIndex]);
         const nextIndex = getNextRandomIndex();
@@ -167,16 +195,12 @@ export const Home = () => {
         }
     };
 
-
-
-    console.log(currentProfile)
+    //const nextIndex = (currentIndex + 1 + profiles.length) % profiles.length;
+    //setCurrentIndex(dislikedProfiles.includes(nextIndex) ? currentIndex : nextIndex);
 
     return (
         <Container>
-            <LeftArrow onClick={() => {
-                const nextIndex = getNextRandomIndex();
-                setCurrentIndex(nextIndex);
-            }}>
+            <LeftArrow onClick={handleLike}>
                 <FontAwesomeIcon icon={faHeart} />
             </LeftArrow>
             <Card ref={cardRef} onMouseDown={handleMouseDown}>
@@ -187,7 +211,7 @@ export const Home = () => {
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={(e) => e.preventDefault()}
                     >
-                        {currentProfile.pictures.length > 0 ? (
+                        {currentProfile.pictures.length > 0 ? ( // Only render if pictures exist
                             <div key={imageIndex}>
                                 <Img
                                     src={currentProfile.pictures[imageIndex].imageUrl}
@@ -199,16 +223,19 @@ export const Home = () => {
                         )}
                     </SliderStyle>
                 </DivImage>
-                <DivDescriptionPersso>
-                    <DescriptionPersso>
-                        <Name>{currentProfile.firstName}</Name>
-                        <GenderAge>
-                            <span>{currentProfile.gender}</span>
-                            <span>{currentProfile.age}</span>
-                        </GenderAge>
-                        <Description>{currentProfile.description}</Description>
-                    </DescriptionPersso>
-                </DivDescriptionPersso>
+                {/* Conditionally render profile details only if `currentProfile` has data */}
+                {currentProfile && Object.keys(currentProfile).length > 0 && (
+                    <DivDescriptionPersso>
+                        <DescriptionPersso>
+                            <Name>{currentProfile.firstName}</Name>
+                            <GenderAge>
+                                <span>{currentProfile.gender}</span>
+                                <span>{currentProfile.age}</span>
+                            </GenderAge>
+                            <Description>{currentProfile.description}</Description>
+                        </DescriptionPersso>
+                    </DivDescriptionPersso>
+                )}
             </Card>
             <RightArrow onClick={handleDislike}>
                 <FontAwesomeIcon icon={faCircleXmark} />
@@ -216,4 +243,3 @@ export const Home = () => {
         </Container>
     );
 };
-

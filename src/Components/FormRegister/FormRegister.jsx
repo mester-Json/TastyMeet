@@ -1,4 +1,3 @@
-/*---------------------------- import ------------------------------------------------*/
 import { useState, useEffect } from "react";
 import {
     FormularRegister,
@@ -21,11 +20,9 @@ import {
 import avatarDefault from "../../Resources/Images/avatar.png";
 import eyeOpen from "../../Resources/Images/eye.svg";
 import eyeClose from "../../Resources/Images/eye-slash.svg";
-
-/*----------------------------------------------------------------------------*/
+import { registerUser } from '../../Axios/Axios.js';
 
 export const FormRegister = () => {
-    /*---------------------------- useState ------------------------------------------------*/
     const [errors, setErrors] = useState({
         firstName: "",
         lastName: "",
@@ -33,6 +30,8 @@ export const FormRegister = () => {
         password: "",
         gender: "",
         age: "",
+        phone: "",
+        file: "",
     });
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -42,235 +41,149 @@ export const FormRegister = () => {
     const [lastName, setLastName] = useState("");
     const [gender, setGender] = useState("");
     const [age, setAge] = useState("");
-    const [isAdult, setIsAdult] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [currentForm, setCurrentForm] = useState("formularRegister");
     const [description, setDescription] = useState("");
-    const [phone, setPhone] = useState(null);
+    const [phone, setPhone] = useState("");
     const [file, setFile] = useState(avatarDefault);
     const [urlFile, setUrlFile] = useState(avatarDefault);
     const [eye, setEye] = useState(eyeClose);
-    /*----------------------------------------------------------------------------*/
-    /*---------------------------- useEffect ------------------------------------------------*/
-    // fonction qui vérifie l'age
+
+    // useEffect to check age validity
     useEffect(() => {
         if (age) {
             const today = new Date();
             const birthDateObj = new Date(age);
             const agePerson = today.getFullYear() - birthDateObj.getFullYear();
 
-            setIsAdult(agePerson >= 18);
-        } else {
-            setIsAdult(null);
+            if (birthDateObj > today) {
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    age: "La date de naissance ne peut pas être dans le futur.",
+                }));
+            } else if (agePerson < 18) {
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    age: "Vous devez être majeur pour vous inscrire.",
+                }));
+            } else {
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    age: "", // Clear age error if valid
+                }));
+            }
         }
     }, [age]);
-    /*----------------------------------------------------------------------------*/
 
-    // const ReverseDateTime = () => {
-    //     console.log(age);
-    //     // Convert the date string (YYYY-MM-DD) into a Date object
-    //     const date = new Date(age);
-
-    //     // Extract day, month, and year from the date object
-    //     const day = date.getDate().toString().padStart(2, '0');
-    //     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
-    //     const year = date.getFullYear();
-
-    //     // Format the date as DD-MM-YYYY
-    //     setAge(`${day}-${month}-${year}`);
-
-    // }; 
-
-
-
-
-    /*********************** handleNext************************/
-    // Fonction test pour afficher le form2
     const handleNext = async () => {
         const newErrors = {};
-        switch (currentForm) {
-            case "formularRegister":
-                if (!lastName) {
-                    newErrors.lastName = "Le nom est requis";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (!firstName) {
-                    newErrors.firstName = "Le prénom est requis";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (!email) {
-                    newErrors.email = "L'email est requis";
-                    setShowError(true);
-                } else if (! /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email)) {
-                    newErrors.email = "L'email n'est pas valide";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (!password) {
-                    newErrors.password = "Le mot de passe est requis";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (gender === "") {
-                    newErrors.gender = "Veuillez choisir un genre";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (!age) {
-                    newErrors.age = "La date de naissance est requise";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (isAdult === false) {
-                    newErrors.age = "Vous devez être majeur pour vous inscrire";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                break;
-            default:
-                console.error("Formulaire non reconnu");
-                break;
-        }
-        // Si pas d'erreurs, soumettre le formulaire
-        if (Object.keys(newErrors).length === 0) {
 
+        if (!lastName) newErrors.lastName = "Le nom est requis";
+        if (!firstName) newErrors.firstName = "Le prénom est requis";
+        if (!email) {
+            newErrors.email = "L'email est requis";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            newErrors.email = "L'email n'est pas valide";
+        }
+        if (!password) newErrors.password = "Le mot de passe est requis";
+        if (!gender) newErrors.gender = "Veuillez choisir un genre";
+        if (!age) newErrors.age = "La date de naissance est requise";
+
+        if (Object.keys(newErrors).length === 0) {
             handleFormSwitch("formMoreInfo");
         } else {
             setErrors(newErrors);
+            setShowError(true);
         }
-
     };
-
-    /*****************************************************************************/
-    /*****************************handleLogin**********************************/
-    // Fonction d'inscription
     const handleLogin = async () => {
-        console.log(age);
         const newErrors = {};
 
-        switch (currentForm) {
-            case "formMoreInfo":
-                if (file === avatarDefault) {
-                    newErrors.file = "L'avatar est requis";
-                    setShowError(true);
-                } else {
-                    setShowError(false);
-                }
-                if (phone === null) {
-                    newErrors.phone = "Le numéro de téléphone est requis";
-                    setShowError(true);
-                } else if (! /^\+?[0-9]{10,15}$/.test(phone)) {
-                    newErrors.phone = "Le numéro de téléphone n'est pas valide";
-                } else {
-                    setShowError(false);
-                }
-                break;
-            default:
-                console.error("Formulaire non reconnu");
-                break;
+        // Validate additional fields before submitting
+        if (file === avatarDefault) newErrors.file = "L'avatar est requis";
+        if (!phone) {
+            newErrors.phone = "Le numéro de téléphone est requis";
+        } else if (!/^\+?[0-9]{10,15}$/.test(phone)) {
+            newErrors.phone = "Le numéro de téléphone n'est pas valide";
         }
+
+        const formatDateForDB = (date) => {
+            const formattedDate = new Date(date); // Convert to a Date object
+            return formattedDate.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
+        };
 
         const formData = new FormData();
         formData.append("firstName", firstName);
         formData.append("lastName", lastName);
-        formData.append("age", age);
         formData.append("password", password);
+        formData.append("gender", gender);
         formData.append("description", description);
         formData.append("email", email);
         formData.append("phone", phone);
-        formData.append("gender", gender);
-        formData.append("file", file); // fichier ajouté ici
 
+        // Format the age before appending
+        const formattedAge = formatDateForDB(age); // Pass age to formatDateForDB
+        console.log("Formatted age for DB:", formattedAge); // Log the formatted age for debugging
+        formData.append("age", formattedAge); // Append formatted age
 
-        // Si pas d'erreurs, soumettre le formulaire
+        formData.append("file", file); // Add the file here
+
+        // If no errors, submit the form
         if (Object.keys(newErrors).length === 0) {
-            // Si pas d'erreurs, effectuer la requête POST pour soumettre les données
             setIsLoading(true);
-
-            fetch("http://localhost:9090/api/addUser", {
-                method: "POST",
-                body: formData,
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Erreur lors de l'inscription");
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log("Inscription réussie:", data);
-                    // Action après inscription réussie
-                })
-                .catch((error) => {
-                    console.error("Erreur:", error);
-                })
-                .finally(() => {
-                    setIsLoading(false);
-                });
+            try {
+                const data = await registerUser(formData); // Call the registration function
+                console.log("Inscription réussie:", data);
+                // Perform action after successful registration
+            } catch (error) {
+                console.error("Erreur:", error);
+            } finally {
+                setIsLoading(false);
+            }
         } else {
             setErrors(newErrors);
         }
     };
-    // set la date de naissance
+
+
+
     const handleDateChange = (event) => {
         setAge(event.target.value);
     };
 
-    // Fonction test pour afficher le form2
-
-
     const handlePictureChange = (e) => {
-        const selectedFile = e.target.files[0]; // Sélectionne le premier fichier
+        const selectedFile = e.target.files[0]; // Select the first file
         if (selectedFile) {
-            setFile(selectedFile); // Stocke l'objet File dans l'état
+            setFile(selectedFile); // Store the File object in the state
+            handlePictureDisplay(e); // Update the display of the selected file
         }
-        handlePictureDisplay(e);
     };
 
-    // Changement de l'file par défaut, par le nouvelle file
     const handlePictureDisplay = (e) => {
-        const file = e.target.files[0]; // Sélectionne le premier fichier
+        const file = e.target.files[0]; // Select the first file
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setUrlFile(reader.result); // Stocke l'URL de l'image dans l'état
+                setUrlFile(reader.result); // Store the image URL in the state
             };
-            reader.readAsDataURL(file); // Lit le fichier comme une URL de données
+            reader.readAsDataURL(file); // Read the file as a data URL
         }
     };
 
-
-
-    // Affiche ou non me mot de passe et changer l'oeil
     const handleShowPassword = () => {
-        if (showPassword === false) {
-            setShowPassword(!showPassword);
-            setEye(eyeOpen);
-        } else {
-            setShowPassword(!showPassword);
-            setEye(eyeClose);
-        }
+        setShowPassword(!showPassword);
+        setEye(showPassword ? eyeClose : eyeOpen);
     };
 
-    // Ajuster dynamiquement la taille du textarea selon le contenu
     const handleAutoRedimText = (e) => {
         e.target.style.height = "auto";
         e.target.style.height = e.target.scrollHeight + "px";
     };
 
-    // Changement de formulaire sur la même page
     const handleFormSwitch = (formName) => {
         setCurrentForm(formName);
     };
+
     /*----------------------------------------------------------------------------*/
 
     return (

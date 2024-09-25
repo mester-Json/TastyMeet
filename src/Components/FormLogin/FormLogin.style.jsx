@@ -55,7 +55,7 @@ export const Inscription = styled(Link)`
   text-align: center;
 
   &:hover {
-    color: #775144;
+    color: #4FFFE3;
   }  
   @media(max-width:425px;) {
     font-size:5px;
@@ -70,7 +70,7 @@ export const Mdp = styled(Link)`
   text-align: center;
 
   &:hover {
-    color: #775144;
+    color: #4FFFE3;
   }
   @media(max-width:425px;) {
     font-size:5px;

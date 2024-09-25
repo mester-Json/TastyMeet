@@ -1,14 +1,13 @@
 package fr.tastymeet.apitastymeet.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @NoArgsConstructor
@@ -30,7 +29,7 @@ public class User {
     private String lastName;
     @Column(name = "firstName", nullable = false)
     private String firstName;
-    @Column(name = "age", nullable = false)
+    @Column(name = "age")
     private LocalDate age;
     @Column(name = "description", nullable = true)
     private String description;
@@ -50,14 +49,20 @@ public class User {
     private String city;
     @ElementCollection
     private Set<Roles> roles = Set.of(Roles.PUBLIC);
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Column(nullable = true)
     private List<Picture> pictures = new ArrayList<>();
+
     @ManyToMany
-    private List<User> liked;
+    private Set<User> liked = new HashSet<>();
 
-    public List<User> getMatches() {
-        return liked.stream().filter(like -> like.liked.stream().anyMatch(user -> user.id == id)).toList();
+    public Set<User> getMatches() {
+        return liked.stream().filter(like -> like.liked.stream().anyMatch(user -> user.id == id)).collect(Collectors.toSet());
     }
-
+    public void like(User user) {
+        liked.add(user);
+    }
+    public Set<User> getLiked() {
+        return liked;
+    }
 }

@@ -2,9 +2,21 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BurgerMenu, Menu, NavBar, Img, NavDiv } from './Nav.style.jsx';
 import logo from "../../Resources/Images/Logo.png";
+import { logoutUser } from '../../Axios/Axios.js';
 
 export const Nav = () => {
     const [open, setOpen] = useState(false);
+
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        await logoutUser();
+        window.location.reload();
+    };
+
+
+    const isLoggedIn = localStorage.getItem('token') !== null;
+
 
     return (
         <NavBar>
@@ -12,18 +24,22 @@ export const Nav = () => {
                 <Img src={logo} alt="Logo" />
             </Link>
             <NavDiv>
-                <BurgerMenu open={open} onClick={() => setOpen(!open)}>
-                    <div />
-                    <div />
-                    <div />
-                </BurgerMenu>
+                {isLoggedIn && (
+                    <BurgerMenu open={open} onClick={() => setOpen(!open)}>
+                        <div />
+                        <div />
+                        <div />
+                    </BurgerMenu>
+                )}
                 <Menu open={open}>
                     <li><a href="/profile">Mon Profile</a></li>
                     <li><a href="/accueil">Crouncher</a></li>
-                    <li><a href="/message">Tchacher</a></li>
+                    <li><a href="/messaging">Tchacher</a></li>
                     <li><a href="/help">Help</a></li>
-                </Menu>
-            </NavDiv>
+                    {isLoggedIn && (
+                        <li><a href="#" id="logout" onClick={handleLogout}>Déconnexion</a></li>
+                    )}
+                </Menu>            </NavDiv>
         </NavBar>
     );
 };
