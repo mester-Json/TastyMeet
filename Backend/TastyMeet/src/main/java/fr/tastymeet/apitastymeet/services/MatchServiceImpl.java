@@ -1,8 +1,10 @@
 package fr.tastymeet.apitastymeet.services;
 
+import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.dto.UserLikeDto;
 import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
+import fr.tastymeet.apitastymeet.tools.DtoTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

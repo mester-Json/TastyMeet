@@ -51,8 +51,15 @@ public class User {
     @Column(nullable = true)
     private List<Picture> pictures = new ArrayList<>();
 
+
     @ManyToMany
     private Set<User> liked = new HashSet<>();
+
+    @OneToMany(mappedBy = "senderUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ChatMessage> messages;
+
+    @ManyToMany(mappedBy = "roomUsers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ChatRoom> senderRooms;
 
     public Set<User> getMatches() {
         return liked.stream().filter(like -> like.liked.stream().anyMatch(user -> user.id == id)).collect(Collectors.toSet());

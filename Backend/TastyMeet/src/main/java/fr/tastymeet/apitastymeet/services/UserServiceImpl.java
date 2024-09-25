@@ -2,7 +2,9 @@ package fr.tastymeet.apitastymeet.services;
 
 import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.entities.Gender;
+import fr.tastymeet.apitastymeet.entities.Picture;
 import fr.tastymeet.apitastymeet.entities.User;
+import fr.tastymeet.apitastymeet.repositories.PictureRepository;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
 import fr.tastymeet.apitastymeet.tools.DtoTool;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PictureRepository pictureRepository;
 
     @Override
     public List<UserDto> getByAll() {

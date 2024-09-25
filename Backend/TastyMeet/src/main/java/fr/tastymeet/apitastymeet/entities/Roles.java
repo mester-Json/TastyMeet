@@ -1,5 +1,7 @@
 package fr.tastymeet.apitastymeet.entities;
 
-public enum Roles {
+import java.io.Serializable;
+
+public enum Roles implements Serializable {
     PUBLIC,ADMIN
 }

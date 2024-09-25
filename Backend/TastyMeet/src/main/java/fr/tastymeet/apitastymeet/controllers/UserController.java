@@ -38,6 +38,12 @@ public class UserController {
     @Autowired
     private IPictureService pictureService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private PictureController pictureController;
+
     @Value("${file.upload-dir}")
     private String uploadDir;
 

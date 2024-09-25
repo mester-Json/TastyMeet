@@ -1,7 +1,11 @@
 package fr.tastymeet.apitastymeet.dto;
 
+import fr.tastymeet.apitastymeet.entities.Gender;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter

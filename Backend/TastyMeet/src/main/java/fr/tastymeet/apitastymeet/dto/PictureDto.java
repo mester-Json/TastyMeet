@@ -2,6 +2,8 @@ package fr.tastymeet.apitastymeet.dto;
 
 
 
+import jakarta.persistence.Lob;
+import jakarta.persistence.Version;
 import lombok.*;
 
 @AllArgsConstructor
