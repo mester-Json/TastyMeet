@@ -23,7 +23,7 @@ color: white;
 
 export const UserContainer = styled.div`
 display: flex;
-flex-direction: ${({ sender }) => (sender === 'user1' ? 'row' : 'row-reverse')};
+flex-direction: ${({ sender }) => (sender === 'user2' ? 'row' : 'row-reverse')};
 `;
 
 export const MessagesContainer = styled.div`
@@ -34,7 +34,7 @@ export const MessagesContainer = styled.div`
 
 export const MessageContainer = styled.div`
   display: flex;
-  flex-direction: ${({ sender }) => (sender === 'user1' ? 'row' : 'row-reverse')};
+  flex-direction: ${({ sender }) => (sender === 'user2' ? 'row' : 'row-reverse')};
   margin: 5px 50px;
   align-items: flex-end;
 `;
@@ -42,8 +42,8 @@ export const MessageContainer = styled.div`
 export const MessageBubble = styled.div`
   padding: 10px;
   border-radius: 10px;
-  background-color: ${({ sender }) => (sender === 'user1' ? '#2a0800' : '#D9D9D9')};
-  color: ${({ sender }) => (sender === 'user1' ? 'white' : 'black')};
+  background-color: ${({ sender }) => (sender === 'user2' ? '#2a0800' : '#D9D9D9')};
+  color: ${({ sender }) => (sender === 'user2' ? 'white' : 'black')};
   max-width: 60%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 `;

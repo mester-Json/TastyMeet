@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final CustomUserDetailsService userDetailsService; // Utilisation du service de détails utilisateur
     //private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+
+
+
 
     public AuthController(CustomUserDetailsService userDetailsService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
         this.userDetailsService = userDetailsService;
@@ -44,4 +46,5 @@ public class AuthController {
         // Retourner le token dans la réponse
         return ResponseEntity.ok(jwtUtils.generateToken(userDetails.getUsername(), userId, gender, orientation));
     }
+
 }

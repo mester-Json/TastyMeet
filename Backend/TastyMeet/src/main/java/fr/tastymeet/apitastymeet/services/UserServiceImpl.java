@@ -1,5 +1,7 @@
 package fr.tastymeet.apitastymeet.services;
 
+import fr.tastymeet.apitastymeet.dto.PictureDto;
+import fr.tastymeet.apitastymeet.dto.UserChatDto;
 import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.entities.Gender;
 import fr.tastymeet.apitastymeet.entities.Picture;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -88,5 +91,23 @@ public class UserServiceImpl implements IUserService {
         Optional<User> u= userRepository.findById(id);
 
         return DtoTool.convert(u, UserDto.class);
+    }
+
+
+    public UserChatDto getUserDetails(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec ID: " + userId));
+
+        // Convertir l'entité User en UserChatDto
+        UserChatDto userChatDto = new UserChatDto();
+        userChatDto.setFirstName(user.getFirstName());
+
+        // Convertir les pictures en PictureDto
+        List<PictureDto> pictureDtos = user.getPictures().stream()
+                .map(picture -> DtoTool.convert(picture, PictureDto.class)) // Utiliser DtoTool pour la conversion
+                .collect(Collectors.toList());
+        userChatDto.setPictures(pictureDtos);
+
+        return userChatDto;
     }
 }

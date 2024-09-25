@@ -1,24 +1,29 @@
-import { useState } from 'react';
 import { MessageBar, Avatar, MessageContent } from '../Messaging/CartMessaging.style.jsx';
 
-export const  CartMessaging = () => {
+// const getUserIdFromToken = () => {
+//     const token = localStorage.getItem('token');
+//     if (token) {
+//         const payload = JSON.parse(atob(token.split('.')[1])); // Décoder le payload
+//         return payload.id; // Assurez-vous que l'ID est dans le payload
+//     }
+//     return null;
+// };
+export const CartMessaging = ({ conversation }) => {
+    const { participant, lastMessage } = conversation;
 
-    //Message reçu avec l'image de la personne, prenom et une partie du message reçu 
     return (
-        <>
-            <div>
-                <a style={{ textDecoration: 'none' }} href="http://localhost:5173/Message"><MessageBar>
+        <div>
+            <a style={{ textDecoration: 'none' }} href={`http://localhost:5173/Message`}>
+                <MessageBar>
                     <Avatar>
-                        <img src="https://www.utopix.com/wp-content/uploads/2024/04/MjdmZjg0ZWMtNjE1OS00ZDQxLThhYzItNTg3YjQwYzc1MzVi_70f1467b-7a37-47d4-b2db-0eb0ce163b0f_profilhomme5-scaled.jpg" alt="Avatar de Jonathan" />
+                        <img src={`http://localhost:9090/api/show/${participant.pictures[0].pictureName}`} alt={`Avatar de ${participant.firstName}`} />
                     </Avatar>
                     <MessageContent>
-                        <h4>Jonathan</h4>
-                        <p>Salut je t'ai envoyé un message, ouvre le ....</p>
+                        <h4>{participant.firstName}</h4>
+                        <p>{lastMessage}</p>
                     </MessageContent>
                 </MessageBar>
-                </a>
-            </div>
-        </>
+            </a>
+        </div>
     );
-}
-
+};
