@@ -1,6 +1,6 @@
 package fr.tastymeet.apitastymeet.tools;
 
-import fr.tastymeet.apitastymeet.dto.GenderDto;
+
 import fr.tastymeet.apitastymeet.entities.Gender;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

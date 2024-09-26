@@ -1,10 +1,9 @@
-package fr.tastymeet.apitastymeet.services;
+package fr.tastymeet.apitastymeet.services.Impl;
 
-import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.dto.UserLikeDto;
 import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
-import fr.tastymeet.apitastymeet.tools.DtoTool;
+import fr.tastymeet.apitastymeet.services.Interface.IMatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class MatchServiceImpl implements IMatchService{
+public class MatchServiceImpl implements IMatchService {
     @Autowired
     private UserRepository userRepository;
 

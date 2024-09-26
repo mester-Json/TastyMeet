@@ -12,5 +12,5 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     // Obtenir le dernier message d'une conversation
     ChatMessage findFirstByConversationIdOrderByDateEnvoieDesc(Long conversationId);
 
-
+    List<ChatMessage> findByConversationId(Long conversationId);
 }

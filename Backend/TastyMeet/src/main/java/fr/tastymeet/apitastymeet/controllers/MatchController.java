@@ -1,10 +1,9 @@
 package fr.tastymeet.apitastymeet.controllers;
 
 import fr.tastymeet.apitastymeet.dto.UserLikeDto;
-import fr.tastymeet.apitastymeet.entities.User;
-import fr.tastymeet.apitastymeet.services.ConversationServiceImpl;
-import fr.tastymeet.apitastymeet.services.IMatchService;
-import fr.tastymeet.apitastymeet.services.IUserService;
+import fr.tastymeet.apitastymeet.services.Impl.ConversationServiceImpl;
+import fr.tastymeet.apitastymeet.services.Interface.IConversationService;
+import fr.tastymeet.apitastymeet.services.Interface.IMatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -18,7 +17,7 @@ public class MatchController {
     @Autowired
     private IMatchService matchService;
     @Autowired
-    private ConversationServiceImpl conversationService;
+    private IConversationService conversationService;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
@@ -31,7 +30,6 @@ public class MatchController {
 
         // Vérifiez les matches après avoir liké
         Set<UserLikeDto> matches = matchService.getMatches(userId);
-        System.out.println("Matches pour l'utilisateur " + userId + ": " + matches);
 
         // Vérifiez si le likedUserId est dans les matches
         if (matches.stream().anyMatch(match -> match.getLikedUserId() == likedUserId)) {

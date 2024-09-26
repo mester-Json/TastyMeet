@@ -1,7 +1,6 @@
-package fr.tastymeet.apitastymeet.services;
+package fr.tastymeet.apitastymeet.services.Interface;
 
 import fr.tastymeet.apitastymeet.dto.PictureDto;
-import fr.tastymeet.apitastymeet.entities.Picture;
 
 import java.util.List;
 

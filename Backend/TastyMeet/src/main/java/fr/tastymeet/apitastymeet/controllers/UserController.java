@@ -1,15 +1,15 @@
 package fr.tastymeet.apitastymeet.controllers;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fr.tastymeet.apitastymeet.dto.*;
-import fr.tastymeet.apitastymeet.services.IMatchService;
+import fr.tastymeet.apitastymeet.services.Interface.IMatchService;
 import fr.tastymeet.apitastymeet.tools.JwtUtils;
 import io.jsonwebtoken.Claims;
 import org.springframework.http.HttpStatus;
 import fr.tastymeet.apitastymeet.entities.Gender;
-import fr.tastymeet.apitastymeet.services.IPictureService;
-import fr.tastymeet.apitastymeet.services.IUserService;
+import fr.tastymeet.apitastymeet.services.Interface.IPictureService;
+import fr.tastymeet.apitastymeet.services.Interface.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -36,12 +36,6 @@ public class UserController {
 
     @Autowired
     private IPictureService pictureService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private PictureController pictureController;
 
     @Autowired
     private IMatchService matchService;

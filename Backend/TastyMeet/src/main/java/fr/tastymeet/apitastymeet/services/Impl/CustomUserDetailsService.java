@@ -1,4 +1,4 @@
-package fr.tastymeet.apitastymeet.services;
+package fr.tastymeet.apitastymeet.services.Impl;
 
 
 import fr.tastymeet.apitastymeet.dto.CustomUserDetails;

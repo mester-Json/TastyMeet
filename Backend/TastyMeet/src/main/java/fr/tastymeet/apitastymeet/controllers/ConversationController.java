@@ -1,8 +1,7 @@
 package fr.tastymeet.apitastymeet.controllers;
 
 import fr.tastymeet.apitastymeet.dto.ConversationDto;
-import fr.tastymeet.apitastymeet.entities.Conversation;
-import fr.tastymeet.apitastymeet.services.ConversationServiceImpl;
+import fr.tastymeet.apitastymeet.services.Interface.IConversationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +13,7 @@ import java.util.List;
 public class ConversationController {
 
     @Autowired
-    private ConversationServiceImpl conversationService;
+    private IConversationService conversationService;
 
 
 

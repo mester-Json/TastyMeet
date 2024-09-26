@@ -5,6 +5,7 @@ import { Messaging } from "../Pages/Messaging.jsx";
 import { Message } from "../Pages/Message.jsx";
 import { Accueil } from "../Pages/Accueil.jsx";
 import { ProfilPage } from '../Pages/ProfilePage.jsx';
+import { ChatApp } from "../Components/Messaging/ChatApp.jsx";
 import { Help } from '../Pages/Help.jsx';
 
 
@@ -19,7 +20,7 @@ export const AppRoutes = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/messaging" element={isAuthenticated() ? <Messaging /> : <Navigate to="/login" replace />} />
-                <Route path="/message" element={isAuthenticated() ? <Message /> : <Navigate to="/login" replace />} />
+                <Route path="/message/:conversationId" element={isAuthenticated() ? <ChatApp /> : <Navigate to="/login" replace />} />
                 <Route path="/accueil" element={isAuthenticated() ? <Accueil /> : <Navigate to="/login" replace />} />
                 <Route path="/profile" element={isAuthenticated() ? <ProfilPage /> : <Navigate to="/login" replace />} />
                 <Route path="*" element={<h1>404 Not Found</h1>} />

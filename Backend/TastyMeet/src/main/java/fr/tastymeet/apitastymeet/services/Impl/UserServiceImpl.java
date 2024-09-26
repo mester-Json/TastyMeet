@@ -1,13 +1,13 @@
-package fr.tastymeet.apitastymeet.services;
+package fr.tastymeet.apitastymeet.services.Impl;
 
 import fr.tastymeet.apitastymeet.dto.PictureDto;
 import fr.tastymeet.apitastymeet.dto.UserChatDto;
 import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.entities.Gender;
-import fr.tastymeet.apitastymeet.entities.Picture;
 import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.repositories.PictureRepository;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
+import fr.tastymeet.apitastymeet.services.Interface.IUserService;
 import fr.tastymeet.apitastymeet.tools.DtoTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

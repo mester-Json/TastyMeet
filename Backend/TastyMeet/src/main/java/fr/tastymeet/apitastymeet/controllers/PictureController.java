@@ -1,7 +1,7 @@
 package fr.tastymeet.apitastymeet.controllers;
 
 import fr.tastymeet.apitastymeet.dto.PictureDto;
-import fr.tastymeet.apitastymeet.services.IPictureService;
+import fr.tastymeet.apitastymeet.services.Interface.IPictureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;

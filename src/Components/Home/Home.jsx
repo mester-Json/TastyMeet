@@ -200,31 +200,33 @@ export const Home = () => {
             return;
         }
 
-        const matchResponse = await fetch(`http://localhost:9090/api/${userId}/matches`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
 
-        if (matchResponse.ok) {
-            const matches = await matchResponse.json();
-            console.log("Matches reçus :", matches);
-
-            const matched = matches.find(match => match.likedUserId === currentProfile.id);
-            if (matched) {
-                alert(`Vous avez un match avec ${currentProfile.firstName} !`);
-            } else {
-                console.log("Pas de match trouvé avec ce profil.");
-            }
-        } else {
-            console.error("Erreur lors de la récupération des matches.");
-        }
 
         // Appel à fetchProfileData après un like
         await fetchProfileData(); // Rafraîchit la liste des profils après le like
     };
+
+    // const matchResponse = await fetch(`http://localhost:9090/api/${userId}/matches`, {
+    //     method: 'GET',
+    //     headers: {
+    //         'Authorization': `Bearer ${token}`,
+    //         'Content-Type': 'application/json'
+    //     }
+    // });
+
+    // if (matchResponse.ok) {
+    //     const matches = await matchResponse.json();
+    //     console.log("Matches reçus :", matches);
+
+    //     const matched = matches.find(match => match.likedUserId === currentProfile.id);
+    //     if (matched) {
+    //         alert(`Vous avez un match avec ${currentProfile.firstName} !`);
+    //     } else {
+    //         console.log("Pas de match trouvé avec ce profil.");
+    //     }
+    // } else {
+    //     console.error("Erreur lors de la récupération des matches.");
+    // }
 
     const currentProfile = currentIndex !== null && profiles.length > 0
         ? profiles[currentIndex]
