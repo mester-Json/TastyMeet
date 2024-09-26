@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Setter
 @Getter
-@ToString
 
 @Entity
 public class User {

@@ -1,14 +1,14 @@
 package fr.tastymeet.apitastymeet.dto;
 
 
-import fr.tastymeet.apitastymeet.entities.ChatMessage;
-import fr.tastymeet.apitastymeet.entities.ChatRoom;
-import fr.tastymeet.apitastymeet.entities.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.*;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Set;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,24 +16,17 @@ import java.util.Set;
 @Getter
 @ToString
 public class UserChatDto {
-    //Classe Dto user dans la quelle est stocker les messages, les chatRooms et le nom
-    //Elle sera utiliser dans tout ce qui concerne les messages
-
     // l'id de mon UserChatDto
     private long id;
     // Le prénom du User
     private String firstName;
-    // La liste des messages
-    private List<ChatMessageDto> messages;
-    /*// La liste des personne liké
-    private Set<UserDto> liked = new HashSet<>();*/
+    // Avatar
+    //private PictureDto picture;
+    @JsonIgnore
+    private List<PictureDto> pictures = new ArrayList<>();
 
-
-    /*public static class ChatroomDto1{
-        private long chatRoomId;
-        private UserChatDto senderRoomUser;
-        private UserChatDto recipientRoomUser;
-        private List<ChatMessageDto> messages;
-    }*/
-
+    public PictureDto getPicture()
+    {
+        return pictures.get(0);
+    }
 }

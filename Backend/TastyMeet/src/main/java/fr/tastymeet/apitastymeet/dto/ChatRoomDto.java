@@ -1,6 +1,5 @@
 package fr.tastymeet.apitastymeet.dto;
 
-import fr.tastymeet.apitastymeet.entities.User;
 import lombok.*;
 
 import java.util.HashSet;

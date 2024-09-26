@@ -2,10 +2,11 @@ package fr.tastymeet.apitastymeet.services;
 
 import fr.tastymeet.apitastymeet.dto.ChatMessageDto;
 import fr.tastymeet.apitastymeet.dto.ChatRoomDto;
+import fr.tastymeet.apitastymeet.dto.PictureDto;
 import fr.tastymeet.apitastymeet.dto.UserChatDto;
-import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.entities.ChatMessage;
 import fr.tastymeet.apitastymeet.entities.ChatRoom;
+import fr.tastymeet.apitastymeet.entities.Picture;
 import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.repositories.ChatMessageRepository;
 import fr.tastymeet.apitastymeet.repositories.ChatRoomRepository;
@@ -15,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 @Service
 public class ChatMessageServiceImpl {
@@ -35,69 +34,69 @@ public class ChatMessageServiceImpl {
 
 
     public void createMessage(long roomId, long userId, String content){
-        //1-Récupérer l'id de la Room où le message sera écrit
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(roomId);
-        //2-Récupérer le User qui écrit
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Le User n'existe pas"));
-        //3-Crée un message pour le user concerné
         List<ChatMessage> chatMessage = chatMessageRepository.findBySenderUser_Id(userId);
         ChatMessage message = new ChatMessage();
         message.setSenderUser(user); // Assurez-vous de définir l'utilisateur
         message.setContent(content);
         message.setRoom(chatRoom); // Si nécessaire, associez la ChatRoom
         chatMessage.add(message);
-
-        //3-1-Ajouter le message à la ChatRoom
         chatRoom.getMessages().add(message);
-
-        //4-Convertir le message en MessageDto
-        ChatMessageDto dto = chatMessageToChatMessageDto(message);
-
+        chatRoomRepository.saveAndFlush(chatRoom);
         chatMessageRepository.saveAllAndFlush(chatMessage);
     }
 
-    private ChatMessageDto chatMessageToChatMessageDto(ChatMessage chatMessage){
+ /*   private ChatMessageDto chatMessageToChatMessageDto(ChatMessage chatMessage){
         ChatMessageDto dto = new ChatMessageDto();
         dto.setChatId(chatMessage.getChatId());
-
         //Convertir le User avec l'id concerné avec un UserChatDto
-        dto.setSenderUser(userToUserChatDto(chatMessage));
+        dto.setSenderUser(chatMessage.getSenderUser().getId());
         //Récuperer le contenu du message
         dto.setContent(chatMessage.getContent());
         //Recupérer la date du message
         dto.setDateMessage(chatMessage.getDateMessage());
         //Convertir un ChatRoom en ChatRoomDto
-        dto.setRoom(chatRoomToChatRoomDto(chatMessage.getRoom()));
-
-
-
+        dto.setRoomId(chatMessage.getChatId());
         return dto;
     }
+
 
     private ChatRoomDto chatRoomToChatRoomDto(ChatRoom room) {
         ChatRoomDto chatRoomDto = new ChatRoomDto();
         chatRoomDto.setChatRoomId(room.getChatRoomId());
         chatRoomDto.setRoomUsers(usersToUserChatDto(room.getRoomUsers()));
-        chatRoomDto.setMessages(convertMessagesToChatMessageDtos(room.getMessages()));
         return chatRoomDto;
     }
 
 
-    private Set<UserChatDto> usersToUserChatDto(Collection<User> users) {
+
+   private Set<UserChatDto> usersToUserChatDto(Collection<User> users) {
         Set<UserChatDto> userChatDtos = new HashSet<>();
         for (User user : users) {
             UserChatDto userChatDto = new UserChatDto();
             userChatDto.setId(user.getId());
             userChatDto.setFirstName(user.getFirstName());
-            // Convertir les messages de l'utilisateur s'il y a lieu
-            userChatDto.setMessages(convertMessagesToChatMessageDtos(user.getMessages()));
+            //userChatDto.setPicture(pictureToDto(user.getPictures()));
             userChatDtos.add(userChatDto);
         }
         return userChatDtos;
+    }*/
+
+
+   /* private PictureDto pictureToDto(List<Picture> pictures){
+        PictureDto dto = new PictureDto();
+        if (pictures.get(0) == null){
+            return null;
+        }
+        dto.setId(pictures.get(0).getId());
+        dto.setPictureName(pictures.get(0).getPictureName());
+        dto.setVersion(pictures.get(0).getVersion());
+        dto.setUserId(pictures.get(0).getUser().getId());
+        return dto;
     }
-
-
-    // Méthode pour convertir une liste de ChatMessage en une liste de ChatMessageDto
+*/
+  /*  // Méthode pour convertir une liste de ChatMessage en une liste de ChatMessageDto
     private List<ChatMessageDto> convertMessagesToChatMessageDtos(List<ChatMessage> messages) {
         List<ChatMessageDto> chatMessageDtos = new ArrayList<>();
         for (ChatMessage message : messages) {
@@ -129,7 +128,7 @@ public class ChatMessageServiceImpl {
         userDto.setFirstName(chatMessage.getSenderUser().getFirstName());
         // On peut mapper d'autres propriétés si nécessaire
         return userDto;
-    }
+    }*/
 
 
 

@@ -1,11 +1,16 @@
 package fr.tastymeet.apitastymeet.controllers;
 
+import fr.tastymeet.apitastymeet.dto.ChatMessageDto;
 import fr.tastymeet.apitastymeet.dto.ChatRoomDto;
 import fr.tastymeet.apitastymeet.dto.UserLikeDto;
 import fr.tastymeet.apitastymeet.services.ChatMessageServiceImpl;
 import fr.tastymeet.apitastymeet.services.ChatRoomServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +26,9 @@ public class ChatMessageController {
 
     @Autowired
     private ChatMessageServiceImpl chatMessageService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate; // Injecte le template de messagerie
+
 
     // Afficher 1 ChatRoom et son contenu (messages)
     @GetMapping("/messages/chatroom/{chatRoomId}")
@@ -50,11 +58,26 @@ public class ChatMessageController {
         return ResponseEntity.ok(chatRoomDto);
     }
 
-    @PostMapping("/{roomId}/{userId}/{content}")
-    public ResponseEntity<?> likeUser(@PathVariable long roomId, @PathVariable long userId, @PathVariable String content){
-
+    /*@PostMapping("/{roomId}/{userId}/{content}")
+    public ResponseEntity<?> createMessage(@PathVariable long roomId, @PathVariable long userId, @PathVariable String content){
         chatMessageService.createMessage(roomId,userId,content);
-
         return ResponseEntity.ok("Send with success !!!!");
+    }*/
+
+    @MessageMapping("/message")
+    public void sendMessage(@Payload ChatMessageDto chatMessageDto) throws Exception{
+
+        chatMessageService.createMessage(chatMessageDto.getRoomId(), chatMessageDto.getSenderUserId(), chatMessageDto.getContent());
+
+        // Envoie le message à tous les abonnés du topic "/topic/sendMessage/{roomId}"
+        messagingTemplate.convertAndSend(
+                "/topic/sendMessage/" + chatMessageDto.getRoomId(), // Envoie le message au bon topic
+                chatMessageDto );// Le message à envoyer aux abonnés
     }
+
+    /*@PostMapping("/{roomId}/{userId}/{content}")
+    public ResponseEntity<?> createMessage(@PathVariable long roomId, @PathVariable long userId, @PathVariable String content){
+        chatMessageService.createMessage(roomId,userId,content);
+        return ResponseEntity.ok("Send with success !!!!");
+    }*/
 }

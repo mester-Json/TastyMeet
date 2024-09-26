@@ -1,18 +1,15 @@
 package fr.tastymeet.apitastymeet.services;
 
-import fr.tastymeet.apitastymeet.dto.ChatMessageDto;
 import fr.tastymeet.apitastymeet.dto.ChatRoomDto;
-import fr.tastymeet.apitastymeet.dto.UserChatDto;
-import fr.tastymeet.apitastymeet.entities.ChatMessage;
 import fr.tastymeet.apitastymeet.entities.ChatRoom;
 import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.repositories.ChatRoomRepository;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
+import fr.tastymeet.apitastymeet.tools.DtoTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ChatRoomServiceImpl implements IChatRoomService {
@@ -41,7 +38,7 @@ public class ChatRoomServiceImpl implements IChatRoomService {
         List<ChatRoomDto> chatRoomDtos = new ArrayList<>();
         // Convertit chaque ChatRoom en ChatRoomDto et les ajoute à la liste chatRoomDtos
         for (ChatRoom chatRoom : ch) {
-            chatRoomDtos.add(convertToChatRoomDto(chatRoom));
+            chatRoomDtos.add(DtoTool.convert(chatRoom, ChatRoomDto.class));
         }
         return chatRoomDtos;
     }
@@ -53,10 +50,10 @@ public class ChatRoomServiceImpl implements IChatRoomService {
                 .orElseThrow();
 
         // Convertir le ChatRoom en ChatRoomDto
-        return convertToChatRoomDto(chatRoom);
+        return DtoTool.convert(chatRoom, ChatRoomDto.class);
     }
 
-    public ChatRoomDto convertToChatRoomDto(ChatRoom chatRoom) {
+    /*public ChatRoomDto convertToChatRoomDto(ChatRoom chatRoom) {
         // Créer un ChatRoomDto
         ChatRoomDto chatRoomDto = new ChatRoomDto();
 
@@ -70,9 +67,9 @@ public class ChatRoomServiceImpl implements IChatRoomService {
         chatRoomDto.setMessages(convertMessagesToChatMessageDtos(chatRoom.getMessages()));
 
         return chatRoomDto;
-    }
+    }*/
 
-    // Méthode pour convertir une collection de User en une collection de UserChatDto
+   /* // Méthode pour convertir une collection de User en une collection de UserChatDto
     private Set<UserChatDto> convertUsersToUserChatDtos(Collection<User> users) {
         Set<UserChatDto> userChatDtos = new HashSet<>();
         for (User user : users) {
@@ -80,13 +77,14 @@ public class ChatRoomServiceImpl implements IChatRoomService {
             userChatDto.setId(user.getId());
             userChatDto.setFirstName(user.getFirstName());
             // Convertir les messages de l'utilisateur s'il y a lieu
-            userChatDto.setMessages(convertMessagesToChatMessageDtos(user.getMessages()));
+            //userChatDto.setMessages(convertMessagesToChatMessageDtos(user.getMessages()));
+            //userChatDto.setPicture();
             userChatDtos.add(userChatDto);
         }
         return userChatDtos;
-    }
+    }*/
 
-    // Méthode pour convertir une liste de ChatMessage en une liste de ChatMessageDto
+/*    // Méthode pour convertir une liste de ChatMessage en une liste de ChatMessageDto
     private List<ChatMessageDto> convertMessagesToChatMessageDtos(List<ChatMessage> messages) {
         List<ChatMessageDto> chatMessageDtos = new ArrayList<>();
         for (ChatMessage message : messages) {
@@ -100,17 +98,17 @@ public class ChatRoomServiceImpl implements IChatRoomService {
             userChatDto.setId(message.getSenderUser().getId());
             userChatDto.setFirstName(message.getSenderUser().getFirstName());
 
-            chatMessageDto.setSenderUser(userChatDto);
+            chatMessageDto.setSenderUser(userChatDto.getId());
 
             // Optionnel: Ajouter la ChatRoomDto si nécessaire
             ChatRoomDto chatRoomDto = new ChatRoomDto();
             chatRoomDto.setChatRoomId(message.getRoom().getChatRoomId());
-            chatMessageDto.setRoom(chatRoomDto);
+            chatMessageDto.setRoomId(chatRoomDto.getChatRoomId());
 
             chatMessageDtos.add(chatMessageDto);
         }
         return chatMessageDtos;
-    }
+    }*/
 
 
 

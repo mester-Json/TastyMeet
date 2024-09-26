@@ -1,24 +1,43 @@
-import { useState } from 'react';
-import { MessageBar, Avatar, MessageContent } from '../Messaging/CartMessaging.style.jsx';
+// CartMessaging.jsx
 
-export const  CartMessaging = () => {
+export const CartMessaging = ({ chatRoom }) => {
+    const { chatRoomId, roomUsers, messages } = chatRoom;
 
-    //Message reçu avec l'image de la personne, prenom et une partie du message reçu 
     return (
-        <>
-            <div>
-                <a style={{ textDecoration: 'none' }} href="http://localhost:5173/Message"><MessageBar>
-                    <Avatar>
-                        <img src="https://www.utopix.com/wp-content/uploads/2024/04/MjdmZjg0ZWMtNjE1OS00ZDQxLThhYzItNTg3YjQwYzc1MzVi_70f1467b-7a37-47d4-b2db-0eb0ce163b0f_profilhomme5-scaled.jpg" alt="Avatar de Jonathan" />
-                    </Avatar>
-                    <MessageContent>
-                        <h4>Jonathan</h4>
-                        <p>Salut je t'ai envoyé un message, ouvre le ....</p>
-                    </MessageContent>
-                </MessageBar>
-                </a>
+        <div className="chat-room">
+            <h2>Room ID: {chatRoomId}</h2>
+            <div className="room-users">
+                <h3>Users in this room:</h3>
+                {roomUsers.length > 0 ? (
+                    roomUsers.map(user => (
+                        <div key={user.id} className="user">
+                            <img 
+                                src={`http://localhost:9090/images/${user.picture.pictureName}`} 
+                                alt={user.firstName} 
+                                width={50} 
+                                height={50}
+                            />
+                            <p>{user.firstName}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p>No users in this room</p>
+                )}
             </div>
-        </>
+            
+            <div className="room-messages">
+                <h3>Messages:</h3>
+                {messages.length > 0 ? (
+                    messages.map(message => (
+                        <div key={message.chatId} className="message">
+                            <p><strong>User {message.senderUserId}:</strong> {message.content}</p>
+                            <p><small>{new Date(message.dateMessage).toLocaleString()}</small></p>
+                        </div>
+                    ))
+                ) : (
+                    <p>No messages in this room</p>
+                )}
+            </div>
+        </div>
     );
-}
-
+};

@@ -11,8 +11,10 @@ import java.time.LocalDateTime;
 @ToString
 public class ChatMessageDto {
     private long chatId;
-    private UserChatDto senderUser;
+    //private UserChatDto senderUser; // seulement id du user sender
+    private long senderUserId;
     private String content;
     private LocalDateTime dateMessage = LocalDateTime.now();
-    private ChatRoomDto room;
+    //private ChatRoomDto room; // seulement id du room
+    private long roomId; // Pas besoin c'est déjà les message de la room
 }

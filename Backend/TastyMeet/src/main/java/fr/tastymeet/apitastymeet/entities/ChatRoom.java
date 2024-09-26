@@ -12,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Setter
 @Getter
-@ToString
+//@ToString
 @Accessors(chain = true)
 @Entity
 public class ChatRoom {

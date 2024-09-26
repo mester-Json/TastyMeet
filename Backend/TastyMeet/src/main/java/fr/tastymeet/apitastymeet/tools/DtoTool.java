@@ -9,4 +9,6 @@ public class DtoTool {
     public static <TSource, TDestination> TDestination convert(TSource source, Class<TDestination> clazz) {
         return mapper.map(source, clazz);
     }
+
+
 }
