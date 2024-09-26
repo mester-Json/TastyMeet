@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Div, Form, InputField, Button, Inscription, Mdp } from './FormLogin.style.jsx';
 import { SignIn } from '../../Axios/Axios.js';
@@ -13,9 +13,10 @@ export const FormLogin = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex pour validation e-mail
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const handleLogin = async () => {
+    const handleLogin = async (e) => {
+
         setEmailError(null);
         setPasswordError(null);
         setError(null);
@@ -37,8 +38,8 @@ export const FormLogin = () => {
         setIsLoading(true);
 
         try {
-            await SignIn(email, password);
-            navigate('/acceuil');
+            const token = await SignIn(email, password);
+            localStorage.setItem('token', token);
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.message || 'Erreur lors de la connexion.');
@@ -48,9 +49,16 @@ export const FormLogin = () => {
         }
     };
 
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            navigate('/accueil');
+        }
+    }, [navigate]);
+
     return (
         <Div>
-            <Form>
+            <Form onSubmit={handleLogin}>
                 <InputField
                     type="email"
                     placeholder="Adresse e-mail"
@@ -97,9 +105,10 @@ export const FormLogin = () => {
                     </label>
                 </div>
 
-                <Button type="button" onClick={handleLogin} disabled={isLoading}>
+                <Button type="submit" disabled={isLoading}>
                     {isLoading ? 'Connexion...' : 'Se connecter'}
                 </Button>
+
                 <div>
                     <Inscription to="/register">
                         Inscription

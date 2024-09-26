@@ -30,11 +30,14 @@ export const DivImage = styled.div`
         transform: scale(1.1);
         transition-duration: 0.5s;
     }  */
+        @media (max-width: 520px) {
+         width:300px;
+        }
 `
 
 export const DivDescriptionPersso = styled.div`
 margin-top :-50px;
-
+margin-bottom:50px;
 `
 
 export const ImageContainer = styled.div`
@@ -44,7 +47,9 @@ export const ImageContainer = styled.div`
     background-color: #333;
     margin:auto;
     display: flex;
-
+    @media (max-width: 520px) {
+         width:auto;
+        }
 `;
 
 
@@ -105,6 +110,9 @@ export const LeftArrow = styled(NavArrow)`
     &::before {
         box-shadow: 0 0 8px 4px red;
     }
+    @media (max-width: 768px) {
+         display:none;
+        }
 `;
 
 export const RightArrow = styled(NavArrow)`
@@ -116,6 +124,9 @@ export const RightArrow = styled(NavArrow)`
     &::before {
         box-shadow: 0 0 8px 4px mediumspringgreen;
     }
+    @media (max-width: 768px) {
+         display:none;
+        }
 `;
 
 
@@ -147,7 +158,9 @@ export const Img = styled.img`
     height: 350px;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
-
+    @media (max-width: 520px) {
+         width:300px;
+        }
 
 `
 
@@ -160,4 +173,7 @@ export const SliderStyle = styled(Slider)`
     &:focus {
         outline: none; /* Supprime le contour lors du focus */
     }
+    @media (max-width: 520px) {
+         width:300px;
+        }
 `;

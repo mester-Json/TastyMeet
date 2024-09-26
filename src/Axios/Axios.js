@@ -15,17 +15,12 @@ const instance = axios.create({
 
 export const logoutUser = async (navigate) => {
     try {
-        // Envoie une requête de déconnexion si nécessaire
-        await instance.post('/auth/logout'); // Si tu as une route de logout dans ton API
+        await instance.post('/auth/logout');
 
-        // Supprime le token du localStorage
         localStorage.removeItem('token');
 
-        // Redirige vers la page de connexion ou une autre page
-        navigate('/'); // Change cela en fonction de ta route de connexion
     } catch (error) {
         console.error('Erreur lors de la déconnexion :', error);
-        // Tu peux gérer l'erreur ici si nécessaire
     }
 };
 
@@ -60,7 +55,7 @@ export const SignIn = async (email, password) => {
     try {
         const response = await instance.post(`/auth/login`, { email, password });
 
-        return response.data;
+        return response.data.token;
     } catch (error) {
         throw error;
     }
