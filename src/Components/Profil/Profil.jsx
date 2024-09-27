@@ -26,7 +26,6 @@ export const Profil = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [gender, setGender] = useState('');
-    const [age, setAge] = useState('');
     const [orientation, setOrientation] = useState('');
     const [description, setDescription] = useState('');
     const [phone, setPhone] = useState('');
@@ -34,13 +33,13 @@ export const Profil = () => {
     const [city, setCity] = useState('');
     const [file, setFile] = useState(null);
     const [pictures, setPictures] = useState([]);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState({});
 
-    // Form management
     const [showPasswordForm, setShowPasswordForm] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
+
     const [showEmailForm, setShowEmailForm] = useState(false);
     const [currentEmail, setCurrentEmail] = useState('');
     const [newEmail, setNewEmail] = useState('');
@@ -50,25 +49,26 @@ export const Profil = () => {
         const fetchProfile = async () => {
             try {
                 const userId = getUserIdFromToken();
-                console.log("Fetching profile for user ID:", userId);
                 const data = await fetchProfileData(userId);
-                console.log("Profile data received:", data);
-                setId(data.id);
-                setVersion(data.version);
-                setEmail(data.email);
-                setFirstName(data.firstName);
-                setLastName(data.lastName);
-                setGender(data.gender);
-                setAge(data.age);
-                setOrientation(data.orientation || '');
-                setDescription(data.description);
-                setPhone(data.phone);
-                setLocation(data.location || '');
-                setCity(data.city || '');
-                setPictures(data.pictures);
+
+                if (data) {
+                    setId(data.id || '');
+                    setVersion(data.version || '');
+                    setEmail(data.email || '');
+                    setFirstName(data.firstName || '');
+                    setLastName(data.lastName || '');
+                    setGender(data.gender || '');
+                    setOrientation(data.orientation || '');
+                    setDescription(data.description || '');
+                    setPhone(data.phone || '');
+                    setLocation(data.location || '');
+                    setCity(data.city || '');
+                    setPictures(data.pictures || []);
+                } else {
+                    setError({ fetch: 'Une erreur est survenue lors de la récupération des données.' });
+                }
             } catch (error) {
-                console.error('Erreur:', error);
-                setError('Une erreur est survenue lors de la récupération des données.');
+                setError({ fetch: 'Une erreur est survenue lors de la récupération des données.' });
             }
         };
 
@@ -76,52 +76,44 @@ export const Profil = () => {
     }, []);
 
     const validatePassword = (password) => {
-        const regex = /(?=.*[!@#$%^&*])/; // Un caractère spécial
+        const regex = /(?=.*[!@#$%^&*])/; // Require at least one special character
         return password.length >= 6 && password.length <= 15 && regex.test(password);
     };
 
-
-
-
     const handleUpdate = async (event) => {
         event.preventDefault();
-        const newErrors = {};
-        const formData = new FormData();
-
         setError({});
 
+        // Check for empty fields
+        const fieldsToCheck = {
+            firstName,
+            lastName,
+            location,
+            phone,
+            gender,
+            description,
+        };
+        const newErrors = {};
+        Object.keys(fieldsToCheck).forEach((field) => {
+            if (!fieldsToCheck[field]) {
+                newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} est requis`;
+            }
+        });
 
-        if (!firstName.trim() || !lastName.trim() || !location.trim() || !phone() || !gender.trim() || !description.trim()) {
-            if (!firstName.trim()) {
-                newErrors.firstName = 'Prénom Requis'
-            }
-            if (!lastName.trim()) {
-                newErrors.lastName = 'Nom Requis'
-            }
-            if (!location.trim()) {
-                newErrors.location = 'Adress Requis'
-            }
-            if (!phone.trim()) {
-                newErrors.phone = ' Téléphone Requis'
-            }
-            if (!gender.trim()) {
-                newErrors.gender = 'Tu est de quel Genre'
-
-            }
-            if (!description.trim()) {
-                newErrors.description = 'Tu veux Pecho alors ecris'
-            }
-            if (password && !validatePassword(password)) {
-                newErrors.password = ' tu veux te faire pirater'
-            }
-
+        if (password && !validatePassword(password)) {
+            newErrors.password = 'Le mot de passe doit être entre 6 et 15 caractères, incluant un caractère spécial.';
         }
 
+        if (Object.keys(newErrors).length) {
+            setError(newErrors);
+            return;
+        }
+
+        const formData = new FormData();
         formData.append("id", id);
         formData.append("version", version);
         formData.append("firstName", firstName);
         formData.append("lastName", lastName);
-        formData.append("age", age);
         formData.append("description", description);
         formData.append("orientation", orientation);
         formData.append("email", email);
@@ -130,20 +122,15 @@ export const Profil = () => {
         if (file) {
             formData.append("file", file);
         }
-
-        if (password && password.this() !== '') {
+        if (password) {
             formData.append("password", password);
         }
 
-        if (Object.keys(newErrors).length === 0) {
-            try {
-                await updateProfileData(formData);
-                console.log("Modification utilisateur réussie");
-            } catch (error) {
-                console.error("Erreur:", error);
-            }
-        } else {
-            setError(newErrors);
+        try {
+            await updateProfileData(formData);
+            alert("Modification utilisateur réussie");
+        } catch (error) {
+            setError({ update: 'Une erreur est survenue lors de la mise à jour.' });
         }
     };
 
@@ -152,36 +139,21 @@ export const Profil = () => {
         setError(null);
 
         if (newPassword !== confirmNewPassword) {
-            setError('Les nouveaux mots de passe ne correspondent pas.');
+            setError({ password: 'Les nouveaux mots de passe ne correspondent pas.' });
             return;
         }
 
         if (!validatePassword(newPassword)) {
-            setError('Le nouveau mot de passe doit contenir entre 6 et 15 caractères, y compris un caractère spécial.');
+            setError({ password: 'Le nouveau mot de passe doit contenir entre 6 et 15 caractères, y compris un caractère spécial.' });
             return;
         }
 
-        if (Object.keys(newErrors).length === 0) {
-            try {
-                console.log("Données à envoyer:", formData);
-                await updateProfileData(formData);
-                console.log("Modification utilisateur réussie");
-            } catch (error) {
-                console.error("Erreur lors de la mise à jour:", error);
-                setError('Une erreur est survenue lors de la mise à jour.');
-            }
-        } else {
-            setError(newErrors);
-        }
-
-
-
         try {
             await changePassword({
-                id: id,
-                currentPassword: currentPassword,
-                newPassword: newPassword,
-                confirmNewPassword: confirmNewPassword,
+                id,
+                currentPassword,
+                newPassword,
+                confirmNewPassword,
             });
             alert('Mot de passe modifié avec succès.');
             setShowPasswordForm(false);
@@ -189,26 +161,29 @@ export const Profil = () => {
             setNewPassword('');
             setConfirmNewPassword('');
         } catch (error) {
-            setError(error.message);
-            console.log("Erreur capturée:", error);
+            setError({ password: error.message });
         }
     };
-
     const handleEmailChange = async (event) => {
         event.preventDefault();
-        setError(null);
+        setError({}); // Clear previous errors
 
         if (newEmail !== confirmNewEmail) {
-            setError('Les nouveaux emails ne correspondent pas.');
+            setError({ email: 'Les nouveaux emails ne correspondent pas.' });
+            return;
+        }
+
+        if (!newEmail || !currentEmail) {
+            setError({ email: 'Tous les champs doivent être remplis.' });
             return;
         }
 
         try {
             await changeEmail({
-                id: id,
-                currentEmail: currentEmail,
-                newEmail: newEmail,
-                confirmNewEmail: confirmNewEmail,
+                id,
+                currentEmail,
+                newEmail,
+                confirmNewEmail,
             });
             alert('Email modifié avec succès.');
             setShowEmailForm(false);
@@ -216,10 +191,11 @@ export const Profil = () => {
             setNewEmail('');
             setConfirmNewEmail('');
         } catch (error) {
-            setError(error.message);
-            console.log("Erreur capturée:", error);
+            setError({ email: 'Une erreur est survenue lors de la modification de l\'email.' });
+            console.error('Error changing email:', error);
         }
     };
+
 
     const handleDeletePhoto = async (photoId) => {
         const updatedPictures = pictures.filter(photo => photo.id !== photoId);
@@ -260,7 +236,6 @@ export const Profil = () => {
         setShowEmailForm(!showEmailForm);
     };
 
-
     return (
         <>
             <div style={styles.container}>
@@ -274,9 +249,8 @@ export const Profil = () => {
                                 placeholder="Prénom"
                                 onChange={(e) => setFirstName(e.target.value)}
                                 style={styles.input}
-
                             />
-                            {error?.firstName && <label style={{ color: 'red' }}>{error.firstName}</label>}
+                            {error.firstName && <div style={styles.error}>{error.firstName}</div>}
 
                             <input
                                 type="text"
@@ -286,7 +260,7 @@ export const Profil = () => {
                                 onChange={(e) => setLastName(e.target.value)}
                                 style={styles.input}
                             />
-                            {error?.lastName && <label style={{ color: 'red' }}>{error.lastName}</label>}
+                            {error.lastName && <div style={styles.error}>{error.lastName}</div>}
 
                         </div>
                         <div style={styles.row}>
@@ -298,7 +272,7 @@ export const Profil = () => {
                                 onChange={(e) => setLocation(e.target.value)}
                                 style={{ ...styles.input, marginTop: '10px' }}
                             />
-                            {error?.location && <label style={{ color: 'red' }}>{error.location}</label>}
+                            {error.location && <div style={styles.error}>{error.location}</div>}
 
                             <input
                                 type="tel"
@@ -308,7 +282,7 @@ export const Profil = () => {
                                 onChange={(e) => setPhone(e.target.value)}
                                 style={styles.input}
                             />
-                            {error?.phone && <label style={{ color: 'red' }}>{error.phone}</label>}
+                            {error.phone && <div style={styles.error}>{error.phone}</div>}
 
                         </div>
 
@@ -326,8 +300,6 @@ export const Profil = () => {
                                     <option value="TRANS">trans</option>
                                     <option value="NONBINAIRE">Non binaire</option>
                                 </select>
-                                {error?.gender && <label style={{ color: 'red' }}>{error.gender}</label>}
-
                             </div>
                             <div style={{ width: '100%' }}>
                                 <p>Orientation :</p>
@@ -342,39 +314,30 @@ export const Profil = () => {
                                     <option value="TRANS">trans</option>
                                     <option value="NONBINAIRE">Non binaire</option>
                                 </select>
-                                {error?.orientation && <label style={{ color: 'red' }}>{error.orientation}</label>}
-
                             </div>
                         </div>
-                        <div style={styles.row}>
-                            <textarea
-                                name="description"
-                                value={description}
-                                placeholder="Description"
-                                onChange={(e) => setDescription(e.target.value)}
-                                style={styles.textArea}
-                            />
-                            {error?.description && <label style={{ color: 'red' }}>{error.description}</label>}
-                        </div>
-                        <div>
-                            <button onClick={handleUpdate} style={styles.buttonModif}>
-                                Accepter les modifications
+                        <textarea
+                            name="description"
+                            maxLength="200"
+                            value={description}
+                            placeholder="Description"
+                            onChange={(e) => setDescription(e.target.value)}
+                            style={{ ...styles.input, ...styles.textarea, marginTop: '10px' }}
+                        />
+                        {error.description && <div style={styles.error}>{error.description}</div>}
+
+                        <button onClick={handleUpdate} style={styles.buttonModif}>
+                            Accepter les modifications
+                        </button>
+                        <div style={styles.rowButtons}>
+                            <button style={styles.button} onClick={togglePasswordForm}>
+                                {showPasswordForm ? 'Annuler' : 'Modifier le mot de passe'}
                             </button>
-
-                            <div style={styles.rowButtons}>
-                                <button style={styles.button} onClick={togglePasswordForm}>
-                                    {showPasswordForm ? 'Annuler' : 'Modifier le mot de passe'}
-                                </button>
-                                <button style={styles.button} onClick={toggleEmailForm}>
-                                    {showEmailForm ? 'Annuler' : "Modifier l'email"}
-                                </button>
-                            </div>
-                            {error && (
-                                <div style={styles.rowButtons}>
-                                    <label style={{ color: 'red' }}>{error}</label>
-                                </div>
-                            )}
+                            <button style={styles.button} onClick={toggleEmailForm}>
+                                {showEmailForm ? 'Annuler' : "Modifier l'email"}
+                            </button>
                         </div>
+
                     </form>
                 </div>
 
@@ -420,6 +383,7 @@ export const Profil = () => {
                             placeholder="Mot de passe actuel"
                             style={styles.ShowInput}
                         />
+
                     </div>
                     <div style={styles.row}>
                         <input
@@ -436,6 +400,8 @@ export const Profil = () => {
                             placeholder="Confirmer le nouveau mot de passe"
                             style={styles.ShowInput}
                         />
+                        {error.password && <div style={styles.error}>{error.password}</div>}
+
                         <button type="submit" style={styles.button}>Changer le mot de passe</button>
                     </div>
                 </form>
@@ -467,6 +433,8 @@ export const Profil = () => {
                             placeholder="Confirmer le nouvel email"
                             style={styles.ShowInput}
                         />
+                        {error.email && <div style={styles.error}>{error.email}</div>}
+
                         <button type="submit" style={styles.button}>Changer l'email</button>
                     </div>
                 </form>
@@ -474,3 +442,4 @@ export const Profil = () => {
         </>
     );
 };
+
