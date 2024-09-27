@@ -129,3 +129,76 @@ export const CheckMatch = async (userId, token) => {
         throw error;
     }
 };
+
+
+////////////////////
+/// Profiles ///////
+////////////////////
+
+export const fetchProfileData = async (userId) => {
+    try {
+        const response = await instance.get(`/profile/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching profile data:', error);
+        throw new Error('Erreur lors de la récupération des données.');
+    }
+};
+
+export const updateProfileData = async (formData) => {
+    try {
+        const response = await instance.post(`/update`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating profile data:', error);
+        throw new Error('Erreur lors de la modification');
+    }
+};
+
+export const changePassword = async (data) => {
+    try {
+        const response = await instance.post(`/verifyPassword`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Error changing password:', error);
+        throw new Error(error.response?.data?.message || 'Erreur lors de la modification du mot de passe');
+    }
+};
+
+export const changeEmail = async (data) => {
+    try {
+        const response = await instance.post(`/updateEmail`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Error changing email:', error);
+        throw new Error(error.response?.data?.message || 'Erreur lors de la modification de l\'email');
+    }
+};
+
+export const deletePhoto = async (photoId) => {
+    try {
+        const response = await instance.delete(`/delete/${photoId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting photo:', error);
+        throw new Error('Erreur lors de la suppression de la photo');
+    }
+};
+
+export const uploadFile = async (id, formData) => {
+    try {
+        const response = await instance.post(`/upload/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        throw new Error(error.response?.data?.message || 'Erreur lors de l\'upload du fichier');
+    }
+};

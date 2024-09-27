@@ -11,35 +11,63 @@ export const FormLogin = () => {
     const [emailError, setEmailError] = useState(null);
     const [passwordError, setPasswordError] = useState(null);
     const [error, setError] = useState(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            setIsAuthenticated(true);
+            navigate('/accueil');
+        }
+    }, [navigate]);
+
+
     const handleLogin = async (e) => {
+        e.preventDefault();
 
         setEmailError(null);
         setPasswordError(null);
         setError(null);
         setShowError(false);
 
+
+        let hasError = false;
+
+
         if (!email || !password) {
             if (!email) setEmailError('L\'adresse e-mail est requise.');
             if (!password) setPasswordError('Le mot de passe est requis.');
-            setShowError(true);
+            hasError(true);
             return;
         }
 
         if (!emailRegex.test(email)) {
             setEmailError('Adresse e-mail invalide.');
+            hasError(true);
+            return;
+        }
+
+
+        if (hasError) {
             setShowError(true);
             return;
         }
 
+
+
+
         setIsLoading(true);
+
 
         try {
             const token = await SignIn(email, password);
             localStorage.setItem('token', token);
+            setIsAuthenticated(true);
+            navigate('/accueil');
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.message || 'Erreur lors de la connexion.');
@@ -49,12 +77,11 @@ export const FormLogin = () => {
         }
     };
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            navigate('/accueil');
-        }
-    }, [navigate]);
+    if (isAuthenticated) {
+        return null;
+    }
+
+
 
     return (
         <Div>

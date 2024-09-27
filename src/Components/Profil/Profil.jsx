@@ -1,101 +1,222 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as styles from './Profil.style.jsx';
+import {
+    fetchProfileData,
+    updateProfileData,
+    changePassword,
+    changeEmail,
+    deletePhoto,
+    uploadFile,
+} from '../../Axios/Axios.js';
+
+const getUserIdFromToken = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.id;
+    }
+    return null;
+};
 
 export const Profil = () => {
-    const [profile, setProfile] = useState({
-        firstName: 'John',
-        lastName: 'Doe',
-        gender: 'Male',
-        email: 'john.doe@example.com',
-        phone: '0655321347',
-        address: '123 Route de turin, Nice, France',
-        description: 'Ceci est ma description',
-        photos: [
-            'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-            'https://swello.com/fr/blog/wp-content/uploads/2018/07/profil-personnel.jpg',
-            'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-        ],
-    });
+    const [email, setEmail] = useState('');
+    const [version, setVersion] = useState('');
+    const [id, setId] = useState('');
+    const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [gender, setGender] = useState('');
+    const [age, setAge] = useState('');
+    const [orientation, setOrientation] = useState('');
+    const [description, setDescription] = useState('');
+    const [phone, setPhone] = useState('');
+    const [location, setLocation] = useState('');
+    const [city, setCity] = useState('');
+    const [file, setFile] = useState(null);
+    const [pictures, setPictures] = useState([]);
+    const [error, setError] = useState(null);
 
-    //gère les modif des champs du formulaire
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setProfile({
-            ...profile,
-            [name]: value,
-        });
-    };
-
-    // composant qui s'affiche ou se désafiche lorsque l'on clique sur "Modifier mdp"
+    // Form management
     const [showPasswordForm, setShowPasswordForm] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
-
-    // composant qui s'affiche ou se désafiche lorsque l'on clique sur "Modifier email"
     const [showEmailForm, setShowEmailForm] = useState(false);
     const [currentEmail, setCurrentEmail] = useState('');
     const [newEmail, setNewEmail] = useState('');
     const [confirmNewEmail, setConfirmNewEmail] = useState('');
 
-    // afficher (ou désafficher) le composant pour modifier le mdp
-    const togglePasswordForm = () => {
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const userId = getUserIdFromToken();
+                const data = await fetchProfileData(userId);
+                setId(data.id);
+                setVersion(data.version);
+                setEmail(data.email);
+                setFirstName(data.firstName);
+                setLastName(data.lastName);
+                setGender(data.gender);
+                setAge(data.age);
+                setOrientation(data.orientation || '');
+                setDescription(data.description);
+                setPhone(data.phone);
+                setLocation(data.location || '');
+                setCity(data.city || '');
+                setPictures(data.pictures);
+            } catch (error) {
+                console.error('Erreur:', error);
+                setError('Une erreur est survenue lors de la récupération des données.');
+            }
+        };
+
+        fetchProfile();
+    }, []);
+
+    const handleUpdate = async (event) => {
+        event.preventDefault();
+        const newErrors = {};
+        const formData = new FormData();
+
+        formData.append("id", id);
+        formData.append("version", version);
+        formData.append("firstName", firstName);
+        formData.append("lastName", lastName);
+        formData.append("password", password);
+        formData.append("age", age);
+        formData.append("description", description);
+        formData.append("orientation", orientation);
+        formData.append("email", email);
+        formData.append("phone", phone);
+        formData.append("gender", gender);
+        if (file) {
+            formData.append("file", file);
+        }
+
+        if (Object.keys(newErrors).length === 0) {
+            try {
+                await updateProfileData(formData);
+                console.log("Modification utilisateur réussie");
+            } catch (error) {
+                console.error("Erreur:", error);
+            }
+        } else {
+            setError(newErrors);
+        }
+    };
+
+    const handlePasswordChange = async (event) => {
+        event.preventDefault();
+        setError(null);
+
+        if (newPassword !== confirmNewPassword) {
+            setError('Les nouveaux mots de passe ne correspondent pas.');
+            return;
+        }
+
+        try {
+            await changePassword({
+                id: id,
+                currentPassword: currentPassword,
+                newPassword: newPassword,
+                confirmNewPassword: confirmNewPassword,
+            });
+            alert('Mot de passe modifié avec succès.');
+            setShowPasswordForm(false);
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmNewPassword('');
+        } catch (error) {
+            setError(error.message);
+            console.log("Erreur capturée:", error);
+        }
+    };
+
+    const handleEmailChange = async (event) => {
+        event.preventDefault();
+        setError(null);
+
+        if (newEmail !== confirmNewEmail) {
+            setError('Les nouveaux emails ne correspondent pas.');
+            return;
+        }
+
+        try {
+            await changeEmail({
+                id: id,
+                currentEmail: currentEmail,
+                newEmail: newEmail,
+                confirmNewEmail: confirmNewEmail,
+            });
+            alert('Email modifié avec succès.');
+            setShowEmailForm(false);
+            setCurrentEmail('');
+            setNewEmail('');
+            setConfirmNewEmail('');
+        } catch (error) {
+            setError(error.message);
+            console.log("Erreur capturée:", error);
+        }
+    };
+
+    const handleDeletePhoto = async (photoId) => {
+        const updatedPictures = pictures.filter(photo => photo.id !== photoId);
+        setPictures(updatedPictures);
+
+        try {
+            await deletePhoto(photoId);
+            console.log("Photo supprimée avec succès");
+        } catch (error) {
+            console.error("Erreur:", error);
+        }
+    };
+
+    const handleFileUpload = async (e) => {
+        const selectedFiles = Array.from(e.target.files);
+        const formData = new FormData();
+        selectedFiles.forEach(file => formData.append('file', file));
+
+        try {
+            await uploadFile(id, formData);
+            const newPicture = {
+                pictureName: selectedFiles[0].name
+            };
+            setPictures(prevPictures => [...prevPictures, newPicture]);
+            alert('Une image a été ajoutée');
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    };
+
+    const togglePasswordForm = (event) => {
         event.preventDefault();
         setShowPasswordForm(!showPasswordForm);
     };
 
-    // Verifie si le nouveau mdp et le confirmer le nouveau mdp sont identitique, si ils le sont alors le composant se désafiche
-    const handlePasswordChange = (e) => {
-        if (newPassword !== confirmNewPassword) {
-            alert('Les mots de passe ne correspondent pas.');
-            return;
-        }
-        alert('Mot de passe modifié avec succès.');
-        setShowPasswordForm(false);
-    };
-
-    // afficher (ou désafficher) le composant pour modifier l'email'
-    const toggleEmailForm = () => {
+    const toggleEmailForm = (event) => {
         event.preventDefault();
         setShowEmailForm(!showEmailForm);
-    };
-
-
-    // Verifie si le nouvel email et le confirmer le nouvel email sont identitique, si ils le sont alors le composant se désafiche
-    const handleEmailChange = (e) => {
-        if (newEmail !== confirmNewEmail) {
-            alert("les adresses ne correspondent pas.");
-            return;
-        }
-        alert("l'email modifié avec succès.");
-        setShowEmailForm(false);
-    };
-
-
-    const handleFileUpload = () => {
-        alert('Une image a été ajouté');
     };
 
     return (
         <>
             <div style={styles.container}>
                 <div style={styles.leftColumn}>
-                    <form>
+                    <form onSubmit={handleUpdate}>
                         <div style={styles.row}>
-
                             <input
                                 type="text"
                                 name="firstName"
-                                value={profile.firstName}
-                                onChange={handleChange}
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
                                 placeholder="Prénom"
                                 style={styles.input}
                             />
                             <input
                                 type="text"
                                 name="lastName"
-                                value={profile.lastName}
-                                onChange={handleChange}
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
                                 placeholder="Nom"
                                 style={styles.input}
                             />
@@ -103,25 +224,25 @@ export const Profil = () => {
                         <div style={styles.row}>
                             <input
                                 type="text"
-                                name="address"
-                                value={profile.address}
-                                onChange={handleChange}
+                                name="location"
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
                                 placeholder="Adresse"
                                 style={{ ...styles.input, marginTop: '10px' }}
                             />
                             <input
                                 type="tel"
                                 name="phone"
-                                value={profile.phone}
-                                onChange={handleChange}
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
                                 placeholder="Téléphone"
                                 style={styles.input}
                             />
                         </div>
                         <select
                             name="gender"
-                            value={profile.gender}
-                            onChange={handleChange}
+                            value={gender}
+                            onChange={(e) => setGender(e.target.value)}
                             style={styles.select}
                         >
                             <option value="Male">Homme</option>
@@ -132,39 +253,38 @@ export const Profil = () => {
                         <textarea
                             name="description"
                             maxLength="200"
-                            value={profile.description}
-                            onChange={handleChange}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                             placeholder="Description"
                             style={{ ...styles.input, ...styles.textarea, marginTop: '10px' }}
                         ></textarea>
 
-                        <button style={styles.buttonModif} onClick={handleChange}>
+                        <button type="submit" style={styles.buttonModif}>
                             Accepter les modifications
                         </button>
                         <div style={styles.rowButtons}>
                             <button style={styles.button} onClick={togglePasswordForm}>
                                 {showPasswordForm ? 'Annuler' : 'Modifier le mot de passe'}
                             </button>
-                            <button style={styles.button} type="submit" onClick={toggleEmailForm}>
+                            <button style={styles.button} onClick={toggleEmailForm}>
                                 {showEmailForm ? 'Annuler' : "Modifier l'email"}
                             </button>
                         </div>
                     </form>
                 </div>
 
-
                 <div style={styles.rightColumn}>
                     <h2 style={styles.photoGalleryHeader}>Galerie de Photos</h2>
                     <div style={styles.photos}>
-                        {profile.photos.slice(0, 4).map((photo, index) => (
+                        {pictures.slice(0, 4).map((photo, index) => (
                             <img
                                 key={index}
-                                src={photo}
+                                src={photo.pictureName} // Assuming pictureName holds the URL
                                 alt={`Photo ${index + 1}`}
                                 style={styles.photo}
                             />
                         ))}
-                        {profile.photos.length < 4 && (
+                        {pictures.length < 4 && (
                             <label style={styles.photo}>
                                 <input
                                     type="file"
@@ -187,7 +307,6 @@ export const Profil = () => {
                             placeholder="Mot de passe actuel"
                             style={styles.ShowInput}
                         />
-
                     </div>
                     <div style={styles.row}>
                         <input
@@ -213,24 +332,23 @@ export const Profil = () => {
                 <form onSubmit={handleEmailChange} style={styles.ShowForm}>
                     <div style={styles.row}>
                         <input
-                            type="password"
+                            type="email"
                             value={currentEmail}
                             onChange={(e) => setCurrentEmail(e.target.value)}
-                            placeholder="email actuel"
+                            placeholder="Email actuel"
                             style={styles.ShowInput}
                         />
-
                     </div>
                     <div style={styles.row}>
                         <input
-                            type="password"
+                            type="email"
                             value={newEmail}
                             onChange={(e) => setNewEmail(e.target.value)}
                             placeholder="Nouvel email"
                             style={styles.ShowInput}
                         />
                         <input
-                            type="password"
+                            type="email"
                             value={confirmNewEmail}
                             onChange={(e) => setConfirmNewEmail(e.target.value)}
                             placeholder="Confirmer le nouvel email"
@@ -240,8 +358,7 @@ export const Profil = () => {
                     </div>
                 </form>
             )}
-
+            {error && <p style={{ color: 'red' }}>{error}</p>}
         </>
     );
 };
-

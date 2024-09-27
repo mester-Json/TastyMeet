@@ -57,11 +57,10 @@ export const Inscription = styled(Link)`
   &:hover {
     color: #4FFFE3;
   }  
-  @media(max-width:425px;) {
-    font-size:5px;
-    margin: 5px  ;
-
-  }
+  @media (max-width: 768px) {
+    font-size:10px;
+    margin-left:0px;
+}
 `;
 
 export const Mdp = styled(Link)`
@@ -72,9 +71,9 @@ export const Mdp = styled(Link)`
   &:hover {
     color: #4FFFE3;
   }
-  @media(max-width:425px;) {
-    font-size:5px;
-    margin: 5px  ;
+  @media (max-width:768px) {
+    font-size:10px;
+    margin-left:5px;
 
   }
 `;
