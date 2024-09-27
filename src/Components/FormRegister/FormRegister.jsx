@@ -19,7 +19,7 @@ import {
     InputFieldAge
 } from "./FormRegister.style.jsx";
 import avatarDefault from "../../Resources/Images/avatar.png";
-
+import { useNavigate } from "react-router-dom";
 import { registerUser } from '../../Axios/Axios.js';
 
 export const FormRegister = () => {
@@ -50,7 +50,19 @@ export const FormRegister = () => {
     const [phone, setPhone] = useState("");
     const [file, setFile] = useState(avatarDefault);
     const [urlFile, setUrlFile] = useState(avatarDefault);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const navigate = useNavigate();
+
     // const [eye, setEye] = useState(eyeClose);
+
+    useEffect(() => {
+        const token = sessionStorage.getItem('token');
+        if (token) {
+            setIsAuthenticated(true);
+            navigate('/accueil');
+        }
+    }, [navigate]);
 
     useEffect(() => {
         if (age) {
@@ -115,6 +127,7 @@ export const FormRegister = () => {
             setShowError(true);
         }
     };
+
     const handleLogin = async () => {
         const newErrors = {};
 
@@ -165,7 +178,7 @@ export const FormRegister = () => {
 
 
         useEffect(() => {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (token) {
                 navigate('/');
             }
@@ -215,7 +228,6 @@ export const FormRegister = () => {
 
     return (
         <>
-
             {currentForm === "formularRegister" && (
                 <>
                     <TitleForm1>Inscription</TitleForm1>

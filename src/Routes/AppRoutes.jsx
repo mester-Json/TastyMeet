@@ -8,7 +8,7 @@ import ProfilPage from '../Pages/ProfilePage.jsx';
 import Help from '../Pages/Help.jsx';
 
 const isAuthenticated = () => {
-    return localStorage.getItem('token') !== null;
+    return sessionStorage.getItem('token') !== null;
 };
 
 export const AppRoutes = () => {

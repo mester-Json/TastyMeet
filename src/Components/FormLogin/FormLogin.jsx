@@ -18,7 +18,7 @@ export const FormLogin = () => {
 
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (token) {
             setIsAuthenticated(true);
             navigate('/accueil');
@@ -65,7 +65,7 @@ export const FormLogin = () => {
 
         try {
             const token = await SignIn(email, password);
-            localStorage.setItem('token', token);
+            sessionStorage.setItem('token', token);
             setIsAuthenticated(true);
             navigate('/accueil');
         } catch (err) {

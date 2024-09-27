@@ -31,7 +31,7 @@ export const Home = () => {
     const [dislikedProfiles, setDislikedProfiles] = useState([]);
 
     const getUserIdFromToken = () => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (token) {
             const payload = JSON.parse(atob(token.split('.')[1]));
             return payload.id;
@@ -140,7 +140,7 @@ export const Home = () => {
     };
 
     const fetchProfileData = async () => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) {
             console.error('No authentication token found. User might not be logged in.');
             return;
@@ -163,7 +163,7 @@ export const Home = () => {
 
     const handleLike = async () => {
         const userId = getUserIdFromToken();
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
         if (!userId || !currentProfile) return;
 

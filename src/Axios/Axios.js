@@ -17,7 +17,7 @@ export const logoutUser = async (navigate) => {
     try {
         await instance.post('/auth/logout');
 
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
 
     } catch (error) {
         console.error('Erreur lors de la déconnexion :', error);

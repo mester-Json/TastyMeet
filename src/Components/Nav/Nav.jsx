@@ -15,7 +15,7 @@ export const Nav = () => {
     };
 
 
-    const isLoggedIn = localStorage.getItem('token') !== null;
+    const isLoggedIn = sessionStorage.getItem('token') !== null;
 
 
     return (
