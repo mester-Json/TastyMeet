@@ -58,11 +58,11 @@ public class ChatMessageController {
         return ResponseEntity.ok(chatRoomDto);
     }
 
-    /*@PostMapping("/{roomId}/{userId}/{content}")
+    @PostMapping("/{roomId}/{userId}/{content}")
     public ResponseEntity<?> createMessage(@PathVariable long roomId, @PathVariable long userId, @PathVariable String content){
         chatMessageService.createMessage(roomId,userId,content);
         return ResponseEntity.ok("Send with success !!!!");
-    }*/
+    }
 
     @MessageMapping("/message")
     public void sendMessage(@Payload ChatMessageDto chatMessageDto) throws Exception{

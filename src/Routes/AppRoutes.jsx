@@ -19,7 +19,7 @@ export const AppRoutes = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/messaging" element={isAuthenticated() ? <Messaging /> : <Navigate to="/login" replace />} />
-                <Route path="/message" element={isAuthenticated() ? <Message /> : <Navigate to="/login" replace />} />
+                <Route path="/message/:chatRoomId" element={isAuthenticated() ? <Message /> : <Navigate to="/login" replace />} />
                 <Route path="/accueil" element={isAuthenticated() ? <Accueil /> : <Navigate to="/login" replace />} />
                 <Route path="/profile" element={isAuthenticated() ? <ProfilPage /> : <Navigate to="/login" replace />} />
                 <Route path="*" element={<h1>404 Not Found</h1>} />

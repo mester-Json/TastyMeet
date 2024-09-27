@@ -43,7 +43,6 @@ public class ChatMessageServiceImpl {
         message.setRoom(chatRoom); // Si nécessaire, associez la ChatRoom
         chatMessage.add(message);
         chatRoom.getMessages().add(message);
-        chatRoomRepository.saveAndFlush(chatRoom);
         chatMessageRepository.saveAllAndFlush(chatMessage);
     }
 
