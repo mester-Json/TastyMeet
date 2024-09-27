@@ -50,7 +50,9 @@ export const Profil = () => {
         const fetchProfile = async () => {
             try {
                 const userId = getUserIdFromToken();
+                console.log("Fetching profile for user ID:", userId);
                 const data = await fetchProfileData(userId);
+                console.log("Profile data received:", data);
                 setId(data.id);
                 setVersion(data.version);
                 setEmail(data.email);
@@ -73,16 +75,52 @@ export const Profil = () => {
         fetchProfile();
     }, []);
 
+    const validatePassword = (password) => {
+        const regex = /(?=.*[!@#$%^&*])/; // Un caractère spécial
+        return password.length >= 6 && password.length <= 15 && regex.test(password);
+    };
+
+
+
+
     const handleUpdate = async (event) => {
         event.preventDefault();
         const newErrors = {};
         const formData = new FormData();
 
+        setError({});
+
+
+        if (!firstName.trim() || !lastName.trim() || !location.trim() || !phone() || !gender.trim() || !description.trim()) {
+            if (!firstName.trim()) {
+                newErrors.firstName = 'Prénom Requis'
+            }
+            if (!lastName.trim()) {
+                newErrors.lastName = 'Nom Requis'
+            }
+            if (!location.trim()) {
+                newErrors.location = 'Adress Requis'
+            }
+            if (!phone.trim()) {
+                newErrors.phone = ' Téléphone Requis'
+            }
+            if (!gender.trim()) {
+                newErrors.gender = 'Tu est de quel Genre'
+
+            }
+            if (!description.trim()) {
+                newErrors.description = 'Tu veux Pecho alors ecris'
+            }
+            if (password && !validatePassword(password)) {
+                newErrors.password = ' tu veux te faire pirater'
+            }
+
+        }
+
         formData.append("id", id);
         formData.append("version", version);
         formData.append("firstName", firstName);
         formData.append("lastName", lastName);
-        formData.append("password", password);
         formData.append("age", age);
         formData.append("description", description);
         formData.append("orientation", orientation);
@@ -91,6 +129,10 @@ export const Profil = () => {
         formData.append("gender", gender);
         if (file) {
             formData.append("file", file);
+        }
+
+        if (password && password.this() !== '') {
+            formData.append("password", password);
         }
 
         if (Object.keys(newErrors).length === 0) {
@@ -113,6 +155,26 @@ export const Profil = () => {
             setError('Les nouveaux mots de passe ne correspondent pas.');
             return;
         }
+
+        if (!validatePassword(newPassword)) {
+            setError('Le nouveau mot de passe doit contenir entre 6 et 15 caractères, y compris un caractère spécial.');
+            return;
+        }
+
+        if (Object.keys(newErrors).length === 0) {
+            try {
+                console.log("Données à envoyer:", formData);
+                await updateProfileData(formData);
+                console.log("Modification utilisateur réussie");
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour:", error);
+                setError('Une erreur est survenue lors de la mise à jour.');
+            }
+        } else {
+            setError(newErrors);
+        }
+
+
 
         try {
             await changePassword({
@@ -198,77 +260,120 @@ export const Profil = () => {
         setShowEmailForm(!showEmailForm);
     };
 
+
     return (
         <>
             <div style={styles.container}>
                 <div style={styles.leftColumn}>
-                    <form onSubmit={handleUpdate}>
+                    <form>
                         <div style={styles.row}>
                             <input
                                 type="text"
                                 name="firstName"
                                 value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
                                 placeholder="Prénom"
+                                onChange={(e) => setFirstName(e.target.value)}
                                 style={styles.input}
+
                             />
+                            {error?.firstName && <label style={{ color: 'red' }}>{error.firstName}</label>}
+
                             <input
                                 type="text"
                                 name="lastName"
                                 value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
                                 placeholder="Nom"
+                                onChange={(e) => setLastName(e.target.value)}
                                 style={styles.input}
                             />
+                            {error?.lastName && <label style={{ color: 'red' }}>{error.lastName}</label>}
+
                         </div>
                         <div style={styles.row}>
                             <input
                                 type="text"
                                 name="location"
                                 value={location}
-                                onChange={(e) => setLocation(e.target.value)}
                                 placeholder="Adresse"
+                                onChange={(e) => setLocation(e.target.value)}
                                 style={{ ...styles.input, marginTop: '10px' }}
                             />
+                            {error?.location && <label style={{ color: 'red' }}>{error.location}</label>}
+
                             <input
                                 type="tel"
                                 name="phone"
                                 value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
                                 placeholder="Téléphone"
+                                onChange={(e) => setPhone(e.target.value)}
                                 style={styles.input}
                             />
+                            {error?.phone && <label style={{ color: 'red' }}>{error.phone}</label>}
+
                         </div>
-                        <select
-                            name="gender"
-                            value={gender}
-                            onChange={(e) => setGender(e.target.value)}
-                            style={styles.select}
-                        >
-                            <option value="Male">Homme</option>
-                            <option value="Female">Femme</option>
-                            <option value="Other">Autre</option>
-                        </select>
 
-                        <textarea
-                            name="description"
-                            maxLength="200"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Description"
-                            style={{ ...styles.input, ...styles.textarea, marginTop: '10px' }}
-                        ></textarea>
+                        <div style={styles.row}>
+                            <div style={{ width: '100%' }}>
+                                <p>Genre :</p>
+                                <select
+                                    name="gender"
+                                    value={gender}
+                                    onChange={(e) => setGender(e.target.value)}
+                                    style={styles.select}
+                                >
+                                    <option value="MALE">Homme</option>
+                                    <option value="FEMALE">Femme</option>
+                                    <option value="TRANS">trans</option>
+                                    <option value="NONBINAIRE">Non binaire</option>
+                                </select>
+                                {error?.gender && <label style={{ color: 'red' }}>{error.gender}</label>}
 
-                        <button type="submit" style={styles.buttonModif}>
-                            Accepter les modifications
-                        </button>
-                        <div style={styles.rowButtons}>
-                            <button style={styles.button} onClick={togglePasswordForm}>
-                                {showPasswordForm ? 'Annuler' : 'Modifier le mot de passe'}
+                            </div>
+                            <div style={{ width: '100%' }}>
+                                <p>Orientation :</p>
+                                <select
+                                    name="orientation"
+                                    value={orientation}
+                                    onChange={(e) => setOrientation(e.target.value)}
+                                    style={styles.select}
+                                >
+                                    <option value="MALE">Homme</option>
+                                    <option value="FEMALE">Femme</option>
+                                    <option value="TRANS">trans</option>
+                                    <option value="NONBINAIRE">Non binaire</option>
+                                </select>
+                                {error?.orientation && <label style={{ color: 'red' }}>{error.orientation}</label>}
+
+                            </div>
+                        </div>
+                        <div style={styles.row}>
+                            <textarea
+                                name="description"
+                                value={description}
+                                placeholder="Description"
+                                onChange={(e) => setDescription(e.target.value)}
+                                style={styles.textArea}
+                            />
+                            {error?.description && <label style={{ color: 'red' }}>{error.description}</label>}
+                        </div>
+                        <div>
+                            <button onClick={handleUpdate} style={styles.buttonModif}>
+                                Accepter les modifications
                             </button>
-                            <button style={styles.button} onClick={toggleEmailForm}>
-                                {showEmailForm ? 'Annuler' : "Modifier l'email"}
-                            </button>
+
+                            <div style={styles.rowButtons}>
+                                <button style={styles.button} onClick={togglePasswordForm}>
+                                    {showPasswordForm ? 'Annuler' : 'Modifier le mot de passe'}
+                                </button>
+                                <button style={styles.button} onClick={toggleEmailForm}>
+                                    {showEmailForm ? 'Annuler' : "Modifier l'email"}
+                                </button>
+                            </div>
+                            {error && (
+                                <div style={styles.rowButtons}>
+                                    <label style={{ color: 'red' }}>{error}</label>
+                                </div>
+                            )}
                         </div>
                     </form>
                 </div>
@@ -277,15 +382,22 @@ export const Profil = () => {
                     <h2 style={styles.photoGalleryHeader}>Galerie de Photos</h2>
                     <div style={styles.photos}>
                         {pictures.slice(0, 4).map((photo, index) => (
-                            <img
-                                key={index}
-                                src={photo.pictureName} // Assuming pictureName holds the URL
-                                alt={`Photo ${index + 1}`}
-                                style={styles.photo}
-                            />
+                            <div key={index} style={styles.photoContainer}>
+                                <img
+                                    src={`http://localhost:9090/api/show/${photo.pictureName}`}
+                                    alt={`Photo ${index + 1}`}
+                                    style={styles.photo}
+                                />
+                                <button
+                                    style={styles.deleteButton}
+                                    onClick={() => handleDeletePhoto(photo.id)}
+                                >
+                                    -
+                                </button>
+                            </div>
                         ))}
                         {pictures.length < 4 && (
-                            <label style={styles.photo}>
+                            <label style={styles.photoContainer}>
                                 <input
                                     type="file"
                                     onChange={handleFileUpload}
@@ -297,6 +409,7 @@ export const Profil = () => {
                     </div>
                 </div>
             </div>
+
             {showPasswordForm && (
                 <form onSubmit={handlePasswordChange} style={styles.ShowForm}>
                     <div style={styles.row}>
@@ -358,7 +471,6 @@ export const Profil = () => {
                     </div>
                 </form>
             )}
-            {error && <p style={{ color: 'red' }}>{error}</p>}
         </>
     );
 };

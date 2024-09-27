@@ -5,14 +5,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-
 public class CustomUserDetails implements UserDetails {
-    private final Long id;
-    private final String email;
-    private final String password;
+
+    private Long id;
+    private String email;
+    private String password;
     private Gender gender;
     private Gender orientation;
-    private final Collection<? extends GrantedAuthority> authorities;
+    private Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(Long id, String email, String password, Gender gender, Gender orientation, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
@@ -36,6 +36,11 @@ public class CustomUserDetails implements UserDetails {
     public String getPassword() {
         return password;
     }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Gender getGender() {
         return gender;
     }

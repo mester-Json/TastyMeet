@@ -166,10 +166,19 @@ public class UserController {
 
     @PostMapping(value = "/update", consumes = "multipart/form-data", produces = "application/json")
     public ResponseEntity<UserDto> update(@ModelAttribute UserDto userDto) throws Exception {
+        UserDto existingUser = userService.getById(userDto.getId());
 
-        // Sauvegarde des données utilisateur
-        UserDto dto = userService.save(userDto);
-        return ResponseEntity.status(HttpStatus.OK).body(dto);
+        if (existingUser != null) {
+            if (userDto.getPassword() == null || userDto.getPassword().trim().isEmpty()) {
+                userDto.setPassword(existingUser.getPassword());
+            }
+
+            // Sauvegarde des données utilisateur
+            UserDto dto = userService.save(userDto);
+            return ResponseEntity.status(HttpStatus.OK).body(dto);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Ou un message d'erreur approprié
+        }
     }
 
 

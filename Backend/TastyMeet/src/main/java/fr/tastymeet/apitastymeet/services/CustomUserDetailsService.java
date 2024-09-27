@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -30,18 +29,41 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        /* Spring Security utilise ces autorités pour gérer l'autorisation (exemple : accorder ou refuser l'accès à certaines parties de l'application) */
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .collect(Collectors.toList());
 
         return new CustomUserDetails(
-                user.getId(), // L'ID doit être le premier paramètre
+                user.getId(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getGender(),
                 user.getOrientation(),
                 authorities
         );
+    }
+
+    public User updateUser(User updatedUser) {
+        // Récupérer l'utilisateur actuel de la base de données
+        User existingUser = userRepository.findById(updatedUser.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            existingUser.setPassword(updatedUser.getPassword());
+        }
+
+        // Mettre à jour les autres champs
+        existingUser.setAge(updatedUser.getAge());
+        existingUser.setCity(updatedUser.getCity());
+        existingUser.setDescription(updatedUser.getDescription());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setFirstName(updatedUser.getFirstName());
+        existingUser.setGender(updatedUser.getGender());
+        existingUser.setLastName(updatedUser.getLastName());
+        existingUser.setLocation(updatedUser.getLocation());
+        existingUser.setOrientation(updatedUser.getOrientation());
+        existingUser.setPhone(updatedUser.getPhone());
+
+        return userRepository.save(existingUser);
     }
 }

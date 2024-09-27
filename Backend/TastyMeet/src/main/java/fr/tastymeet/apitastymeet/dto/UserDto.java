@@ -21,6 +21,7 @@ public class UserDto {
     private String description;
     private String email;
     private String phone;
+
     private String password;
     private String firstName;
     private String lastName;
@@ -28,6 +29,7 @@ public class UserDto {
     private String location;
     private LocalDate age;
     private List<PictureDto> pictures = new ArrayList<>();
+    @NonNull
     private Gender gender;
     private Gender orientation;
 
