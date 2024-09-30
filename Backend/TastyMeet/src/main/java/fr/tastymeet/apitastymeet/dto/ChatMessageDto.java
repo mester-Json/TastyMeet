@@ -1,5 +1,6 @@
 package fr.tastymeet.apitastymeet.dto;
 
+import fr.tastymeet.apitastymeet.entities.Conversation;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -8,10 +9,9 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class ChatMessageDto {
-    private Long senderId;
-    private String content;
+    private long id;
     private UserChatDto sender;
+    private String content;
     private LocalDateTime dateEnvoie;
 }

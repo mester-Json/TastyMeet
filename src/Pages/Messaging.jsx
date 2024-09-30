@@ -5,7 +5,7 @@ import { CartMessaging } from '../Components/Messaging/CartMessaging.jsx';
 import { CountMessaging } from "../Components/Messaging/CountMessaging.jsx";
 
 const getUserIdFromToken = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
         const payload = JSON.parse(atob(token.split('.')[1])); // Décoder le payload
         return payload.id; // Assurez-vous que l'ID est dans le payload
@@ -13,7 +13,7 @@ const getUserIdFromToken = () => {
     return null;
 };
 
-export const Messaging = () => {
+function Messaging() {
     const [conversations, setConversations] = useState([]);
 
     useEffect(() => {
@@ -39,3 +39,4 @@ export const Messaging = () => {
         </>
     );
 }
+export default Messaging

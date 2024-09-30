@@ -8,6 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,68 +18,50 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api")
 public class PictureController {
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+
 
     @Autowired
     private IPictureService pictureService;
 
-    @PostMapping(value="/upload/{id}", consumes = "multipart/form-data" )
+    @PostMapping(value="/upload/{id}", consumes = "multipart/form-data")
     public ResponseEntity<String> uploadPhoto(@RequestPart("file") MultipartFile file, @PathVariable("id") long userId) {
         if (file.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Aucun fichier sélectionné.");
+            return ResponseEntity.badRequest().body("Aucun fichier sélectionné.");
         }
 
         try {
-
-
-            // Chemin où le fichier sera sauvegardé
-            Path path = Paths.get(uploadDir + File.separator + file.getOriginalFilename());
-
-            PictureDto dto = new PictureDto();
-            dto.setPictureName(file.getOriginalFilename());
-            dto.setUserId(userId);
-            pictureService.save(dto);
-
-            // Sauvegarde le fichier sur le système de fichiers
-            Files.write(path, file.getBytes());
-
-            return ResponseEntity.status(HttpStatus.OK).body("Fichier téléversé avec succès : " + file.getOriginalFilename());
+            pictureService.uploadPicture(file, userId);
+            return ResponseEntity.ok("Fichier téléversé avec succès : " + file.getOriginalFilename());
         } catch (IOException e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors du téléversement du fichier.");
         }
     }
 
 
+
     @GetMapping("/show/{imageName}")
     public ResponseEntity<Resource> getImage(@PathVariable String imageName) throws IOException {
-        // Chemin vers l'image dans le dossier resources/images
-        Resource imgFile = new ClassPathResource("images/"+imageName);
+        Resource imgFile = new ClassPathResource("images/" + imageName);
+        String contentType = Files.probeContentType(Paths.get(imgFile.getURI()));
 
-        // Lire le fichier d'image sous forme de tableau de bytes
-        // byte[] imageBytes = Files.readAllBytes(Path.of(imgFile.getURI()));
-
-        // Ajouter les en-têtes nécessaires
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "image/jpeg");  // Ou "image/png" selon le type d'image
-
-        return new ResponseEntity<>(imgFile, headers, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(imgFile);
     }
 
-    @DeleteMapping(value="delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") long id) throws Exception{
-        PictureDto dto = pictureService.getById(id);
-        if(dto !=null) {
+    @DeleteMapping(value = "delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable("id") long id) {
+        try {
             pictureService.deleteById(id);
-            return ResponseEntity.status(HttpStatus.OK).body("picture with id = " +id+" deleted.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No picture to delete.");
+            return ResponseEntity.ok("Picture with id = " + id + " deleted.");
+        } catch (NoSuchElementException e) { //Si l'élement n'existe pas
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No picture found to delete.");
         }
     }
 }

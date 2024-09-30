@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { AppContainer, NomConversation, MessagesContainer, MessageContainer, MessageBubble, UserContainer, InputContainer, Input, Button } from './ChatApp.style.jsx';
+import {
+    AppContainer, NomConversation, MessagesContainer, MessageContainer, MessageBubble,
+    UserContainer, InputContainer, Input, Button
+} from './ChatApp.style.jsx';
 import { Avatar, MessageContent } from '../Messaging/CartMessaging.style.jsx';
 import { Client } from '@stomp/stompjs'; // Importation du client STOMP
 
 const getUserIdFromToken = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
         const payload = JSON.parse(atob(token.split('.')[1]));
         return payload.id;
@@ -13,39 +16,30 @@ const getUserIdFromToken = () => {
     return null;
 };
 
-
-
 export const ChatApp = () => {
     const formatDate = (dateArray) => {
-        // Vérifiez si dateArray est bien un tableau et a la longueur attendue
-
         if (!Array.isArray(dateArray) || dateArray.length !== 7) {
             console.error('dateEnvoie n\'est pas un tableau valide:', dateArray);
             return ''; // Retournez une chaîne vide ou un message d'erreur
         }
 
-        // Récupération des éléments du tableau
-        const year = dateArray[0]; // Année
-        const month = String(dateArray[1]).padStart(2, '0'); // Mois (avec zéro devant si nécessaire)
-        const day = String(dateArray[2]).padStart(2, '0'); // Jour (avec zéro devant si nécessaire)
-        const hours = String(dateArray[3]).padStart(2, '0'); // Heures (avec zéro devant si nécessaire)
-        const minutes = String(dateArray[4]).padStart(2, '0'); // Minutes (avec zéro devant si nécessaire)
+        const year = dateArray[0];
+        const month = String(dateArray[1]).padStart(2, '0');
+        const day = String(dateArray[2]).padStart(2, '0');
+        const hours = String(dateArray[3]).padStart(2, '0');
+        const minutes = String(dateArray[4]).padStart(2, '0');
 
-        // Retournez la date formatée
-        return `${day}-${month}-${year} ${hours}h${minutes}`;
+
+        return `${hours}h${minutes}`;
     };
-
-
-
-
 
     const [messageContent, setMessageContent] = useState('');
     const [messages, setMessages] = useState([]);
-    const [users, setUsers] = useState({}); // État pour stocker les utilisateurs
+    const [users, setUsers] = useState({}); // Objet contenant les utilisateurs
     const [stompClient, setStompClient] = useState(null);
     const { conversationId } = useParams();
 
-
+    // Récupération des messages et des utilisateurs
     const fetchMessages = () => {
         fetch(`http://localhost:9090/conversation/${conversationId}/messages`)
             .then(response => {
@@ -55,31 +49,49 @@ export const ChatApp = () => {
                 return response.json();
             })
             .then(data => {
-                setMessages(data.messages); // Stockez les messages
-                setUsers(data.users); // Stockez les utilisateurs
+                setMessages(data.messages); // Stocker les messages
+                setUsers(data.users); // Stocker les utilisateurs dans l'état
             })
             .catch(error => {
                 console.error('Erreur lors de la récupération des messages :', error);
             });
     };
 
+    // Connexion WebSocket avec STOMP
     const connectWebSocket = () => {
         if (stompClient) return; // Évite les connexions multiples
 
         const client = new Client({
             brokerURL: 'ws://localhost:9090/ws',
-
             onConnect: (frame) => {
                 console.log('Connecté: ' + frame);
-
-                // Abonnement au topic
                 client.subscribe(`/topic/messages/${conversationId}`, (message) => {
                     const receivedMessage = JSON.parse(message.body);
                     console.log("Message reçu :", receivedMessage);
 
+                    // Récupérer l'ID de l'expéditeur
+                    const senderId = receivedMessage.sender?.id; // Utiliser l'opérateur de chaîne facultatif pour éviter les erreurs
+                    console.log("Sender ID récupéré :", senderId); // Log de l'ID pour débogage
 
 
-                    // Ajout d'un message
+
+                    // Récupérer l'ID de l'expéditeur
+                    if (senderId > 0) { // Assurez-vous que l'ID est valide
+                        if (!users[senderId]) {
+                            fetch(`http://localhost:9090/api/profile/${senderId}`)
+                                .then(response => response.json())
+                                .then(userData => {
+                                    setUsers(prevUsers => ({
+                                        ...prevUsers,
+                                        [senderId]: userData,
+                                    }));
+                                })
+                                .catch(error => console.error('Erreur lors de la récupération de l\'utilisateur:', error));
+                        }
+                    } else {
+                        console.warn("L'ID de l'expéditeur est invalide :", senderId);
+                    }
+
                     setMessages((prevMessages) => {
                         const alreadyExists = prevMessages.some((msg) =>
                             msg.content === receivedMessage.content &&
@@ -108,10 +120,6 @@ export const ChatApp = () => {
         setStompClient(client);
     };
 
-    // Fonction pour récupérer les informations d'un utilisateur
-
-
-
     useEffect(() => {
         if (!stompClient) {
             console.log('Connexion WebSocket en cours...');
@@ -124,19 +132,22 @@ export const ChatApp = () => {
         return () => {
             if (stompClient) {
                 console.log('Déconnexion du WebSocket...');
-                stompClient.deactivate(); // Déconnexion propre lors de la désactivation du composant
-                setStompClient(null); // Réinitialisez le client STOMP
+                stompClient.deactivate();
+                setStompClient(null); // Réinitialiser le client STOMP
             }
         };
-    }, [stompClient]);
-
+    }, [stompClient, conversationId]);
 
     const handleSendMessage = () => {
+        const senderId = getUserIdFromToken(); // Récupère l'ID de l'expéditeur
+        console.log("ID de l'expéditeur :", senderId); // Log de l'ID pour débogage
+
         if (stompClient && stompClient.connected && messageContent) {
             const chatMessage = {
                 conversation: { id: conversationId },
-                senderId: getUserIdFromToken(),
+                sender: { id: senderId }, // Assurez-vous que l'ID est correctement passé ici
                 content: messageContent,
+                dateEnvoie: null,
             };
 
             console.log("Envoi du message :", chatMessage); // Log du message avant envoi
@@ -146,11 +157,13 @@ export const ChatApp = () => {
                 body: JSON.stringify(chatMessage),
             });
 
-            setMessageContent(''); // Réinitialiser le contenu sans ajouter localement le message
+            setMessageContent(''); // Réinitialiser le contenu
         } else {
             console.warn("STOMP client not connected or message content is empty.");
         }
     };
+
+
 
 
     return (
@@ -158,13 +171,13 @@ export const ChatApp = () => {
             <NomConversation>Nom de la conversation</NomConversation>
             <MessagesContainer>
                 {messages.map((msg, index) => {
-                    const user = users[msg.senderId]; // Récupérez l'utilisateur à partir de l'objet users
+                    const senderId = msg.sender.id; // Récupère l'ID de l'expéditeur
+                    const user = users[senderId]; // Récupérez l'utilisateur à partir de l'objet users
 
                     return (
-                        <MessageContainer key={index} sender={msg.senderId === getUserIdFromToken() ? "user1" : "user2"}>
-                            <UserContainer sender={msg.senderId === getUserIdFromToken() ? "user1" : "user2"}>
+                        <MessageContainer key={index} sender={senderId === getUserIdFromToken() ? "user1" : "user2"}>
+                            <UserContainer sender={senderId === getUserIdFromToken() ? "user1" : "user2"}>
                                 <Avatar>
-                                    {/* Vérifiez si l'utilisateur existe et a des images */}
                                     {user && user.pictures && user.pictures.length > 0 ? (
                                         <img src={`http://localhost:9090/api/show/${user.pictures[0].pictureName}`} alt="Avatar" />
                                     ) : (
@@ -176,7 +189,7 @@ export const ChatApp = () => {
                                     <span>{formatDate(msg.dateEnvoie)}</span>
                                 </MessageContent>
                             </UserContainer>
-                            <MessageBubble sender={msg.senderId === getUserIdFromToken() ? "user1" : "user2"}>
+                            <MessageBubble sender={senderId === getUserIdFromToken() ? "user1" : "user2"}>
                                 {msg.content}
                             </MessageBubble>
                         </MessageContainer>

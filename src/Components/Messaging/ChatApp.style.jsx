@@ -6,7 +6,7 @@ export const AppContainer = styled.div`
   flex-direction: column;
   height: 70vh;
   max-width: 80%;
-  margin-top: 150px;
+  margin-top: 20px;
   margin-left: auto;
   margin-right: auto;
   background-color: #775144;

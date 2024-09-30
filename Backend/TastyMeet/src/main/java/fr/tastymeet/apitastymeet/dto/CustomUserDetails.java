@@ -3,58 +3,28 @@ package fr.tastymeet.apitastymeet.dto;
 import fr.tastymeet.apitastymeet.entities.Gender;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Collection;
 
+@Getter
+@Setter
+@NoArgsConstructor // Pour un constructeur sans arguments, utile pour la désérialisation
+@AllArgsConstructor // Pour générer un constructeur avec tous les champs
 public class CustomUserDetails implements UserDetails {
-    private final Long id;
-    private final String email;
-    private final String password;
-    private Gender gender;
-    private Gender orientation;
-    private final Collection<? extends GrantedAuthority> authorities;
-
-    public CustomUserDetails(Long id, String email, String password, Gender gender, Gender orientation, Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.gender = gender;
-        this.orientation = orientation;
-        this.authorities = authorities;
-    }
-
-    public Long getId() {
-        return id;
-    }
+    private Long id;
+    private String email;
+    private String password;
+    private GenderDto gender;
+    private GenderDto orientation;
+    private Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public String getUsername() {
         return email;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public Gender getOrientation() {
-        return orientation;
-    }
-
-    public void setOrientation(Gender orientation) {
-        this.orientation = orientation;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
     }
 
     @Override

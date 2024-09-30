@@ -89,42 +89,15 @@ export const photos = {
     justifyContent: 'center',
 };
 
-export const photoContainer = {
-    position: 'relative', // Permet de positionner le bouton par rapport à l'image
-    width: 'calc(50% - 10px)',
+export const photo = {
+    width: 'calc(50% - 10px)', // Ajuste la largeur en fonction du gap
     height: '150px',
     borderRadius: '10px',
-    overflow: 'hidden', // Cache le débordement éventuel
-};
-
-export const photo = {
-    width: '100%',
-    height: '100%',
     objectFit: 'cover',
-    borderRadius: '10px',
     border: '2px solid #ddd',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     transition: 'transform 0.3s, box-shadow 0.3s',
     cursor: 'pointer',
-};
-
-export const deleteButton = {
-    position: 'absolute',
-    top: '5px',
-    right: '5px',
-    backgroundColor: 'red',
-    color: 'white',
-    border: 'none',
-    borderRadius: '50%',
-    width: '24px',
-    height: '24px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-    transition: 'background-color 0.3s, transform 0.3s',
 };
 
 export const fileInput = {

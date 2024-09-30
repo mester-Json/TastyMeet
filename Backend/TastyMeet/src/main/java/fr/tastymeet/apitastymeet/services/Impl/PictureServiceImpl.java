@@ -2,17 +2,25 @@ package fr.tastymeet.apitastymeet.services.Impl;
 
 import fr.tastymeet.apitastymeet.dto.PictureDto;
 import fr.tastymeet.apitastymeet.entities.Picture;
-import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.repositories.PictureRepository;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
 import fr.tastymeet.apitastymeet.services.Interface.IPictureService;
 import fr.tastymeet.apitastymeet.tools.DtoTool;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PictureServiceImpl implements IPictureService {
@@ -23,49 +31,43 @@ public class PictureServiceImpl implements IPictureService {
     @Autowired
     private UserRepository userRepository;
 
-    @Override
-    public PictureDto save(PictureDto pictureDto) {
-
-        Picture picture= DtoTool.convert(pictureDto, Picture.class);
-
-        User u = userRepository.findById(pictureDto.getUserId()).get();
-
-        picture.setUser(u);
-
-        Picture insertedPicture= pictureRepository.saveAndFlush(picture);
-
-        return DtoTool.convert(insertedPicture, PictureDto.class);
-
-    }
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @Override
-    public List<PictureDto> getPictureByUserId(long userId){
-        List<PictureDto> resultPictures= new ArrayList<>();
-
-        List<Picture> entities = pictureRepository.findByUserId(userId);
-
-        for(Picture p : entities) {
-            resultPictures.add(DtoTool.convert(p,PictureDto.class));
+    public void uploadPicture(MultipartFile file, long userId) throws IOException {
+        if (file.isEmpty()) {
+            throw new IOException("Le fichier est vide");
         }
-        return resultPictures;
 
+        String filename = file.getOriginalFilename();
+        Path path = Paths.get(uploadDir + File.separator + filename);
+
+        // Créer le PictureDto
+        PictureDto dto = new PictureDto();
+        dto.setPictureName(filename);
+        dto.setUserId(userId);
+
+        // Sauvegarde le fichier sur le système de fichiers
+        Files.write(path, file.getBytes());
+
+        // Conversion de PictureDto en Picture
+        Picture picture = DtoTool.convert(dto, Picture.class);
+
+        // Récupération de l'utilisateur et association à l'image
+        picture.setUser(userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé")));
+
+        // Sauvegarde de l'image et conversion du résultat en DTO
+        DtoTool.convert(pictureRepository.saveAndFlush(picture), PictureDto.class);
     }
+
 
     @Override
     public void deleteById(long id) {
-        pictureRepository.deleteById(id);
-    }
-
-    @Override
-    public PictureDto getById(long id) {
-       Optional<Picture> optional= pictureRepository.findById(id);
-       if(optional.isPresent()){
-           Picture p = optional.get();
-           return DtoTool.convert(p, PictureDto.class);
-       }else {
-           return null;
-       }
-
+        Picture picture = pictureRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Picture not found with id: " + id));
+        pictureRepository.delete(picture);
     }
 
 }

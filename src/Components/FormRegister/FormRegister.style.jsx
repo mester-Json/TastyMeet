@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 
 /* -----------------Form-----------------------*/
-export const FormularRegister = styled.form
-    `
+export const FormularRegister = styled.form`
         display: flex;
         flex-wrap: wrap;
         background-color: rgba(207, 206, 206, 0.5);
@@ -11,16 +10,15 @@ export const FormularRegister = styled.form
         height: auto;
         border-radius: 20px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top:150px;
+        margin-bottom:150px;
+        margin-left:auto ;
+        margin-right:auto;
         justify-content: center;
         align-items: center;
-        margin: 250px 0 0 600px ;
-        @media (max-width: 768px) {
-            width: 90%;
-        }
 
     `;
-export const FormMoreInfo = styled.form
-    `
+export const FormMoreInfo = styled.form`
         display: flex;
         flex-wrap: wrap;
         background-color: rgba(207, 206, 206, 0.5);
@@ -38,43 +36,62 @@ export const FormMoreInfo = styled.form
     `;
 /* ----------------------------------------*/
 /* -----------------Input-----------------------*/
-export const InputField = styled.input
-    `
+export const InputField = styled.input`
         width: 300px;
-        padding: 10px;
+        padding: 7px;
         border: 1px solid #ccc;
         border-radius: 20px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: box-shadow 0.3s ease;
-        margin-bottom: 20px;
+        margin-bottom: 5px;
+        &:focus {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            outline: none;
+        }&::placeholder {
+            text-align:center;
+        }
+    `;
+
+export const InputFieldAge = styled.input`
+        width: 300px;
+        padding: 4px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: box-shadow 0.3s ease;
+        margin-bottom: 5px;
+        text-align:center;
         &:focus {
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             outline: none;
         }
-    `;
-export const InputAvatar = styled.input
-    `
+
+` ;
+
+export const InputAvatar = styled.input`
         padding: 10px;
         border-radius: 100px;
     `;
 /* ----------------------------------------*/
 /* -----------------Button+Select-----------------------*/
-export const Select = styled.select
-    `
-        width: 320px;
-        padding: 10px;
+export const Select = styled.select`
+        width: 315px;
+        padding:5px;
+        font-size:13px;
+        text-align:center;
         border-radius: 20px;
         border: 1px solid #ccc;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: box-shadow 0.3s ease;
-        margin-bottom: 20px;
+        margin-bottom: 5px;
         &:focus {
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             outline: none;
         }
     `;
-export const Button = styled.button
-    `
+
+
+export const Button = styled.button`
         width: 200px;
         height: 30px;
         background: #2A0800;
@@ -82,6 +99,7 @@ export const Button = styled.button
         border: none;
         border-radius: 20px;
         cursor: pointer ;
+        margin-top:25px;
 
         transition: transform 0.3s ease, background-color 0.3s ease;
 
@@ -92,16 +110,14 @@ export const Button = styled.button
     `;
 /* ----------------------------------------*/
 /* -----------------Img-----------------------*/
-export const ImgAvatar = styled.img
-    `
+export const ImgAvatar = styled.img`
         width: 150px;
         height: 150px;
         border-radius: 50%;
         box-shadow: 0 5px 10px rgba(0, 0.2, 0.2, 0.8);
         margin-bottom: 10px;
     `;
-export const ImgEye = styled.img
-    `
+export const ImgEye = styled.img`
         position: absolute;
         right: 640px;
         top: 54.4%;
@@ -113,35 +129,25 @@ export const ImgEye = styled.img
     `;
 /* ----------------------------------------*/
 /* -----------------Text+Label-----------------------*/
-export const TitleForm1 = styled.h1
-    `
-        position: absolute;
+export const TitleForm1 = styled.h1`
+        font-size: xx-large;
+        color : white;
+        font-weight: bold;
+        text-align: center;
+    `;
+export const TitleForm2 = styled.h2`
         font-size: xx-large;
         color : white;
         font-weight: bold;
 
-        top: 150px;
         align-items: center;
         text-align: center;
     `;
-export const TitleForm2 = styled.h2
-    `
-        position: absolute;
-        font-size: xx-large;
-        color : white;
-        font-weight: bold;
-
-        top: 150px;
-        align-items: center;
-        text-align: center;
-    `;
-export const P = styled.p
-    `
+export const P = styled.p`
         font-size: 12px;
         margin-left: 200px;
     `;
-export const Description = styled.textarea
-    `
+export const Description = styled.textarea`
         border-radius: 20px;
         padding: 10px;
         max-height: 250px;
@@ -149,30 +155,32 @@ export const Description = styled.textarea
         overflow-y: auto;
     `;
 
-export const LabelError = styled.label
-    `
+export const LabelError = styled.label`
+    text-align:center;
+        font-size:13px;
         color: red;
     `;
 /* ----------------------------------------*/
 /* -----------------Div-----------------------*/
-export const Div = styled.div
-    `
+export const Div = styled.div`
         display: flex;
         flex-direction: column;
-        margin-right: 5px;
+        margin-top: 6px;
+        margin-right: 15px;
+        padding:5px;
 
     `;
-export const Div2 = styled.div
-    `
+export const Div2 = styled.div`
         display: flex;
         flex-direction: column;
-        margin-left: 5px;
+        margin-left: 15px;
+        padding:5px;
     `;
-export const DivError = styled.div
-    `
+export const DivError = styled.div`
         height: 25px;
         text-align: left ;
         margin-bottom: 5px;
-        margin-right: 5px;
+        margin-right: auto;
+        margin-left:auto;
     `;
 /* ----------------------------------------*/

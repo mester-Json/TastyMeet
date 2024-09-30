@@ -1,33 +1,40 @@
 package fr.tastymeet.apitastymeet.entities;
 
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
-@ToString
 @Entity
 public class Conversation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long userId1; // ID du premier utilisateur
-    private Long userId2; // ID du deuxième utilisateur
+    private long id;
 
-    // Ajoutez d'autres champs si nécessaire, comme un ID de conversation ou une liste de messages
+    @ManyToOne
+    @JoinColumn(name = "user_id_1") // Renommer la colonne pour un meilleur contexte
+    private User user1; // Le premier utilisateur
 
-    // Vous pouvez également ajouter des méthodes supplémentaires ici si nécessaire
+    @ManyToOne
+    @JoinColumn(name = "user_id_2") // Renommer la colonne pour un meilleur contexte
+    private User user2; // Le deuxième utilisateur
+
+    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL)
+    private List<ChatMessage> messages;
+
     // Constructeur par défaut
     public Conversation() {}
 
-    // Constructeur avec deux paramètres
-    public Conversation(Long userId1, Long userId2) {
-        this.userId1 = userId1;
-        this.userId2 = userId2;
+    // Constructeur avec deux utilisateurs
+    public Conversation(User user1, User user2) {
+        this.user1 = user1;
+        this.user2 = user2;
+    }
+
+    public ChatMessage getLastMessage() {
+        return messages.isEmpty() ? null : messages.get(messages.size() - 1);
     }
 }

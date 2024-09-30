@@ -1,10 +1,7 @@
 package fr.tastymeet.apitastymeet.dto;
 
-import fr.tastymeet.apitastymeet.entities.Gender;
-import fr.tastymeet.apitastymeet.entities.Picture;
-import lombok.Data;
 
-import java.time.LocalDate;
+import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,4 +10,5 @@ public class UserChatDto {
     private long id;
     private String firstName;
     private List<PictureDto> pictures = new ArrayList<>();
+
 }

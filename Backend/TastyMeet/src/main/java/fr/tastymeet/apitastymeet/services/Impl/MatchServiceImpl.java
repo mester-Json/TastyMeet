@@ -4,6 +4,7 @@ import fr.tastymeet.apitastymeet.dto.UserLikeDto;
 import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
 import fr.tastymeet.apitastymeet.services.Interface.IMatchService;
+import fr.tastymeet.apitastymeet.tools.DtoTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,28 +26,31 @@ public class MatchServiceImpl implements IMatchService {
     }
 
     public Set<UserLikeDto> getMatches(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         return user.getMatches().stream()
-                .map(matchedUser -> new UserLikeDto(
-                        matchedUser.getId(), // ID de l'utilisateur qui a été liké
-                        matchedUser.getFirstName(),
-                        matchedUser.getLastName(),
-                        userId // ID de l'utilisateur qui a liké
-                ))
+                .map(matchedUser -> {
+                    UserLikeDto userLikeDto = DtoTool.convert(matchedUser, UserLikeDto.class);
+                    userLikeDto.setLikedUserId(userId); // ID de l'utilisateur qui a liké
+                    return userLikeDto;
+                })
                 .collect(Collectors.toSet());
     }
 
+
     public Set<UserLikeDto> getLikes(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Convertir chaque utilisateur liké en UserLikeDto
         return user.getLiked().stream()
-                .map(likedUser -> new UserLikeDto(
-                        likedUser.getId(),
-                        likedUser.getFirstName(),
-                        likedUser.getLastName(),
-                        user.getId() // ou likedUser.getId() si tu veux autre chose
-                ))
+                .map(likedUser -> {
+                    UserLikeDto userLikeDto = DtoTool.convert(likedUser, UserLikeDto.class);
+                    userLikeDto.setLikedUserId(likedUser.getId()); // ID de l'utilisateur qui a liké
+                    return userLikeDto;
+                })
                 .collect(Collectors.toSet());  // Retourner un ensemble de UserLikeDto
     }
+
 }

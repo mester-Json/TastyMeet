@@ -44,8 +44,5 @@ public class MatchController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{userId}/matches")
-    public Set<UserLikeDto> getMatches(@PathVariable long userId) {
-        return matchService.getMatches(userId);
-    }
+
 }

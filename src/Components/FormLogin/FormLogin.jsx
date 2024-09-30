@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, InputField, Button, Inscription, Mdp } from './FormLogin.style.jsx';
+import { Div, Form, InputField, Button, Inscription, Mdp } from './FormLogin.style.jsx';
+import { SignIn } from '../../Axios/Axios.js';
 
 export const FormLogin = () => {
     const [email, setEmail] = useState('');
@@ -10,65 +11,81 @@ export const FormLogin = () => {
     const [emailError, setEmailError] = useState(null);
     const [passwordError, setPasswordError] = useState(null);
     const [error, setError] = useState(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex pour validation e-mail
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const handleLogin = async () => {
+
+    useEffect(() => {
+        const token = sessionStorage.getItem('token');
+        if (token) {
+            setIsAuthenticated(true);
+            navigate('/accueil');
+        }
+    }, [navigate]);
+
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+
         setEmailError(null);
         setPasswordError(null);
         setError(null);
         setShowError(false);
 
+
+        let hasError = false;
+
+
         if (!email || !password) {
             if (!email) setEmailError('L\'adresse e-mail est requise.');
             if (!password) setPasswordError('Le mot de passe est requis.');
-            setShowError(true);
+            hasError(true);
             return;
         }
 
         if (!emailRegex.test(email)) {
             setEmailError('Adresse e-mail invalide.');
+            hasError(true);
+            return;
+        }
+
+
+        if (hasError) {
             setShowError(true);
             return;
         }
 
+
+
+
         setIsLoading(true);
 
+
         try {
-            const response = await fetch('http://localhost:9090/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (response.ok) {
-                // Ici, on récupère le token comme une chaîne de texte
-                const token = await response.text(); // Pas response.json()
-                console.log('Login successful, token:', token);
-
-                // Sauvegardez le token (localStorage, cookie, etc.)
-                localStorage.setItem('token', token);
-
-                // Redirection après connexion
-                navigate('/accueil');
-            } else {
-                const errorData = await response.json();
-                setError(errorData.message || 'Erreur de connexion.');
-                setShowError(true);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            setError('Une erreur est survenue. Veuillez réessayer.');
+            const token = await SignIn(email, password);
+            sessionStorage.setItem('token', token);
+            setIsAuthenticated(true);
+            navigate('/accueil');
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || 'Erreur lors de la connexion.');
             setShowError(true);
         } finally {
             setIsLoading(false);
         }
     };
 
+    if (isAuthenticated) {
+        return null;
+    }
+
+
+
     return (
-        <>
-            <Form>
+        <Div>
+            <Form onSubmit={handleLogin}>
                 <InputField
                     type="email"
                     placeholder="Adresse e-mail"
@@ -115,11 +132,12 @@ export const FormLogin = () => {
                     </label>
                 </div>
 
-                <Button type="button" onClick={handleLogin} disabled={isLoading}>
+                <Button type="submit" disabled={isLoading}>
                     {isLoading ? 'Connexion...' : 'Se connecter'}
                 </Button>
+
                 <div>
-                    <Inscription to={"/register"}>
+                    <Inscription to="/register">
                         Inscription
                     </Inscription>
                     <Mdp>
@@ -127,6 +145,6 @@ export const FormLogin = () => {
                     </Mdp>
                 </div>
             </Form>
-        </>
+        </Div>
     );
 };

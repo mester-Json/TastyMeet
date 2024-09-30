@@ -1,9 +1,15 @@
 package fr.tastymeet.apitastymeet.services.Impl;
 
 
+import fr.tastymeet.apitastymeet.dto.AuthRequest;
 import fr.tastymeet.apitastymeet.dto.CustomUserDetails;
+import fr.tastymeet.apitastymeet.dto.TokenDto;
+import fr.tastymeet.apitastymeet.entities.Gender;
 import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
+import fr.tastymeet.apitastymeet.tools.DtoTool;
+import fr.tastymeet.apitastymeet.tools.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,11 +23,33 @@ import java.util.stream.Collectors;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Autowired
+    private JwtUtils jwtUtils;
+
+
+
+    public String authenticateUser(AuthRequest authRequest) {
+        UserDetails userDetails = loadUserByUsername(authRequest.getEmail());
+
+        // Vérifiez si le mot de passe correspond
+        if (!authRequest.getPassword().equals(userDetails.getPassword())) {
+            throw new RuntimeException("Invalid username or password");
+        }
+
+        // Créer un TokenDto directement
+        TokenDto tokenDto = DtoTool.convert(userDetails, TokenDto.class); // Convertir CustomUserDetails en TokenDto
+
+        // Récupérez l'énumération Gender à partir de GenderDto avec vérification de nullité
+        Gender gender = tokenDto.getGender() != null ? Gender.valueOf(tokenDto.getGender().name()) : null;
+        Gender orientation = tokenDto.getOrientation() != null ? Gender.valueOf(tokenDto.getOrientation().name()) : null;
+
+        // Retourner le token
+        return jwtUtils.generateToken(tokenDto.getUsername(), tokenDto.getUserId(), gender, orientation);
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -30,18 +58,18 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        /* Spring Security utilise ces autorités pour gérer l'autorisation (exemple : accorder ou refuser l'accès à certaines parties de l'application) */
+        // Créer la liste des autorités
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .collect(Collectors.toList());
 
-        return new CustomUserDetails(
-                user.getId(), // L'ID doit être le premier paramètre
-                user.getEmail(),
-                user.getPassword(),
-                user.getGender(),
-                user.getOrientation(),
-                authorities
-        );
+        // Convertir User en CustomUserDetails
+        CustomUserDetails customUserDetails = DtoTool.convert(user, CustomUserDetails.class);
+
+        // Définir les autorités dans CustomUserDetails
+        customUserDetails.setAuthorities(authorities);
+
+        return customUserDetails;
     }
+
 }

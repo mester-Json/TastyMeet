@@ -1,17 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import * as styles from './Profil.style.jsx';
+import {
+    fetchProfileData,
+    updateProfileData,
+    changePassword,
+    changeEmail,
+    deletePhoto,
+    uploadFile,
+} from '../../Axios/Axios.js';
 
 const getUserIdFromToken = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
-        const payload = JSON.parse(atob(token.split('.')[1])); // Décoder le payload
-        return payload.id; // Assurez-vous que l'ID est dans le payload
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.id;
     }
     return null;
 };
 
 export const Profil = () => {
-    // Déclaration des états pour les données du profil utilisateur
     const [email, setEmail] = useState('');
     const [version, setVersion] = useState('');
     const [id, setId] = useState('');
@@ -19,7 +26,6 @@ export const Profil = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [gender, setGender] = useState('');
-    const [age, setAge] = useState('');
     const [orientation, setOrientation] = useState('');
     const [description, setDescription] = useState('');
     const [phone, setPhone] = useState('');
@@ -27,267 +33,212 @@ export const Profil = () => {
     const [city, setCity] = useState('');
     const [file, setFile] = useState(null);
     const [pictures, setPictures] = useState([]);
+    const [error, setError] = useState({});
 
-    // Gestion de l'affichage des formulaires de modification de mot de passe et d'email
     const [showPasswordForm, setShowPasswordForm] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
+
     const [showEmailForm, setShowEmailForm] = useState(false);
     const [currentEmail, setCurrentEmail] = useState('');
     const [newEmail, setNewEmail] = useState('');
     const [confirmNewEmail, setConfirmNewEmail] = useState('');
 
     useEffect(() => {
-        // Utilisation du hook useEffect pour charger les données du profil utilisateur au montage du composant
-        const fetchProfileData = async () => {
+        const fetchProfile = async () => {
             try {
-                const userId = getUserIdFromToken(); // Récupérer l'ID de l'utilisateur connecté (depuis le token ou l'état global)
-                const response = await fetch(`http://localhost:9090/api/profile/${userId}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    // Mise à jour des états avec les données récupérées
-                    setId(data.id);
-                    setVersion(data.version);
-                    setEmail(data.email);
-                    setFirstName(data.firstName);
-                    setLastName(data.lastName);
-                    setPassword(data.password); // Ne pas stocker le mot de passe en état
-                    setGender(data.gender);
-                    setAge(data.age);
+                const userId = getUserIdFromToken();
+                const data = await fetchProfileData(userId);
+                console.log(data);
+                if (data) {
+                    setId(data.id || '');
+                    setVersion(data.version || '');
+                    setEmail(data.email || '');
+                    setFirstName(data.firstName || '');
+                    setLastName(data.lastName || '');
+                    setGender(data.gender || '');
                     setOrientation(data.orientation || '');
-                    setDescription(data.description);
-                    setPhone(data.phone);
+                    setDescription(data.description || '');
+                    setPhone(data.phone || '');
                     setLocation(data.location || '');
                     setCity(data.city || '');
-                    setPictures(data.pictures);
+                    setPictures(data.pictures || []);
                 } else {
-                    setError('Erreur lors de la récupération des données.');
+                    setError({ fetch: 'Une erreur est survenue lors de la récupération des données.' });
                 }
             } catch (error) {
-                console.error('Erreur:', error);
-                setError('Une erreur est survenue lors de la récupération des données.');
+                setError({ fetch: 'Une erreur est survenue lors de la récupération des données.' });
             }
         };
 
-        fetchProfileData(); // Appel de la fonction de récupération des données
-    }, []);// Le tableau vide signifie que cette fonction s'exécute uniquement au montage du composant
+        fetchProfile();
+    }, []);
 
-    const [error, setError] = useState(null);
+    const validatePassword = (password) => {
+        const regex = /(?=.*[!@#$%^&*])/; // Require at least one special character
+        return password.length >= 6 && password.length <= 15 && regex.test(password);
+    };
 
+    const handleUpdate = async (event) => {
+        event.preventDefault();
+        setError({});
+        console.log("Début de la mise à jour du profil");
 
-    // Fonction pour soumettre les modifications du profil utilisateur
-    const handleUpdate = async () => {
-
+        // Check for empty fields
+        const fieldsToCheck = {
+            firstName,
+            lastName,
+            location,
+            phone,
+            gender,
+            description,
+        };
         const newErrors = {};
+        Object.keys(fieldsToCheck).forEach((field) => {
+            if (!fieldsToCheck[field]) {
+                newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} est requis`;
+            }
+        });
+
+        if (password && !validatePassword(password)) {
+            newErrors.password = 'Le mot de passe doit être entre 6 et 15 caractères, incluant un caractère spécial.';
+        }
+
+        if (Object.keys(newErrors).length) {
+            setError(newErrors);
+            console.log("Erreurs de validation:", newErrors);
+            return;
+        }
 
         const formData = new FormData();
         formData.append("id", id);
-        formData.append("version", version);
         formData.append("firstName", firstName);
+        formData.append("location", location);
         formData.append("lastName", lastName);
-        formData.append("password", password);
-        formData.append("age", age);
+        formData.append("version", version);
         formData.append("description", description);
         formData.append("orientation", orientation);
         formData.append("email", email);
         formData.append("phone", phone);
         formData.append("gender", gender);
         if (file) {
-            formData.append("file", file); // Ajout du fichier si présent
+            formData.append("file", file);
+        }
+        if (password) {
+            formData.append("password", password);
         }
 
-        console.log(formData);
-
-        // Si pas d'erreurs, soumettre le formulaire
-        if (Object.keys(newErrors).length === 0) {
-            event.preventDefault();
-            // Si pas d'erreurs, effectuer la requête POST pour soumettre les données
-
-            fetch("http://localhost:9090/api/update", {
-                method: "POST",
-                body: formData,
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Erreur lors de la modification");
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log("Modification user reussi", data);
-                    // Action après inscription réussie
-                })
-                .catch((error) => {
-                    console.error("Erreur:", error);
-                })
-                .finally(() => {
-                });
-        } else {
-            setErrors(newErrors);
+        try {
+            console.log("Envoi des données:", formData);
+            await updateProfileData(formData);
+            alert("Modification utilisateur réussie");
+        } catch (error) {
+            setError({ update: 'Une erreur est survenue lors de la mise à jour.' });
+            console.error("Erreur lors de la mise à jour du profil:", error);
         }
     };
 
-    // Affichage ou masquage du formulaire de modification du mot de passe
-    const togglePasswordForm = () => {
-        event.preventDefault();
-        const newErrors = {};
-        setError(null);
-        setShowEmailForm(false); // Masquer le formulaire de modification d'email
-        if (!showEmailForm) {
-            setShowPasswordForm(!showPasswordForm); // Inverser l'affichage du formulaire de mot de passe
-
-        }
-
-    };
-
-    // Vérification et soumission du changement de mot de passe
     const handlePasswordChange = async (event) => {
         event.preventDefault();
-        setError(null); // Réinitialiser les erreurs avant de commencer
+        setError(null);
 
-        // Vérifiez que les nouveaux emails sont identiques
         if (newPassword !== confirmNewPassword) {
-            setError('Les nouveaux passwords ne correspondent pas.');
+            setError({ password: 'Les nouveaux mots de passe ne correspondent pas.' });
+            return;
+        }
+
+        if (!validatePassword(newPassword)) {
+            setError({ password: 'Le nouveau mot de passe doit contenir entre 6 et 15 caractères, y compris un caractère spécial.' });
             return;
         }
 
         try {
-            const response = await fetch('http://localhost:9090/api/verifyPassword', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id: id,
-                    currentPassword: currentPassword,
-                    newPassword: newPassword,
-                    confirmNewPassword: confirmNewPassword,
-                }),
+            await changePassword({
+                id,
+                currentPassword,
+                newPassword,
+                confirmNewPassword,
             });
-
-            if (response.ok) {
-                const data = await response.text();
-                alert('Mot de passe modifié avec succès.');
-                setShowPasswordForm(false); // Masquer le formulaire après le changement
-                setCurrentPassword(''); // Réinitialiser les champs
-                setNewPassword('');
-                setConfirmNewPassword('');
-            } else {
-                // Lire le texte de la réponse pour le message d'erreur
-                const errorMessage = await response.text();
-                setError(errorMessage);
-            }
+            alert('Mot de passe modifié avec succès.');
+            setShowPasswordForm(false);
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmNewPassword('');
         } catch (error) {
-            setError('Erreur lors de la mise à jour du mot de passe.');
-            console.log("Erreur capturée:", error);
+            setError({ password: error.message });
         }
     };
-
-    // Affichage ou masquage du formulaire de modification d'email
-    const toggleEmailForm = () => {
-        event.preventDefault();
-        setError(null);
-        setShowPasswordForm(false);// Masquer le formulaire de modification de mot de passe
-        if (!showPasswordForm) {
-            setShowEmailForm(!showEmailForm); // Inverser l'affichage du formulaire d'email
-
-        }
-    };
-
-    // Vérification et soumission du changement d'email
     const handleEmailChange = async (event) => {
         event.preventDefault();
-        setError(null); // Réinitialiser les erreurs avant de commencer
+        setError({}); // Clear previous errors
 
-        // Vérifiez que les nouveaux emails sont identiques
         if (newEmail !== confirmNewEmail) {
-            setError('Les nouveaux emails ne correspondent pas.');
+            setError({ email: 'Les nouveaux emails ne correspondent pas.' });
+            return;
+        }
+
+        if (!newEmail || !currentEmail) {
+            setError({ email: 'Tous les champs doivent être remplis.' });
             return;
         }
 
         try {
-            const response = await fetch('http://localhost:9090/api/updateEmail', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id: id,
-                    currentEmail: currentEmail,
-                    newEmail: newEmail,
-                    confirmNewEmail: confirmNewEmail,
-                }),
+            await changeEmail({
+                id,
+                currentEmail,
+                newEmail,
+                confirmNewEmail,
             });
-
-            if (response.ok) {
-                const data = await response.text();
-                alert('Email modifié avec succès.');
-                setShowEmailForm(false); // Masquer le formulaire après le changement
-                setCurrentEmail(''); // Réinitialiser les champs
-                setNewEmail('');
-                setConfirmNewEmail('');
-            } else {
-                // Lire le texte de la réponse pour le message d'erreur
-                const errorMessage = await response.text();
-                setError(errorMessage);
-            }
+            alert('Email modifié avec succès.');
+            setShowEmailForm(false);
+            setCurrentEmail('');
+            setNewEmail('');
+            setConfirmNewEmail('');
         } catch (error) {
-            setError('Erreur lors de la mise à jour de l\'email.');
-            console.log("Erreur capturée:", error);
+            setError({ email: 'Une erreur est survenue lors de la modification de l\'email.' });
+            console.error('Error changing email:', error);
         }
     };
 
 
-    // Suppression d'une photo
-    const handleDeletePhoto = (photoId) => {
-        // Logique pour supprimer la photo
+    const handleDeletePhoto = async (photoId) => {
         const updatedPictures = pictures.filter(photo => photo.id !== photoId);
-        setPictures(updatedPictures); // Mise à jour de l'état local des photos
+        setPictures(updatedPictures);
 
-        // Suppression de la photo de la BDD via son ID
-        fetch(`http://localhost:9090/api/delete/${photoId}`, {
-            method: "DELETE",
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Erreur lors de la suppression de la photo");
-                }
-                console.log("Photo supprimée avec succès");
-            })
-            .catch(error => {
-                console.error("Erreur:", error);
-            });
+        try {
+            await deletePhoto(photoId);
+            console.log("Photo supprimée avec succès");
+        } catch (error) {
+            console.error("Erreur:", error);
+        }
     };
 
-
-
-    // Téléchargement de fichiers
     const handleFileUpload = async (e) => {
-        const selectedFiles = Array.from(e.target.files); // Récupération des fichiers sélectionnés
+        const selectedFiles = Array.from(e.target.files);
         const formData = new FormData();
         selectedFiles.forEach(file => formData.append('file', file));
 
         try {
-            const response = await fetch(`http://localhost:9090/api/upload/${id}`, {
-                method: 'POST',
-                body: formData,
-            });
-
-            // Traitez la réponse comme du texte
-            const text = await response.text();
-            if (response.ok) {
-                console.log("Réponse du serveur:", text);
-                const newPicture = {
-                    pictureName: selectedFiles[0].name // Ajout du nouveau fichier à la galerie
-                };
-                setPictures(prevPictures => [...prevPictures, newPicture]);
-            } else {
-                console.error('Erreur lors de l\'upload:', text);
-            }
+            await uploadFile(id, formData);
+            const newPicture = {
+                pictureName: selectedFiles[0].name
+            };
+            setPictures(prevPictures => [...prevPictures, newPicture]);
+            alert('Une image a été ajoutée');
         } catch (error) {
             console.error('Erreur:', error);
         }
+    };
+
+    const togglePasswordForm = (event) => {
+        event.preventDefault();
+        setShowPasswordForm(!showPasswordForm);
+    };
+
+    const toggleEmailForm = (event) => {
+        event.preventDefault();
+        setShowEmailForm(!showEmailForm);
     };
 
     return (
@@ -304,6 +255,8 @@ export const Profil = () => {
                                 onChange={(e) => setFirstName(e.target.value)}
                                 style={styles.input}
                             />
+                            {error.firstName && <div style={styles.error}>{error.firstName}</div>}
+
                             <input
                                 type="text"
                                 name="lastName"
@@ -312,6 +265,8 @@ export const Profil = () => {
                                 onChange={(e) => setLastName(e.target.value)}
                                 style={styles.input}
                             />
+                            {error.lastName && <div style={styles.error}>{error.lastName}</div>}
+
                         </div>
                         <div style={styles.row}>
                             <input
@@ -322,6 +277,8 @@ export const Profil = () => {
                                 onChange={(e) => setLocation(e.target.value)}
                                 style={{ ...styles.input, marginTop: '10px' }}
                             />
+                            {error.location && <div style={styles.error}>{error.location}</div>}
+
                             <input
                                 type="tel"
                                 name="phone"
@@ -330,6 +287,8 @@ export const Profil = () => {
                                 onChange={(e) => setPhone(e.target.value)}
                                 style={styles.input}
                             />
+                            {error.phone && <div style={styles.error}>{error.phone}</div>}
+
                         </div>
 
                         <div style={styles.row}>
@@ -369,7 +328,8 @@ export const Profil = () => {
                             placeholder="Description"
                             onChange={(e) => setDescription(e.target.value)}
                             style={{ ...styles.input, ...styles.textarea, marginTop: '10px' }}
-                        ></textarea>
+                        />
+                        {error.description && <div style={styles.error}>{error.description}</div>}
 
                         <button onClick={handleUpdate} style={styles.buttonModif}>
                             Accepter les modifications
@@ -382,11 +342,7 @@ export const Profil = () => {
                                 {showEmailForm ? 'Annuler' : "Modifier l'email"}
                             </button>
                         </div>
-                        {error && (
-                            <div style={styles.rowButtons}>
-                                <label style={{ color: 'red' }}>{error}</label> {/* Affiche le message d'erreur */}
-                            </div>
-                        )}
+
                     </form>
                 </div>
 
@@ -432,6 +388,7 @@ export const Profil = () => {
                             placeholder="Mot de passe actuel"
                             style={styles.ShowInput}
                         />
+
                     </div>
                     <div style={styles.row}>
                         <input
@@ -448,6 +405,8 @@ export const Profil = () => {
                             placeholder="Confirmer le nouveau mot de passe"
                             style={styles.ShowInput}
                         />
+                        {error.password && <div style={styles.error}>{error.password}</div>}
+
                         <button type="submit" style={styles.button}>Changer le mot de passe</button>
                     </div>
                 </form>
@@ -479,6 +438,8 @@ export const Profil = () => {
                             placeholder="Confirmer le nouvel email"
                             style={styles.ShowInput}
                         />
+                        {error.email && <div style={styles.error}>{error.email}</div>}
+
                         <button type="submit" style={styles.button}>Changer l'email</button>
                     </div>
                 </form>
@@ -486,3 +447,4 @@ export const Profil = () => {
         </>
     );
 };
+

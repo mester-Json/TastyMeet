@@ -2,6 +2,7 @@ package fr.tastymeet.apitastymeet.services.Impl;
 import fr.tastymeet.apitastymeet.dto.ChatMessageDto;
 import fr.tastymeet.apitastymeet.dto.PictureDto;
 import fr.tastymeet.apitastymeet.dto.UserChatDto;
+import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.entities.ChatMessage;
 import fr.tastymeet.apitastymeet.entities.Picture;
 import fr.tastymeet.apitastymeet.entities.User;
@@ -9,6 +10,8 @@ import fr.tastymeet.apitastymeet.repositories.ChatMessageRepository;
 import fr.tastymeet.apitastymeet.repositories.PictureRepository;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
 import fr.tastymeet.apitastymeet.services.Interface.IChatMessageService;
+import fr.tastymeet.apitastymeet.services.Interface.IPictureService;
+import fr.tastymeet.apitastymeet.services.Interface.IUserService;
 import fr.tastymeet.apitastymeet.tools.DtoTool; // Importer la classe DtoTool
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,77 +33,96 @@ public class ChatMessageServiceImpl implements IChatMessageService {
     private UserRepository userRepository;
 
     @Autowired
+    private IUserService userService;
+
+    @Autowired
+    private IPictureService pictureService;
+
+    @Autowired
     private PictureRepository pictureRepository;
 
     // Enregistrer un nouveau message
     @Override
-    public ChatMessageDto sendMessage(ChatMessage chatMessage) {
-        // Récupérer l'expéditeur à partir de son ID
-        User sender = userRepository.findById(chatMessage.getSenderId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public ChatMessageDto sendMessage(ChatMessage chatMessage, Long conversationId) {
+        // Initialiser la date d'envoi si elle est nulle
+        if (chatMessage.getDateEnvoie() == null) {
+            chatMessage.setDateEnvoie(LocalDateTime.now());
+        }
 
-        List<Picture> pictures = pictureRepository.findByUserId(sender.getId());
-        sender.setPictures(pictures);
+        // Récupérer l'utilisateur en fonction de senderId
+        UserDto user = userService.getById(chatMessage.getSender().getId());
 
-        // Créer le DTO pour le message de chat
+        // Convertir UserDto en UserChatDto
+        UserChatDto userChatDto = DtoTool.convert(user, UserChatDto.class);
+
+        // Convertir ChatMessage en ChatMessageDto
         ChatMessageDto chatMessageDto = DtoTool.convert(chatMessage, ChatMessageDto.class);
-        chatMessageDto.setSender(DtoTool.convert(sender, UserChatDto.class)); // Convertir l'utilisateur en DTO
-        chatMessageDto.setDateEnvoie(LocalDateTime.now());
+
+        // Assigner l'expéditeur au DTO du message
+        chatMessageDto.setSender(userChatDto); // Cette ligne reste nécessaire
 
         // Enregistrer le message dans la base de données
         chatMessageRepository.save(chatMessage);
 
-        // Retourner le DTO
-        return chatMessageDto;
+        return chatMessageDto; // Retourner le DTO
     }
+
+
+
+
     @Override
     public Map<String, Object> getMessagesByConversationId(Long conversationId) {
         // Récupérer les messages par ID de conversation
         List<ChatMessage> messages = chatMessageRepository.findByConversationId(conversationId);
 
+        // Convertir les messages en DTO
+        List<Map<String, Object>> messageDtos = messages.stream()
+                .map(message -> {
+                    Map<String, Object> messageDto = new HashMap<>();
+                    messageDto.put("sender", Map.of("id", message.getSender().getId())); // Juste l'ID de l'expéditeur
+                    messageDto.put("content", message.getContent());
+                    messageDto.put("dateEnvoie", message.getDateEnvoie()); // Ou convertis au format désiré
+                    return messageDto;
+                })
+                .collect(Collectors.toList());
+
         // Créer une liste d'IDs d'utilisateurs pour éviter les doublons
         Set<Long> userIds = messages.stream()
-                .map(ChatMessage::getSenderId)
+                .map(message -> message.getSender().getId())
                 .collect(Collectors.toSet());
 
         // Récupérer les utilisateurs par leurs IDs
         List<User> users = userRepository.findAllById(userIds);
 
+        //Pour eviter de repèter plusieurs fois les informations des utilisateurs (images, prenom)
         // Convertir les utilisateurs en DTO
-        Map<Long, UserChatDto> userDtos = users.stream()
+        Map<Long, Map<String, Object>> userDtos = users.stream()
                 .map(user -> {
-                    UserChatDto userChatDto = DtoTool.convert(user, UserChatDto.class);
+                    Map<String, Object> userDto = new HashMap<>();
+                    userDto.put("id", user.getId());
+                    userDto.put("firstName", user.getFirstName());
+
                     // Récupérer les images de l'utilisateur
                     List<Picture> pictures = pictureRepository.findByUserId(user.getId());
-                    List<PictureDto> pictureDtos = pictures.stream()
-                            .map(picture -> DtoTool.convert(picture, PictureDto.class)) // Utiliser DtoTool pour la conversion
+                    List<Map<String, Object>> pictureDtos = pictures.stream()
+                            .map(picture -> {
+                                Map<String, Object> pictureDto = new HashMap<>();
+                                pictureDto.put("pictureName", picture.getPictureName());
+                                return pictureDto;
+                            })
                             .collect(Collectors.toList());
-                    userChatDto.setPictures(pictureDtos); // Ajouter les images ici
-                    return userChatDto;
-                })
-                .collect(Collectors.toMap(UserChatDto::getId, userChatDto -> userChatDto));
 
-        // Conversion des messages en DTO
-        List<ChatMessageDto> messageDtos = messages.stream()
-                .map(this::convertMessageToDto)
-                .collect(Collectors.toList());
+                    userDto.put("pictures", pictureDtos);
+                    return Map.entry(user.getId(), userDto);  // Créer une entrée Map avec l'ID de l'utilisateur
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)); // Utiliser les clés et valeurs
+
 
         // Construction de la réponse
         Map<String, Object> response = new HashMap<>();
-        response.put("users", userDtos);
-        response.put("messages", messageDtos);
+        response.put("users", userDtos); // Utilisateurs avec images
+        response.put("messages", messageDtos); // Messages simplifiés avec ID de l'expéditeur
 
         return response;
-    }
-
-    private ChatMessageDto convertMessageToDto(ChatMessage message) {
-        return DtoTool.convert(message, ChatMessageDto.class); // Utiliser DtoTool pour la conversion
-    }
-
-    // Récupérer le dernier message d'une conversation
-    @Override
-    public String getLastMessage(Long conversationId) {
-        ChatMessage lastMessage = chatMessageRepository.findFirstByConversationIdOrderByDateEnvoieDesc(conversationId);
-        return lastMessage != null ? lastMessage.getContent() : "Pas de message";
     }
 }

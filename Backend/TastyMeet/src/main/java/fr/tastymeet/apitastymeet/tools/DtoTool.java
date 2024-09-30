@@ -1,7 +1,5 @@
 package fr.tastymeet.apitastymeet.tools;
 
-import fr.tastymeet.apitastymeet.entities.ChatMessage;
-import fr.tastymeet.apitastymeet.entities.Picture;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
