@@ -2,7 +2,7 @@ import { MessageBar, Avatar, MessageContent } from '../Messaging/CartMessaging.s
 import { Link } from 'react-router-dom';
 
 const getUserIdFromToken = () => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
         const payload = JSON.parse(atob(token.split('.')[1])); // Décoder le payload
         return payload.id; // Assurez-vous que l'ID est dans le payload

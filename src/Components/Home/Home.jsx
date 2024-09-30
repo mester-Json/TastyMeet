@@ -79,23 +79,6 @@ export const Home = () => {
         }
     }, [profiles]);
 
-    // const getNextRandomIndex = () => {
-    //     const availableProfiles = profiles.filter((_, index) => !dislikedProfiles.includes(index));
-    //     console.log('Profils disponibles après filtrage :', availableProfiles);
-
-    //     if (availableProfiles.length === 0) {
-    //         console.log('Tous les profils ont été rejetés ou likés.');
-    //         return null;
-    //     }
-
-    //     let nextIndex;
-    //     do {
-    //         nextIndex = Math.floor(Math.random() * profiles.length);
-    //     } while (dislikedProfiles.includes(nextIndex) || nextIndex >= availableProfiles.length);
-
-    //     return availableProfiles[nextIndex] ? profiles.indexOf(availableProfiles[nextIndex]) : null;
-    // };
-
     const getNextRandomIndex = () => {
         const availableProfiles = profiles.filter((_, index) => !dislikedProfiles.includes(index));
         console.log('Profils disponibles après filtrage :', availableProfiles);
@@ -105,24 +88,26 @@ export const Home = () => {
             return null; // Retourne null si aucun profil disponible
         }
 
-        // Si des profils sont disponibles, choisissez un index valide
-        let nextIndex;
-        do {
-            nextIndex = Math.floor(Math.random() * availableProfiles.length); // Utilisez la longueur des profils disponibles
-        } while (dislikedProfiles.includes(nextIndex) || nextIndex >= availableProfiles.length);
-
-        // Retournez l'index correspondant dans la liste originale
-        return profiles.indexOf(availableProfiles[nextIndex]); // Trouvez l'index du profil dans la liste originale
+        // Utilisez la longueur des profils disponibles pour choisir un index valide
+        const nextIndex = Math.floor(Math.random() * availableProfiles.length);
+        return profiles.indexOf(availableProfiles[nextIndex]); // Trouver l'index dans la liste originale
     };
 
 
+    const debounce = (func, delay) => {
+        let debounceTimer;
+        return function (...args) {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(this, args), delay);
+        };
+    };
 
     const handleMouseDown = (e) => {
         e.preventDefault();
-        const card = cardRef.current;
-        card.style.cursor = 'grabbing';
+        cardRef.current.style.cursor = 'grabbing';
+
         const startX = e.clientX;
-        const cardWidth = card.offsetWidth;
+        const cardWidth = cardRef.current.offsetWidth;
         const screenWidth = window.innerWidth;
 
         const handleMouseMove = (moveEvent) => {
@@ -132,27 +117,35 @@ export const Home = () => {
                 -(screenWidth / 2) + HORIZONTAL_MARGIN + (cardWidth / 2)
             );
             const rotation = Math.min(Math.max(limitedDeltaX / 10, -MAX_ROTATION_DEGREE), MAX_ROTATION_DEGREE);
-            card.style.transform = `translateX(${limitedDeltaX}px) rotate(${rotation}deg)`;
+            cardRef.current.style.transform = `translateX(${limitedDeltaX}px) rotate(${rotation}deg)`;
         };
 
-        const handleMouseUp = () => {
-            card.style.cursor = 'grab';
+        const handleMouseUp = (upEvent) => {
+            cardRef.current.style.cursor = 'grab';
             document.removeEventListener('mouseup', handleMouseUp);
             document.removeEventListener('mousemove', handleMouseMove);
 
-            const deltaX = e.clientX - startX;
-            const isSwipeValid = Math.abs(deltaX) > MAX_SWIPE_DISTANCE;
+            const deltaX = upEvent.clientX - startX;
+            const absDeltaX = Math.abs(deltaX);
+            const isSwipeValid = absDeltaX > MAX_SWIPE_DISTANCE;
 
             if (isSwipeValid) {
-                handleDislike(); // Appel ici pour gérer le dislike lors d'un swipe
+                const nextIndex = getNextRandomIndex();
+                if (nextIndex !== null) {
+                    setCurrentIndex(nextIndex);
+                    handleLike();  // Envoyer le like seulement si un swipe valide
+                } else {
+                    console.log("Il n'y a plus de profils disponibles.");
+                }
             }
 
-            card.style.transform = '';
+            cardRef.current.style.transform = '';  // Réinitialiser la transformation
         };
 
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
     };
+
 
     const fetchProfileData = async () => {
         const token = sessionStorage.getItem('token');
@@ -244,19 +237,17 @@ export const Home = () => {
         setDislikedProfiles((prev) => [...prev, currentIndex]);
 
         // Mettre à jour la liste des profils après un dislike
-        setProfiles((prevProfiles) => {
-            const updatedProfiles = prevProfiles.filter((_, index) => index !== currentIndex);
-            console.log('Profils mis à jour après un dislike:', updatedProfiles);
-            return updatedProfiles;
-        });
+        const updatedProfiles = profiles.filter((_, index) => index !== currentIndex);
+        console.log('Profils mis à jour après un dislike:', updatedProfiles);
 
-        // Obtenez le prochain index valide après le dislike
-        const nextIndex = getNextRandomIndex();
-        if (nextIndex !== null) {
-            setCurrentIndex(nextIndex);
-        } else {
+        if (updatedProfiles.length === 0) {
             console.log("Aucun profil suivant disponible.");
-            setCurrentIndex(null); // Réinitialisez l'index si aucun profil n'est disponible
+            setProfiles(updatedProfiles); // Mettre à jour la liste des profils
+            setCurrentIndex(null); // Réinitialiser à null si aucun profil n'est disponible
+        } else {
+            setProfiles(updatedProfiles); // Mettre à jour la liste des profils
+            const nextIndex = Math.floor(Math.random() * updatedProfiles.length); // Obtenez un index valide parmi les profils restants
+            setCurrentIndex(nextIndex);
         }
     };
 
