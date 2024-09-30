@@ -10,7 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @Setter
 @Getter
-@ToString
 public class PictureDto {
     private long id;
     private int version;

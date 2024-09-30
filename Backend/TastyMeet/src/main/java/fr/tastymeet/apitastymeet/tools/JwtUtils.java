@@ -1,6 +1,6 @@
 package fr.tastymeet.apitastymeet.tools;
 
-import fr.tastymeet.apitastymeet.dto.GenderDto;
+
 import fr.tastymeet.apitastymeet.entities.Gender;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -21,6 +21,7 @@ public class JwtUtils {
 
     public String generateToken(String username, long userId, Gender gender, Gender  orientation) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("username", username);
         claims.put("id", userId); // Ajoutez l'ID utilisateur aux claims
         claims.put("gender", gender.toString());  // Conversion en chaîne
         claims.put("orientation", orientation.toString());  // Conversion en chaîne

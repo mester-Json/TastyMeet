@@ -3,7 +3,7 @@ import { Nav } from "../Components/Nav/Nav";
 import { Footer } from "../Components/Footer/Footer";
 
 
-export const ProfilPage = () => {
+function ProfilePage() {
     return (
         <>
             <Nav />
@@ -12,3 +12,5 @@ export const ProfilPage = () => {
         </>
     )
 }
+
+export default ProfilePage

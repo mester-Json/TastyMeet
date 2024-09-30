@@ -1,56 +1,36 @@
-import {
-    MessageBar,
-    Avatar,
-    MessageContent,
-  } from "../Messaging/CartMessaging.style.jsx";
-  import { Link } from "react-router-dom";
-  
-  export const CartMessaging = ({ chatRoom }) => {
-    const { roomUsers, messages } = chatRoom;
-  
-    const getUserIdFromToken = () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const payload = JSON.parse(atob(token.split(".")[1]));
-          return payload.id;
-        } catch (error) {
-          console.error("Erreur lors du décodage du token:", error);
-        }
-      }
-      return null;
-    };
-  
-    const currentUserId = getUserIdFromToken();
-    const otherUser = roomUsers.find((user) => user.id !== currentUserId);
-    const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-  
+import { MessageBar, Avatar, MessageContent } from '../Messaging/CartMessaging.style.jsx';
+import { Link } from 'react-router-dom';
+
+const getUserIdFromToken = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1])); // Décoder le payload
+        return payload.id; // Assurez-vous que l'ID est dans le payload
+    }
+    return null;
+};
+
+export const CartMessaging = ({ conversation }) => {
+    const currentUserId = getUserIdFromToken(); // ID de l'utilisateur connecté
+    const participant = conversation.user1.id === currentUserId ? conversation.user2 : conversation.user1; // Si user1 est l'utilisateur courant, alors le participant est user2, sinon c'est user1
+    const { lastMessage } = conversation;
+
     return (
-      <div>
-        {/* Le Link doit inclure l'ID de la chatRoom dans l'URL */}
-        <Link style={{ textDecoration: "none" }} to={`/message/${chatRoom.chatRoomId}`}>
-          <MessageBar>
-            <Avatar>
-              <img
-                src={`http://localhost:9090/api/show/${otherUser.picture.pictureName}`}
-              />
-            </Avatar>
-            <MessageContent>
-              <h4>{otherUser.firstName}</h4>
-              {lastMessage ? (
-                <div className="message">
-                  <p>{lastMessage.content}</p>
-                  <p>
-                    <small>{new Date(lastMessage.dateMessage).toLocaleString()}</small>
-                  </p>
-                </div>
-              ) : (
-                <p>No messages in this room</p>
-              )}
-            </MessageContent>
-          </MessageBar>
-        </Link>
-      </div>
+        <div>
+            <Link style={{ textDecoration: 'none' }} to={`/message/${conversation.id}`}>
+                <MessageBar>
+                    <Avatar>
+                        <img
+                            src={`http://localhost:9090/api/show/${participant.pictures[0]?.pictureName}`}
+                            alt={`Avatar de ${participant.firstName}`}
+                        />
+                    </Avatar>
+                    <MessageContent>
+                        <h4>{participant.firstName}</h4>
+                        <p>{lastMessage || "Envoyez un message à " + participant.firstName + " en premier"}</p> {/* Afficher un message par défaut s'il n'y a pas de dernier message */}
+                    </MessageContent>
+                </MessageBar>
+            </Link>
+        </div>
     );
-  };
-  
+};

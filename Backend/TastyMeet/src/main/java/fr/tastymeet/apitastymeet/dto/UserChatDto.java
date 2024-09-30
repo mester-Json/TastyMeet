@@ -1,6 +1,7 @@
 package fr.tastymeet.apitastymeet.dto;
 
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.*;
@@ -29,4 +30,16 @@ public class UserChatDto {
     {
         return pictures.get(0);
     }
+=======
+import lombok.Data;
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+public class UserChatDto {
+    private long id;
+    private String firstName;
+    private List<PictureDto> pictures = new ArrayList<>();
+
+>>>>>>> 60bce07a5f0cbcc7aef06a2781db5612097e8f8d
 }
