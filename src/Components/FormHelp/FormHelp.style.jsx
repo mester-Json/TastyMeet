@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 export const Container = styled.div`
   max-width: 70vw;
-  margin: 5vh auto 0 auto;
+  margin: 5vh auto 5vh auto;
   padding: 2.034vw;
   background-color: rgba(73, 37, 27, 0.7);
   color: #ffffff;

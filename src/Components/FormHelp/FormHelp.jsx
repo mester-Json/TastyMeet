@@ -17,28 +17,28 @@ export const FormHelp = () => {
       <HelpContainer>
         <HelpText>
           <Title>HELP</Title>
-          <p>Batnae municipium in Anthemusia conditum Macedonum manu priscorum ab Euphrate flumine brevi spatio disparatur,
-          refertum mercatoribus opulentis, ubi annua sollemnitate prope Septembris initium mensis ad nundinas magna promiscuae
-          fortunae convenit multitudo ad commer-canda quae Indi mittunt et Seres aliaque plurima vehi terra marique consueta.</p>
+          <p> Bienvenue sur la page d'aide ! Ici, vous trouverez des réponses aux questions les plus fréquemment posées ainsi que des solutions aux problèmes courants. Si vous avez besoin d'assistance, nous sommes là pour vous aider.</p>
         </HelpText>
       </HelpContainer>
       <QuestionContainer>
         {/* Première question avec son contenu déroulant */}
         <QuestionButton onClick={toggleDropdown1}>+ C'est une question</QuestionButton>
         <QuestionContent isOpen={isOpen1}>
-          <p>Ceci est le contenu de la première question. Lorem ipsum dolor sit amet...</p>
+        <p>Pour créer un compte, cliquez sur le bouton "S'inscrire" en haut à droite de la page. Remplissez le formulaire avec vos informations personnelles (nom, adresse e-mail, mot de passe) puis validez. Vous recevrez un e-mail de confirmation.</p>
         </QuestionContent>
 
         {/* Deuxième question avec son contenu déroulant */}
         <QuestionButton onClick={toggleDropdown2}>+ C'est une question</QuestionButton>
         <QuestionContent isOpen={isOpen2}>
-          <p>Ceci est le contenu de la deuxième question. Lorem ipsum dolor sit amet...</p>
+        <p>Si vous avez oublié votre mot de passe, cliquez sur le lien "Mot de passe oublié" sur la page de connexion. Entrez l'adresse e-mail associée à votre compte et vous recevrez un e-mail pour réinitialiser votre mot de passe.</p>
         </QuestionContent>
 
         {/* Troisième question avec son contenu déroulant */}
         <QuestionButton onClick={toggleDropdown3}>+ C'est une question</QuestionButton>
         <QuestionContent isOpen={isOpen3}>
-          <p>Ceci est le contenu de la troisième question. Lorem ipsum dolor sit amet...</p>
+        <p>Si vous avez toujours des questions ou des problèmes après avoir consulté notre page d'aide, n'hésitez pas à nous contacter directement :
+
+E-mail : support@Tastymeet.com</p>
         </QuestionContent>
       </QuestionContainer>
     </Container>
