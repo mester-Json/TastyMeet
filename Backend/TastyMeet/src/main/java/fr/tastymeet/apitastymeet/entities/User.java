@@ -1,15 +1,13 @@
 package fr.tastymeet.apitastymeet.entities;
 
-<<<<<<< HEAD
-=======
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
->>>>>>> 60bce07a5f0cbcc7aef06a2781db5612097e8f8d
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,10 +16,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Setter
 @Getter
-<<<<<<< HEAD
-
-=======
->>>>>>> 60bce07a5f0cbcc7aef06a2781db5612097e8f8d
 @Entity
 public class User {
 
@@ -59,28 +53,17 @@ public class User {
     @Column(nullable = true)
     private List<Picture> pictures = new ArrayList<>();
 
-<<<<<<< HEAD
-=======
     @OneToMany(mappedBy = "user1")
     private List<Conversation> conversationsAsUser1;
 
     @OneToMany(mappedBy = "user2")
     private List<Conversation> conversationsAsUser2;
->>>>>>> 60bce07a5f0cbcc7aef06a2781db5612097e8f8d
 
     @ManyToMany
     private Set<User> liked = new HashSet<>();
 
-<<<<<<< HEAD
-    @OneToMany(mappedBy = "senderUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ChatMessage> messages;
-
-    @ManyToMany(mappedBy = "roomUsers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<ChatRoom> senderRooms;
-=======
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChatMessage> messagesSent = new ArrayList<>();
->>>>>>> 60bce07a5f0cbcc7aef06a2781db5612097e8f8d
 
     public Set<User> getMatches() {
         return liked.stream().filter(like -> like.liked.stream().anyMatch(user -> user.id == id)).collect(Collectors.toSet());

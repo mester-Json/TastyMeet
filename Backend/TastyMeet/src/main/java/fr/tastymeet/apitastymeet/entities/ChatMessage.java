@@ -1,35 +1,5 @@
 package fr.tastymeet.apitastymeet.entities;
 
-<<<<<<< HEAD
-import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
-
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
-@Getter
-@ToString
-
-@Entity
-public class ChatMessage {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long chatId;
-
-    // Plusieurs messages appartienents a 1 user
-    @ManyToOne
-    private User senderUser;
-    @Column(name = "content")
-    private String content;
-    @Column(name = "dateMessage")
-    private LocalDateTime dateMessage = LocalDateTime.now();
-
-    @ManyToOne
-    private ChatRoom room;
-
-=======
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
@@ -66,5 +36,4 @@ public class ChatMessage {
         this.conversation = conversation;
         this.dateEnvoie = LocalDateTime.now(); // Ici, on s'assure que le timestamp est initialisé
     }
->>>>>>> 60bce07a5f0cbcc7aef06a2781db5612097e8f8d
 }

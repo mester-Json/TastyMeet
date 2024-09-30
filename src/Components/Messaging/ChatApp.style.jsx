@@ -1,55 +1,79 @@
 import styled from 'styled-components';
-export const MessageBar = styled.div`
-  margin-top:10px;
-  margin-left:auto;
-  margin-right:auto;
-  border-radius: 50px;    
+
+
+export const AppContainer = styled.div`
   display: flex;
-  align-items: center;
-  width: 90%;
-  background-color: #5E3826;
+  flex-direction: column;
+  height: 70vh;
+  max-width: 80%;
+  margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #775144;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+`;
+
+export const NomConversation = styled.div`
+margin-bottom:20px;
+margin-top: 15px;
+text-align: center;
+color: white;
+`;
+
+export const UserContainer = styled.div`
+display: flex;
+flex-direction: ${({ sender }) => (sender === 'user2' ? 'row' : 'row-reverse')};
+`;
+
+export const MessagesContainer = styled.div`
+  flex: 1;
   padding: 10px;
-  box-sizing: border-box;
+  overflow-y: auto;
 `;
 
-export const Avatar = styled.div`
-  flex-shrink: 0;
-  margin-right: 10px;
-
-  img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
+export const MessageContainer = styled.div`
+  display: flex;
+  flex-direction: ${({ sender }) => (sender === 'user2' ? 'row' : 'row-reverse')};
+  margin: 5px 50px;
+  align-items: flex-end;
 `;
 
-export const MessageContent = styled.div`
-margin-top:auto;
-margin-bottom:auto;
-margin-right:10px;
+export const MessageBubble = styled.div`
+  padding: 10px;
+  border-radius: 10px;
+  background-color: ${({ sender }) => (sender === 'user1' ? '#2a0800' : '#D9D9D9')};
+  color: ${({ sender }) => (sender === 'user1' ? 'white' : 'black')};
+  max-width: 400px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+`;
+
+export const InputContainer = styled.div`
+  display: flex;
+  padding: 10px;
+  background-color: #775144;
+`;
+
+export const Input = styled.input`
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
+export const Button = styled.button`
+ padding: 10px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgb(42, 8, 0);
   color: white;
+  cursor: pointer;
 
-  h4 {
-    margin: 0;
-    font-size: 16px;
-  }
-
-  p {
-    margin: 5px 0 0 0;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  @media screen and (max-width: 600px) {
-    h4 {
-      font-size: 14px;
-    }
-
-    p {
-      font-size: 12px;
-    }
+  &:hover {
+    background-color: #ff6f28a1;
   }
 `;

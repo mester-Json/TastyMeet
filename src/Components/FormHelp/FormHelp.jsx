@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Header, Title, HelpText, QuestionContainer, QuestionButton, QuestionContent } from "./FormHelp.style.jsx";
+import { Container, HelpContainer, Title, HelpText, QuestionContainer, QuestionButton, QuestionContent } from "./FormHelp.style.jsx";
 
 export const FormHelp = () => {
   // Gérer l'état de la visibilité des contenus déroulants pour chaque question
@@ -14,14 +14,14 @@ export const FormHelp = () => {
 
   return (
     <Container>
-      <Header>
+      <HelpContainer>
         <HelpText>
           <Title>HELP</Title>
-          Batnae municipium in Anthemusia conditum Macedonum manu priscorum ab Euphrate flumine brevi spatio disparatur,
+          <p>Batnae municipium in Anthemusia conditum Macedonum manu priscorum ab Euphrate flumine brevi spatio disparatur,
           refertum mercatoribus opulentis, ubi annua sollemnitate prope Septembris initium mensis ad nundinas magna promiscuae
-          fortunae convenit multitudo ad commer-canda quae Indi mittunt et Seres aliaque plurima vehi terra marique consueta.
+          fortunae convenit multitudo ad commer-canda quae Indi mittunt et Seres aliaque plurima vehi terra marique consueta.</p>
         </HelpText>
-      </Header>
+      </HelpContainer>
       <QuestionContainer>
         {/* Première question avec son contenu déroulant */}
         <QuestionButton onClick={toggleDropdown1}>+ C'est une question</QuestionButton>
