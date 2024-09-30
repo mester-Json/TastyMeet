@@ -14,6 +14,7 @@ import fr.tastymeet.apitastymeet.repositories.UserRepository;
 import fr.tastymeet.apitastymeet.tools.DtoTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -32,7 +33,7 @@ public class ChatMessageServiceImpl {
     private ChatMessageRepository chatMessageRepository;
 
 
-
+    @Transactional
     public void createMessage(long roomId, long userId, String content){
         ChatRoom chatRoom = chatRoomRepository.findByChatRoomId(roomId);
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Le User n'existe pas"));

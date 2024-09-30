@@ -29,6 +29,10 @@ export const ChatApp = () => {
   const [otherUser, setOtherUser] = useState();
   const [currentUser, setCurrentUser] = useState();
   const [roomUsers, setRoomUsers] = useState({}); // État pour stocker les utilisateurs
+  const [messageContent, setMessageContent] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [stompClient, setStompClient] = useState(null);
+
   const getUserIdFromToken = () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -85,7 +89,7 @@ export const ChatApp = () => {
     }
   }, [chatRoomData, currentUserId]);
 
-  const formatDate = (dateArray) => {
+  /*const formatDate = (dateArray) => {
     // Vérifiez si dateArray est bien un tableau et a la longueur attendue
 
     if (!Array.isArray(dateArray) || dateArray.length !== 7) {
@@ -102,90 +106,100 @@ export const ChatApp = () => {
 
     // Retournez la date formatée
     return `${day}-${month}-${year} ${hours}h${minutes}`;
+  };*/
+
+  const formatDate = (date) => {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Mois est basé sur un index 0
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
   };
 
-  const [messageContent, setMessageContent] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [stompClient, setStompClient] = useState(null);
-  const { conversationId } = useParams();
-
   const connectWebSocket = () => {
-        if (stompClient) return; // Évite les connexions multiples
+    if (stompClient) return; // Évite les connexions multiples
 
-        const client = new Client({
-            brokerURL: 'ws://localhost:9090/ws',
+    const client = new Client({
+      brokerURL: "ws://localhost:9090/ws",
 
-            onConnect: (frame) => {
-                console.log('Connecté: ' + frame);
+      onConnect: (frame) => {
+        console.log("Connecté: " + frame);
 
-                // Abonnement au topic
-                client.subscribe(`/topic/message/${chatRoomId}`, (message) => {
-                    const receivedMessage = JSON.parse(message.body);
-                    console.log("Message reçu :", receivedMessage);
+        // Abonnement au topic
+        client.subscribe(`/topic/sendMessage/${chatRoomId}`, (message) => {
+          const receivedMessage = JSON.parse(message.body);
 
+          // Ajout d'un message
+          setMessages((prevMessages) => {
+            const alreadyExists = prevMessages.some(
+              (msg) =>
+                msg.content === receivedMessage.content &&
+                msg.dateMessage ===
+                receivedMessage.dateMessage
+            );
 
-
-                    // Ajout d'un message
-                    setMessages((prevMessages) => {
-                        const alreadyExists = prevMessages.some((msg) =>
-                            msg.content === receivedMessage.content &&
-                            msg.dateEnvoie &&
-                            msg.dateEnvoie[0] === receivedMessage.dateEnvoie[0]
-                        );
-
-                        if (!alreadyExists) {
-                            console.log("Ajout du message :", receivedMessage);
-                            return [...prevMessages, receivedMessage];
-                        }
-                        console.log("Message déjà existant, pas d'ajout :", receivedMessage);
-                        return prevMessages;
-                    });
-                });
-            },
-            onStompError: (frame) => {
-                console.error('Erreur STOMP: ', frame);
-            },
-            onWebSocketClose: (event) => {
-                console.error('WebSocket est fermé. Code:', event.code, 'Raison:', event.reason);
+            if (!alreadyExists) {
+              console.log("Ajout du message :", receivedMessage);
+              return [...prevMessages, receivedMessage];
             }
+            console.log(
+              "Message déjà existant, pas d'ajout :",
+              receivedMessage
+            );
+            return prevMessages;
+          });
         });
+      },
+      onStompError: (frame) => {
+        console.error("Erreur STOMP: ", frame);
+      },
+      onWebSocketClose: (event) => {
+        console.error(
+          "WebSocket est fermé. Code:",
+          event.code,
+          "Raison:",
+          event.reason
+        );
+      },
+    });
 
-        client.activate();
-        setStompClient(client);
-    };
+    client.activate();
+    setStompClient(client);
+  };
 
   // Fonction pour récupérer les informations d'un utilisateur
 
   useEffect(() => {
-        if (!stompClient) {
-            console.log('Connexion WebSocket en cours...');
-            fetchMessages();
-            connectWebSocket();
-        } else {
-            console.log('WebSocket déjà connecté.');
-        }
+    if (!stompClient) {
+      console.log("Connexion WebSocket en cours...");
+      fetchMessages();
+      connectWebSocket();
+    } else {
+      console.log("WebSocket déjà connecté.");
+    }
 
-        return () => {
-            if (stompClient) {
-                console.log('Déconnexion du WebSocket...');
-                stompClient.deactivate(); // Déconnexion propre lors de la désactivation du composant
-                setStompClient(null); // Réinitialisez le client STOMP
-            }
-        };
-    }, [stompClient]);
+    return () => {
+      if (stompClient) {
+        console.log("Déconnexion du WebSocket...");
+        stompClient.deactivate(); // Déconnexion propre lors de la désactivation du composant
+        setStompClient(null); // Réinitialisez le client STOMP
+      }
+    };
+  }, [stompClient]);
 
   const handleSendMessage = () => {
     if (stompClient && stompClient.connected && messageContent) {
       const chatMessage = {
-        conversation: { id: conversationId },
-        senderId: getUserIdFromToken(),
+        roomId: chatRoomId, // Utiliser directement l'ID de la conversation
+        senderUserId: currentUserId, // Assurez-vous que cela retourne bien l'ID de l'utilisateur
         content: messageContent,
+        dateMessage: new Date().toISOString().slice(0, 19), // Ajout de la date actuelle
       };
 
-      console.log("Envoi du message :", chatMessage); // Log du message avant envoi
-
       stompClient.publish({
-        destination: `/app/chat/${conversationId}`,
+        destination: `/app/message/${chatRoomId}`, // C'est bien la route du @MessageMapping
         body: JSON.stringify(chatMessage),
       });
 
@@ -205,17 +219,27 @@ export const ChatApp = () => {
           const messageSender = chatRoomData.roomUsers.find(
             (user) => user.id === msg.senderUserId
           );
+  
           return (
-            <MessageContainer key={index} sender={msg.senderUserId === getUserIdFromToken() ? "user1" : "user2"}>
-              <UserContainer sender={msg.senderUserId === getUserIdFromToken() ? "user1" : "user2"}>
-                <Avatar>
-                  <img
-                    src={`http://localhost:9090/api/show/${messageSender.picture.pictureName}`}
-                    alt={messageSender.firstName}
-                  />
-                </Avatar>
-                <MessageBubble sender={msg.senderUserId === getUserIdFromToken() ? "user1" : "user2"}>{msg.content}</MessageBubble>
-              </UserContainer>
+            <MessageContainer
+              key={index}
+              sender={msg.senderUserId === getUserIdFromToken() ? "user1" : "user2"}
+            >
+              <Avatar>
+                <img
+                  src={`http://localhost:9090/api/show/${messageSender.picture.pictureName}`}
+                  alt={messageSender.firstName}
+                />
+              </Avatar>
+              <MessageContent>
+                <h4>{messageSender.firstName}</h4>
+                <MessageBubble
+                  sender={msg.senderUserId === getUserIdFromToken() ? "user1" : "user2"}
+                >
+                  {msg.content}
+                </MessageBubble>
+                <p className="date">{msg.dateMessage}</p>
+              </MessageContent>
             </MessageContainer>
           );
         })}
@@ -230,5 +254,5 @@ export const ChatApp = () => {
         <Button onClick={handleSendMessage}>Envoyer</Button>
       </InputContainer>
     </AppContainer>
-  );
+  );  
 };

@@ -44,8 +44,11 @@ export const MessageBubble = styled.div`
   border-radius: 10px;
   background-color: ${({ sender }) => (sender === 'user1' ? '#2a0800' : '#D9D9D9')};
   color: ${({ sender }) => (sender === 'user1' ? 'white' : 'black')};
-  max-width: 60%;
+  max-width: 400px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 `;
 
 export const InputContainer = styled.div`

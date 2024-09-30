@@ -64,15 +64,20 @@ public class ChatMessageController {
         return ResponseEntity.ok("Send with success !!!!");
     }
 
-    @MessageMapping("/message")
-    public void sendMessage(@Payload ChatMessageDto chatMessageDto) throws Exception{
 
+    @MessageMapping("/message/{chatRoomId}")
+    @SendTo("/topic/sendMessage/{chatRoomId}")
+    public ChatMessageDto sendMessage(@Payload ChatMessageDto chatMessageDto) throws Exception{
+        System.out.println("Message reçu dans le contrôleur: " + chatMessageDto);
+        long chatRoomId = chatMessageDto.getRoomId();
         chatMessageService.createMessage(chatMessageDto.getRoomId(), chatMessageDto.getSenderUserId(), chatMessageDto.getContent());
 
         // Envoie le message à tous les abonnés du topic "/topic/sendMessage/{roomId}"
         messagingTemplate.convertAndSend(
-                "/topic/sendMessage/" + chatMessageDto.getRoomId(), // Envoie le message au bon topic
+                "/topic/sendMessage/" + chatRoomId, // Envoie le message au bon topic
                 chatMessageDto );// Le message à envoyer aux abonnés
+
+        return chatMessageDto;
     }
 
     /*@PostMapping("/{roomId}/{userId}/{content}")
