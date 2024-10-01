@@ -1,5 +1,7 @@
 package fr.tastymeet.apitastymeet.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,8 +16,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Setter
 @Getter
-@ToString
-
 @Entity
 public class User {
 
@@ -29,9 +29,9 @@ public class User {
     private String lastName;
     @Column(name = "firstName", nullable = false)
     private String firstName;
-    @Column(name = "age")
+    @Column(name = "age", nullable = false)
     private LocalDate age;
-    @Column(name = "description", nullable = true)
+    @Column(name = "description")
     private String description;
     @Column(unique = true, name = "email", nullable = false)
     private String email;
@@ -39,13 +39,13 @@ public class User {
     private String password;
     @Column(name = "gender", nullable = false)
     private Gender gender;
-    @Column(name = "orientation", nullable = true)
+    @Column(name = "orientation")
     private Gender orientation;
-    @Column(name = "phone", nullable = true)
+    @Column(name = "phone")
     private long phone;
-    @Column(name = "location", nullable = true)
+    @Column(name = "location")
     private String location;
-    @Column(name = "city" , nullable = true)
+    @Column(name = "city" )
     private String city;
     @ElementCollection
     private Set<Roles> roles = Set.of(Roles.PUBLIC);
@@ -53,12 +53,30 @@ public class User {
     @Column(nullable = true)
     private List<Picture> pictures = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user1")
+    private List<Conversation> conversationsAsUser1;
+
+    @OneToMany(mappedBy = "user2")
+    private List<Conversation> conversationsAsUser2;
+
     @ManyToMany
     private Set<User> liked = new HashSet<>();
 
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ChatMessage> messagesSent = new ArrayList<>();
+
     public Set<User> getMatches() {
-        return liked.stream().filter(like -> like.liked.stream().anyMatch(user -> user.id == id)).collect(Collectors.toSet());
+        System.out.println("Liked users: " + liked);
+        return liked.stream()
+                .filter(likedUser -> {
+                    boolean hasLiked = likedUser.getLiked().stream().anyMatch(user -> user.id == this.id);
+                    System.out.println("Checking if " + likedUser.id + " has liked current user: " + hasLiked);
+                    return hasLiked;
+                })
+                .collect(Collectors.toSet());
     }
+
+
     public void like(User user) {
         liked.add(user);
     }

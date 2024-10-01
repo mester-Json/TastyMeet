@@ -20,7 +20,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 
 @Component
@@ -30,30 +29,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
         if (!request.getMethod().equals("OPTIONS") && isInterceptedRequest(request)) {
             String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid authorization");
-                return;
+            if (authHeader == null || (!authHeader.startsWith("Bearer"))) {
+                throw new ServletException("Invalid authorization");
             }
-
-            String jwtToken = authHeader.substring(7); // Better to use `substring("Bearer ".length())`
+            String jwtToken = authHeader.substring(7);
             String username = jwtUtils.extractUsername(jwtToken);
+            String userId = jwtUtils.extractClaim(jwtToken, "id"); // Extraire l'ID utilisateur
 
             if (username != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (jwtUtils.validateToken(jwtToken, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(userDetails, jwtToken, userDetails.getAuthorities());
+                if (Boolean.TRUE.equals(jwtUtils.validateToken(jwtToken, userDetails))) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, jwtToken, userDetails.getAuthorities());
+                    authToken.setDetails(userId); // Stocker l'ID dans les détails
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 } else {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
-                    return;
+                    throw new ServletException("Invalid token");
                 }
             }
         }
@@ -63,19 +59,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        // If the path starts with "/api", this filter should not apply.
-        return path.startsWith("/api");
+        return path.startsWith("/") ;
     }
 
     private boolean isInterceptedRequest(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        List<String> authorizedUrls = Arrays.asList(SecurityConfig.getAUTHORIZED_URL());
-
         return Stream.concat(
-                        Arrays.stream(SecurityConfig.getAUTHORIZED_BY_METHOD()
-                                .getOrDefault(HttpMethod.valueOf(request.getMethod()), new String[]{})),
-                        authorizedUrls.stream())
-                .map(s -> s.replace("**", ".*")) // Use regex to replace "**" with ".*"
-                .noneMatch(uri::matches);
+                        Arrays.stream(SecurityConfig.getAUTHORIZED_BY_METHOD().getOrDefault(HttpMethod.valueOf(request.getMethod()), new String[]{})),
+                        Arrays.stream(SecurityConfig.getAUTHORIZED_URL()))
+                .map(s -> s.replace("**", ".*")).noneMatch(uri::matches);
     }
 }

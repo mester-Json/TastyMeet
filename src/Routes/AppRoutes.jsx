@@ -15,15 +15,14 @@ export const AppRoutes = () => {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/dist" element={<Login />} />
+                <Route path="/" element={<Login />} />
                 <Route path="/register" element={<Register />} />
 
                 {/* Protected Routes */}
-                <Route path="/dist/messaging" element={isAuthenticated() ? <Messaging /> : <Navigate to="/dist" />} />
-                <Route path="/dist/message" element={isAuthenticated() ? <Message /> : <Navigate to="/dist" />} />
-                <Route path="/dist/accueil" element={isAuthenticated() ? <Accueil /> : <Navigate to="/" />} />
-                <Route path="/dist/profile" element={isAuthenticated() ? <ProfilPage /> : <Navigate to="/" />} />
-                <Route path="/dist/help" element={isAuthenticated() ? <Help /> : <Navigate to="/" />} />
+                <Route path="/messaging" element={isAuthenticated() ? <Messaging /> : <Navigate to="/" />} />
+                <Route path="/message/:conversationId" element={isAuthenticated() ? <Message /> : <Navigate to="/login" replace />} />                <Route path="/accueil" element={isAuthenticated() ? <Accueil /> : <Navigate to="/" />} />
+                <Route path="/profile" element={isAuthenticated() ? <ProfilPage /> : <Navigate to="/" />} />
+                <Route path="/help" element={isAuthenticated() ? <Help /> : <Navigate to="/" />} />
 
                 {/* Fallback for unknown routes */}
                 <Route path="*" element={<h1> 404  </h1>} />

@@ -1,76 +1,153 @@
-import { useState } from 'react';
-import { AppContainer, NomConversation, MessagesContainer, MessageContainer, MessageBubble, UserContainer, InputContainer, Input, Button } from './ChatApp.style.jsx';
+import { useEffect, useState, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
+import {
+    AppContainer, NomConversation, MessagesContainer, MessageContainer, MessageBubble,
+    UserContainer, InputContainer, Input, Button, Div
+} from './ChatApp.style.jsx';
 import { Avatar, MessageContent } from '../Messaging/CartMessaging.style.jsx';
+import { connectWebSocket, sendMessage, disconnectWebSocket } from '../../Services/websocket.js';
+import { fetchMessages } from '../../Axios/Axios.js';
 
-export const  ChatApp = ()  =>{
-    //Conversation avec un autre utilisateur
+const getUserIdFromToken = () => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.id;
+    }
+    return null;
+};
+
+export const ChatApp = () => {
+    const formatDate = (dateArray) => {
+        if (!Array.isArray(dateArray) || dateArray.length !== 7) {
+            console.error('dateEnvoie n\'est pas un tableau valide:', dateArray);
+            return '';
+        }
+
+        const year = dateArray[0];
+        const month = String(dateArray[1]).padStart(2, '0');
+        const day = String(dateArray[2]).padStart(2, '0');
+        const hours = String(dateArray[3]).padStart(2, '0');
+        const minutes = String(dateArray[4]).padStart(2, '0');
+
+        return `${hours}h${minutes}`;
+    };
+
+    const [messageContent, setMessageContent] = useState('');
+    const [messages, setMessages] = useState([]);
+    const [users, setUsers] = useState({});
+    const { conversationId } = useParams();
+
+    const handleMessageReceived = useCallback((message) => {
+        const senderId = message.sender.id;
+        const currentUserId = getUserIdFromToken();
+
+        if (senderId !== currentUserId) {
+            setMessages((prevMessages) => {
+                const alreadyExists = prevMessages.some((msg) =>
+                    msg.content === message.content &&
+                    msg.dateEnvoie[0] === message.dateEnvoie[0]
+                );
+
+                if (!alreadyExists) {
+                    console.log("Ajout du message :", message);
+                    return [...prevMessages, message];
+                }
+                console.log("Message déjà existant, pas d'ajout :", message);
+                return prevMessages;
+            });
+        }
+    }, []);
+
+    useEffect(() => {
+        connectWebSocket(conversationId, handleMessageReceived);
+
+        return () => {
+            disconnectWebSocket();
+        };
+    }, [conversationId, handleMessageReceived]);
+
+    useEffect(() => {
+        const loadMessages = async () => {
+            try {
+                const data = await fetchMessages(conversationId);
+                setMessages(data.messages);
+                setUsers(data.users);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des messages :', error);
+            }
+        };
+        loadMessages();
+    }, [conversationId]);
+
+    const handleSendMessage = () => {
+        const senderId = getUserIdFromToken();
+        if (messageContent) {
+            const chatMessage = {
+                conversation: { id: conversationId },
+                sender: { id: senderId },
+                content: messageContent,
+                dateEnvoie: null,
+            };
+
+            setMessages((prevMessages) => [...prevMessages, chatMessage]);
+
+            console.log("Envoi du message :", chatMessage);
+            sendMessage(conversationId, chatMessage);
+            setMessageContent('');
+        } else {
+            console.warn("Le contenu du message est vide.");
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSendMessage();
+        }
+    };
+
     return (
-        <>
+        <Div>
             <AppContainer>
-                <NomConversation>
-                    Nom de la conversation
-                </NomConversation>
+                <NomConversation>Nom de la conversation</NomConversation>
                 <MessagesContainer>
-                    <UserContainer sender="user1">
-                        <Avatar>
-                            <img src="https://www.utopix.com/wp-content/uploads/2024/04/MjdmZjg0ZWMtNjE1OS00ZDQxLThhYzItNTg3YjQwYzc1MzVi_70f1467b-7a37-47d4-b2db-0eb0ce163b0f_profilhomme5-scaled.jpg" alt="Avatar de Jonathan" />
-                        </Avatar>
-                        <MessageContent>
-                            <h4>Jonathan</h4>
-                        </MessageContent>
-                    </UserContainer>
-                    <MessageContainer sender="user1">
-                        <MessageBubble sender="user1">Bonjour, comment ça va ?</MessageBubble>
-                    </MessageContainer>
+                    {messages.map((msg, index) => {
+                        const senderId = msg.sender.id;
+                        const user = users[senderId];
 
-                    <UserContainer sender="user2">
-                        <Avatar>
-                            <img src="https://newprofilepic.photo-cdn.net//assets/images/article/profile.jpg?90af0c8" alt="Avatar de Jonathan" />
-                        </Avatar>
-                        <MessageContent>
-                            <h4>Lea</h4>
-                        </MessageContent>
-                    </UserContainer>
-                    <MessageContainer sender="user2">
-                        <MessageBubble sender="user2">Ça va bien, merci ! Et toi ?</MessageBubble>
-                    </MessageContainer>
-
-                    <UserContainer sender="user1">
-                        <Avatar>
-                            <img src="https://www.utopix.com/wp-content/uploads/2024/04/MjdmZjg0ZWMtNjE1OS00ZDQxLThhYzItNTg3YjQwYzc1MzVi_70f1467b-7a37-47d4-b2db-0eb0ce163b0f_profilhomme5-scaled.jpg" alt="Avatar de Jonathan" />
-                        </Avatar>
-                        <MessageContent>
-                            <h4>Jonathan</h4>
-                        </MessageContent>
-                    </UserContainer>
-                    <MessageContainer sender="user1">
-                        <MessageBubble sender="user1">Moi aussi ça va bien, merci !</MessageBubble>
-                    </MessageContainer>
-
-                    <UserContainer sender="user2">
-                        <Avatar>
-                            <img src="https://newprofilepic.photo-cdn.net//assets/images/article/profile.jpg?90af0c8" alt="Avatar de Jonathan" />
-                        </Avatar>
-                        <MessageContent>
-                            <h4>Lea</h4>
-                        </MessageContent>
-                    </UserContainer>
-                    <MessageContainer sender="user2">
-                        <MessageBubble sender="user2">Super ! On se voit bientôt ?</MessageBubble>
-                    </MessageContainer>
+                        return (
+                            <MessageContainer key={index} sender={senderId === getUserIdFromToken() ? "user1" : "user2"}>
+                                <UserContainer sender={senderId === getUserIdFromToken() ? "user1" : "user2"}>
+                                    <Avatar>
+                                        {user && user.pictures && user.pictures.length > 0 ? (
+                                            <img src={`http://localhost:9090/api/show/${user.pictures[0].pictureName}`} alt="Avatar" />
+                                        ) : (
+                                            <img src="default-avatar.png" alt="Default Avatar" />
+                                        )}
+                                    </Avatar>
+                                    <MessageContent>
+                                        <h4>{user ? user.firstName : 'Utilisateur Inconnu'}</h4>
+                                        <span>{formatDate(msg.dateEnvoie)}</span>
+                                    </MessageContent>
+                                </UserContainer>
+                                <MessageBubble sender={senderId === getUserIdFromToken() ? "user1" : "user2"}>
+                                    {msg.content}
+                                </MessageBubble>
+                            </MessageContainer>
+                        );
+                    })}
                 </MessagesContainer>
                 <InputContainer>
                     <Input
                         type="text"
-                        //onChange="{ }"
+                        value={messageContent}
+                        onChange={(e) => setMessageContent(e.target.value)}
+                        onKeyDown={handleKeyDown}
                         placeholder="Tapez votre message..."
                     />
-                    <Button
-                    //onClick={handleSendMessage}
-                    >Envoyer</Button>
+                    <Button onClick={handleSendMessage}>Envoyer</Button>
                 </InputContainer>
             </AppContainer>
-        </>
+        </Div>
     );
-}
-
+};

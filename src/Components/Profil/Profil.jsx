@@ -161,9 +161,11 @@ export const Profil = () => {
             setNewPassword('');
             setConfirmNewPassword('');
         } catch (error) {
-            setError({ password: error.message });
+            setError({ password: 'Une erreur est survenue lors de la modification de l\'email.' });
         }
     };
+
+
     const handleEmailChange = async (event) => {
         event.preventDefault();
         setError({}); // Clear previous errors

@@ -1,19 +1,20 @@
 package fr.tastymeet.apitastymeet.controllers;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fr.tastymeet.apitastymeet.dto.*;
 import fr.tastymeet.apitastymeet.entities.User;
-import fr.tastymeet.apitastymeet.services.IMatchService;
+import fr.tastymeet.apitastymeet.services.Interface.IMatchService;
 import fr.tastymeet.apitastymeet.tools.JwtUtils;
 import io.jsonwebtoken.Claims;
 import org.springframework.http.HttpStatus;
 import fr.tastymeet.apitastymeet.entities.Gender;
-import fr.tastymeet.apitastymeet.services.IPictureService;
-import fr.tastymeet.apitastymeet.services.IUserService;
+import fr.tastymeet.apitastymeet.services.Interface.IPictureService;
+import fr.tastymeet.apitastymeet.services.Interface.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,13 +23,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
     @Autowired
     private IUserService userService;
@@ -40,12 +42,6 @@ public class UserController {
     private IPictureService pictureService;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private PictureController pictureController;
-
-    @Autowired
     private IMatchService matchService;
 
     @Value("${file.upload-dir}")
@@ -54,61 +50,34 @@ public class UserController {
 
     @GetMapping(value="/display", produces ="application/json")
     public List<UserDto> display(@RequestHeader("Authorization") String token) {
-        // Retirer le préfixe "Bearer " du token
-        String jwtToken = token.substring(7);
-
-        // Décoder le token pour obtenir les informations
-        Claims claims = jwtUtils.decodeToken(jwtToken);
-        long userId = Long.parseLong(claims.get("id").toString());
-        Gender gender = Gender.valueOf(claims.get("gender").toString());
-        Gender orientation = Gender.valueOf(claims.get("orientation").toString());
-
-        // Récupérer la liste des utilisateurs que cet utilisateur a liké
-        Set<UserLikeDto> likedUsers = matchService.getLikes(userId);
-        likedUsers.forEach(likedUser -> System.out.println("Liked userId: " + likedUser.getUserId()));
-
-        // Récupérer les utilisateurs qui correspondent au genre et à l'orientation, en excluant les utilisateurs likés
-        List<UserDto> users = userService.getByGenderAndOrientation(orientation, gender).stream()
-                .filter(user -> likedUsers.stream().noneMatch(likedUser -> likedUser.getLikedUserId() == user.getId())) // Exclure les utilisateurs likés
-                .collect(Collectors.toList());
-
-        return users;
+        // Appeler directement le service pour récupérer la liste des utilisateurs
+        return userService.getDisplayableUsers(token);
     }
 
-    @PostMapping(value = "/addUser", consumes = "multipart/form-data")
-    public ResponseEntity<?> addUser(@ModelAttribute UserDto userDto,
-                                     @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
+
+    @PostMapping(value = "/addUser", consumes = "multipart/form-data", produces = "application/json")
+    public ResponseEntity<UserDto> save(@ModelAttribute UserDto userDto,
+                                        @RequestPart(value = "file", required = false) MultipartFile file) throws Exception {
+
         // Sauvegarde des données utilisateur
         UserDto dto = userService.save(userDto);
 
-        // Génération du token
-        String token = jwtUtils.generateToken(userDto.getEmail(), userDto.getId(), userDto.getGender(), userDto.getOrientation());
-
+        // Sauvegarde de l'image si elle est présente
         if (file != null && !file.isEmpty()) {
             try {
-                // Chemin où le fichier sera sauvegardé
-                Path path = Paths.get(uploadDir + File.separator + file.getOriginalFilename());
-
-                PictureDto picturedto = new PictureDto();
-                picturedto.setPictureName(file.getOriginalFilename());
-                picturedto.setUserId(dto.getId());
-                pictureService.save(picturedto);
-
-                // Sauvegarde le fichier sur le système de fichiers
-                Files.write(path, file.getBytes());
+                pictureService.uploadPicture(file, dto.getId());
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(dto);
             }
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(dto);
+        return ResponseEntity.ok(dto);
     }
+
     @GetMapping(value="/profile/{id}", produces = "application/json")
     public UserDto displayProfileId(@PathVariable("id") long id) {
-
-        UserDto user = userService.getById(id);
-        return user;
+        return userService.getById(id);
     }
 
     @PostMapping("/verifyPassword")
@@ -163,23 +132,33 @@ public class UserController {
         }
     }
 
-
     @PostMapping(value = "/update", consumes = "multipart/form-data", produces = "application/json")
     public ResponseEntity<UserDto> update(@ModelAttribute UserDto userDto) throws Exception {
-        UserDto existingUser = userService.getById(userDto.getId());
+        try {
 
-        if (existingUser != null) {
-            if (userDto.getPassword() == null || userDto.getPassword().trim().isEmpty()) {
-                userDto.setPassword(existingUser.getPassword());
-            }
-
-            // Sauvegarde des données utilisateur
-            UserDto dto = userService.save(userDto);
+            UserDto dto = userService.update(userDto);
             return ResponseEntity.status(HttpStatus.OK).body(dto);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Ou un message d'erreur approprié
+        } catch (MethodArgumentNotValidException e) {
+            System.out.println("Erreur de validation: " + e.getMessage());
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
+//    @PostMapping(value = "/update", consumes = "multipart/form-data", produces = "application/json")
+//    public ResponseEntity<UserDto> update(@ModelAttribute UserDto userDto) throws Exception {
+//        UserDto existingUser = userService.getById(userDto.getId());
+//
+//        // Met à jour les autres champs
+//        existingUser.setFirstName(userDto.getFirstName());
+//        existingUser.setLastName(userDto.getLastName());
+//
+//        // Ne modifie pas l'âge si ce n'est pas dans le DTO
+//        if (userDto.getAge() != null) {
+//            existingUser.setAge(userDto.getAge());
+//        }
+//
+//        UserDto updatedUser = userService.update(existingUser);
+//        return ResponseEntity.ok(updatedUser);
+//    }
 
 }

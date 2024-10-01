@@ -1,4 +1,22 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+const borderAnimation = keyframes`
+  0% {
+    border-color: rgb(255, 0, 0);
+  }
+  25% {
+    border-color: rgb(0, 255, 0); 
+  }
+  50% {
+    border-color: rgb(0, 0, 255); 
+  }
+  75% {
+    border-color: rgb(255, 255, 0); 
+  }
+  100% {
+    border-color: rgb(255, 0, 0); 
+  }
+`;
 
 
 export const AppContainer = styled.div`
@@ -6,13 +24,19 @@ export const AppContainer = styled.div`
   flex-direction: column;
   height: 70vh;
   max-width: 80%;
-  margin-top: 150px;
+  margin-top: 50px;
   margin-left: auto;
   margin-right: auto;
   background-color: #775144;
   border-top-left-radius: 50px;
   border-top-right-radius: 50px;
+  border: 3px solid cyan;
+  animation: ${borderAnimation} 4s linear infinite; 
 `;
+
+export const Div = styled.div`
+  margin-bottom:50px;
+`
 
 export const NomConversation = styled.div`
 margin-bottom:20px;

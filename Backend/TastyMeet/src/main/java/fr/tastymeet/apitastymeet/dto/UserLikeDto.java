@@ -16,5 +16,4 @@ public class UserLikeDto {
     private String firstName;
     private String lastName;
     private long userId;
-
 }

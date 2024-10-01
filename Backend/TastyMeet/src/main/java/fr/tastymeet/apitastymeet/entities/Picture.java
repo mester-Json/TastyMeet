@@ -8,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @Setter
 @Getter
-@ToString
 @Entity
 public class Picture {
     @Id
