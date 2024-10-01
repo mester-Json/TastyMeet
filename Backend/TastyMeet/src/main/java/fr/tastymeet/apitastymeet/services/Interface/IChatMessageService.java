@@ -6,7 +6,7 @@ import fr.tastymeet.apitastymeet.entities.ChatMessage;
 import java.util.Map;
 
 public interface IChatMessageService {
-    ChatMessageDto sendMessage(ChatMessage chatMessage, Long conversationId);
-    Map<String, Object> getMessagesByConversationId(Long conversationId);
+    ChatMessageDto sendMessage(ChatMessage chatMessage, long conversationId);
+    Map<String, Object> getMessagesByConversationId(long conversationId);
 
 }

@@ -5,22 +5,19 @@ export const FormularRegister = styled.form`
     display: flex;
     flex-wrap: wrap;
     background-color: rgba(207, 206, 206, 0.5);
-    padding: 20px;
-    max-width: 700px;
+    padding: 1.25rem; /* 20px -> 1.25rem */
+    max-width: 70%; /* Réduit à un pourcentage */
     height: auto;
-    border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 150px;
-    margin-bottom: 150px;
-    margin-left: auto;
-    margin-right: auto;
+    border-radius: 1.25rem; /* 20px -> 1.25rem */
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1); /* 0 4px 8px */
+    margin: 10rem auto; /* 150px -> 10rem */
     justify-content: center;
     align-items: center;
 
     @media (max-width: 768px) {
         max-width: 90%;
-        margin-top: 100px;
-        margin-bottom: 100px;
+        margin-top: 3rem;
+        margin-bottom: 3rem;
     }
 `;
 
@@ -28,223 +25,153 @@ export const FormMoreInfo = styled.form`
     display: flex;
     flex-wrap: wrap;
     background-color: rgba(207, 206, 206, 0.5);
-    padding: 20px;
-    max-width: 700px;
+    padding: 1.25rem;
+    max-width: 90%; /* Pourcentage pour la responsivité */
     height: auto;
-    border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 1.25rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
     justify-content: center;
     align-items: center;
-    margin: 250px 0 0 600px;
-
+    margin: 15rem auto 0; /* Adapté pour centrer mieux */
     @media (max-width: 768px) {
-        width: 90%;
-        margin: 100px auto 0 auto; /* Centrer le formulaire sur petit écran */
+        max-width: 90%;
+        margin: 3rem auto 0;
     }
 `;
 
+/* ----------------------------------------*/
 /* -----------------Input-----------------------*/
 export const InputField = styled.input`
-    width: 300px;
-    padding: 7px;
+    width: 100%; /* Utilisation de 100% pour la largeur */
+    padding: 0.5rem; /* 7px -> 0.5rem */
     border: 1px solid #ccc;
-    border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 1.25rem; /* 20px -> 1.25rem */
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
     transition: box-shadow 0.3s ease;
-    margin-bottom: 5px;
-
+    margin-bottom: 0.5rem;
     &:focus {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
         outline: none;
     }
-    
     &::placeholder {
         text-align: center;
     }
-
-    @media (max-width: 768px) {
-        width: 100%;
-    }
 `;
 
-export const InputFieldAge = styled.input`
-    width: 300px;
-    padding: 4px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: box-shadow 0.3s ease;
-    margin-bottom: 5px;
+export const InputFieldAge = styled(InputField)`
+    padding: 0.5rem; /* Unité relative pour l'accessibilité */
     text-align: center;
-
-    &:focus {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-        outline: none;
-    }
-
-    @media (max-width: 768px) {
-        width: 100%;
-    }
 `;
 
 export const InputAvatar = styled.input`
-    padding: 10px;
-    border-radius: 100px;
+    padding: 0.625rem; /* 10px -> 0.625rem */
+    border-radius: 50%;
 `;
 
+/* ----------------------------------------*/
 /* -----------------Button+Select-----------------------*/
 export const Select = styled.select`
-    width: 315px;
-    padding: 5px;
-    font-size: 13px;
+    width: 100%; /* Remplacer px par 100% */
+    padding: 0.5rem;
+    font-size: 0.875rem; /* 13px -> 0.875rem */
     text-align: center;
-    border-radius: 20px;
+    border-radius: 1.25rem;
     border: 1px solid #ccc;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
     transition: box-shadow 0.3s ease;
-    margin-bottom: 5px;
-
+    margin-bottom: 0.5rem;
     &:focus {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
         outline: none;
-    }
-
-    @media (max-width: 768px) {
-        width: 100%;
     }
 `;
 
 export const Button = styled.button`
-    width: 200px;
-    height: 30px;
-    background: #2A0800;
+    width: 100%; /* Largeur relative à son parent */
+    height: 2rem; /* 30px -> 2rem */
+    background: #2a0800;
     color: white;
     border: none;
-    border-radius: 20px;
+    border-radius: 1.25rem;
     cursor: pointer;
-    margin-top: 25px;
+    margin-top: 1.5rem; /* 25px -> 1.5rem */
     transition: transform 0.3s ease, background-color 0.3s ease;
 
     &:hover {
         background-color: #775144;
-        transform: translateY(5px);
-    }
-
-    @media (max-width: 768px) {
-        width: 100%;
+        transform: translateY(0.3125rem); /* 5px -> 0.3125rem */
     }
 `;
 
+/* ----------------------------------------*/
 /* -----------------Img-----------------------*/
 export const ImgAvatar = styled.img`
-    width: 150px;
-    height: 150px;
+    width: 9.375rem; /* 150px -> 9.375rem */
+    height: 9.375rem;
     border-radius: 50%;
-    box-shadow: 0 5px 10px rgba(0, 0.2, 0.2, 0.8);
-    margin-bottom: 10px;
-
-    @media (max-width: 768px) {
-        width: 100px;
-        height: 100px;
-    }
+    box-shadow: 0 0.3125rem 0.625rem rgba(0, 0, 0, 0.8);
+    margin-bottom: 0.625rem; /* 10px -> 0.625rem */
 `;
 
 export const ImgEye = styled.img`
     position: absolute;
-    right: 640px;
+    right: 40%; /* Remplacer les pixels par des pourcentages */
     top: 54.4%;
     transform: translateY(-50%);
     cursor: pointer;
-    width: 20px;
-    height: 20px;
-
-    @media (max-width: 768px) {
-        right: 30px; /* Ajuste la position en fonction de l'écran */
-    }
+    width: 1.25rem; /* 20px -> 1.25rem */
+    height: 1.25rem;
 `;
 
+/* ----------------------------------------*/
 /* -----------------Text+Label-----------------------*/
 export const TitleForm1 = styled.h1`
-    font-size: xx-large;
+    font-size: 2rem; /* xx-large remplacé par une valeur plus spécifique */
     color: white;
     font-weight: bold;
     text-align: center;
-
-    @media (max-width: 768px) {
-        font-size: x-large; /* Ajuste la taille du titre */
-    }
 `;
 
 export const TitleForm2 = styled.h2`
-    font-size: xx-large;
+    font-size: 2rem;
     color: white;
     font-weight: bold;
-    align-items: center;
     text-align: center;
-
-    @media (max-width: 768px) {
-        font-size: x-large; /* Ajuste la taille du sous-titre */
-    }
 `;
 
 export const P = styled.p`
-    font-size: 12px;
-    margin-left: 200px;
-
-    @media (max-width: 768px) {
-        margin-left: 0; /* Centre le texte sur petits écrans */
-        text-align: center;
-    }
+    font-size: 0.75rem; /* 12px -> 0.75rem */
+    margin-left: 50%; /* Ajuster avec % */
 `;
 
 export const Description = styled.textarea`
-    border-radius: 20px;
-    padding: 10px;
-    max-height: 250px;
-    height: 100px;
+    border-radius: 1.25rem;
+    padding: 0.625rem;
+    max-height: 15.625rem; /* 250px -> 15.625rem */
+    height: 6.25rem; /* 100px -> 6.25rem */
     overflow-y: auto;
-
-    @media (max-width: 768px) {
-        width: 100%; /* Prend toute la largeur sur petits écrans */
-    }
 `;
 
-export const LabelError = styled.label`
-    text-align: center;
-    font-size: 13px;
-    color: red;
-`;
-
+/* ----------------------------------------*/
 /* -----------------Div-----------------------*/
 export const Div = styled.div`
     display: flex;
     flex-direction: column;
-    margin-top: 6px;
-    margin-right: 15px;
-    padding: 5px;
-
-    @media (max-width: 768px) {
-        margin-right: 0; /* Centre les éléments sur petits écrans */
-        align-items: center; /* Centre les éléments horizontalement */
-    }
+    margin-top: 0.375rem; /* 6px -> 0.375rem */
+    margin-right: 0.9375rem; /* 15px -> 0.9375rem */
+    padding: 0.3125rem; /* 5px -> 0.3125rem */
 `;
 
-export const Div2 = styled.div`
-    display: flex;
-    flex-direction: column;
-    margin-left: 15px;
-    padding: 5px;
-
-    @media (max-width: 768px) {
-        margin-left: 0; /* Centre les éléments sur petits écrans */
-        align-items: center; /* Centre les éléments horizontalement */
-    }
+export const Div2 = styled(Div)`
+    margin-left: 0.9375rem;
 `;
 
 export const DivError = styled.div`
-    height: 25px;
+    height: 1.5625rem; /* 25px -> 1.5625rem */
     text-align: left;
-    margin-bottom: 5px;
+    margin-bottom: 0.5rem;
     margin-right: auto;
     margin-left: auto;
 `;
+
+/* ----------------------------------------*/

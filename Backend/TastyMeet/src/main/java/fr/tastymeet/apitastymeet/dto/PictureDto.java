@@ -1,10 +1,10 @@
 package fr.tastymeet.apitastymeet.dto;
 
 
-
-import jakarta.persistence.Lob;
-import jakarta.persistence.Version;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor

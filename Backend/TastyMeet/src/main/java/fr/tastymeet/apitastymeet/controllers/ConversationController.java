@@ -19,7 +19,7 @@ public class ConversationController {
 
     // Endpoint pour récupérer les conversations d'un utilisateur
     @GetMapping("/{userId}")
-    public ResponseEntity<List<ConversationDto>> getConversations(@PathVariable Long userId) {
+    public ResponseEntity<List<ConversationDto>> getConversations(@PathVariable long userId) {
         List<ConversationDto> conversations = conversationService.getConversationsByUserId(userId);
         return ResponseEntity.ok(conversations);
     }

@@ -15,9 +15,8 @@ import java.util.Map;
 @Component
 public class JwtUtils {
 
-    private final String SECRET_KEY = "YOUR_SECRET_KEY"; // Remplacez par une clé secrète robuste
-    private final long EXPIRATION_TIME = 86400000; // 24 heures
-
+    private final String SECRETKEY = "Mm#UJ(v:T/RvK3vhr-3f1o7xY;gBGX"; // Remplacez par une clé secrète robuste
+    private final long EXPIRATIONTIME = 86400000; // 24 heures
 
     public String generateToken(String username, long userId, Gender gender, Gender  orientation) {
         Map<String, Object> claims = new HashMap<>();
@@ -25,10 +24,7 @@ public class JwtUtils {
         claims.put("id", userId); // Ajoutez l'ID utilisateur aux claims
         claims.put("gender", gender.toString());  // Conversion en chaîne
         claims.put("orientation", orientation.toString());  // Conversion en chaîne
-        String token = createToken(claims, username);
-
-        System.out.println("Generated Token: " + token); // Ajoutez ce log
-        return token;
+        return createToken(claims, username);
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
@@ -36,22 +32,19 @@ public class JwtUtils {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATIONTIME))
+                .signWith(SignatureAlgorithm.HS256, SECRETKEY)
                 .compact();  // Cette méthode génère un token avec 2 points
     }
 
-
-
     public String extractUsername(String token) {
-
         return extractAllClaims(token).getSubject();
     }
     public String extractClaim(String token, String claim) {
         return extractAllClaims(token).get(claim, String.class); // Méthode pour extraire des claims
     }
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(SECRETKEY).parseClaimsJws(token).getBody();
     }
     public Claims decodeToken(String token) {
         return extractAllClaims(token); // Ajout de la méthode pour décoder le token
@@ -65,6 +58,4 @@ public class JwtUtils {
     private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
     }
-
-
 }

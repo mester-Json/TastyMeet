@@ -1,17 +1,16 @@
-import FormLogin  from  '../Components/FormLogin/FormLogin.jsx'
-import Nav from "../Components/Nav/Nav.jsx";
-import Footer from "../Components/Footer/Footer.jsx";
+import { Nav } from "../Components/Nav/Nav.jsx";
+import { FormLogin } from '../Components/FormLogin/FormLogin.jsx'
+import { Footer } from "../Components/Footer/Footer.jsx";
 
 
 function Login() {
     return (
         <>
             <Nav />
-                <FormLogin />
+            <FormLogin />
             <Footer />
         </>
     );
 }
 
-
-export default Login;
+export default Login

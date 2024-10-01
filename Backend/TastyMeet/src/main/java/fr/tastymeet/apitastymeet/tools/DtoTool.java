@@ -20,14 +20,10 @@ public class DtoTool {
                 return new ArrayList<>(context.getSource());
             }
         };
-
         mapper.addConverter(persistentBagToListConverter);
     }
 
     public static <TSource, TDestination> TDestination convert(TSource source, Class<TDestination> clazz) {
         return mapper.map(source, clazz);
     }
-
-
-
 }

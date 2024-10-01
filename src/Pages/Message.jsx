@@ -4,7 +4,7 @@ import { ChatApp } from "../Components/Messaging/ChatApp.jsx";
 
 //Conversation 
 
-export const Message = () => {
+function Message() {
     return (
         <>
             <Nav />
@@ -13,5 +13,4 @@ export const Message = () => {
         </>
     );
 }
-
-
+export default Message

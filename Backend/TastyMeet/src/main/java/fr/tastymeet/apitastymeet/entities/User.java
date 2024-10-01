@@ -1,13 +1,8 @@
 package fr.tastymeet.apitastymeet.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,32 +20,26 @@ public class User {
 
     @Version
     private int version;
-    @Column(name = "lastName", nullable = false)
+    @Column(nullable = false)
     private String lastName;
-    @Column(name = "firstName", nullable = false)
+    @Column(nullable = false)
     private String firstName;
-    @Column(name = "age", nullable = false)
+    @Column(nullable = false)
     private LocalDate age;
-    @Column(name = "description")
     private String description;
-    @Column(unique = true, name = "email", nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
-    @Column(name = "password", nullable = false)
+    @Column(nullable = false)
     private String password;
-    @Column(name = "gender", nullable = false)
+    @Column(nullable = false)
     private Gender gender;
-    @Column(name = "orientation")
     private Gender orientation;
-    @Column(name = "phone")
     private long phone;
-    @Column(name = "location")
     private String location;
-    @Column(name = "city" )
     private String city;
     @ElementCollection
     private Set<Roles> roles = Set.of(Roles.PUBLIC);
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Column(nullable = true)
     private List<Picture> pictures = new ArrayList<>();
 
     @OneToMany(mappedBy = "user1")
@@ -66,21 +55,13 @@ public class User {
     private List<ChatMessage> messagesSent = new ArrayList<>();
 
     public Set<User> getMatches() {
-        System.out.println("Liked users: " + liked);
-        return liked.stream()
-                .filter(likedUser -> {
+        return liked.stream().filter(likedUser -> {
                     boolean hasLiked = likedUser.getLiked().stream().anyMatch(user -> user.id == this.id);
-                    System.out.println("Checking if " + likedUser.id + " has liked current user: " + hasLiked);
                     return hasLiked;
                 })
                 .collect(Collectors.toSet());
     }
-
-
     public void like(User user) {
         liked.add(user);
-    }
-    public Set<User> getLiked() {
-        return liked;
     }
 }
