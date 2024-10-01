@@ -1,6 +1,5 @@
 package fr.tastymeet.apitastymeet.dto;
 
-import fr.tastymeet.apitastymeet.entities.Gender;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import lombok.AllArgsConstructor;

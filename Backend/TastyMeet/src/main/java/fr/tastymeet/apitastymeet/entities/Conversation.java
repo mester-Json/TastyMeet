@@ -6,6 +6,8 @@ import lombok.*;
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Setter
 @Entity
 public class Conversation {
@@ -24,9 +26,6 @@ public class Conversation {
 
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL)
     private List<ChatMessage> messages;
-
-    // Constructeur par défaut
-    public Conversation() {}
 
     // Constructeur avec deux utilisateurs
     public Conversation(User user1, User user2) {

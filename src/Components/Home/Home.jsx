@@ -122,7 +122,6 @@ export const Home = () => {
             cardRef.current.style.cursor = 'grab';
             document.removeEventListener('mouseup', handleMouseUp);
             document.removeEventListener('mousemove', handleMouseMove);
-
             const deltaX = upEvent.clientX - startX;
             const absDeltaX = Math.abs(deltaX);
             const isSwipeValid = absDeltaX > MAX_SWIPE_DISTANCE;
@@ -132,13 +131,10 @@ export const Home = () => {
                 if (nextIndex !== null) {
                     setCurrentIndex(nextIndex);
                     handleLike();  // Envoyer le like seulement si un swipe valide
-                } else {
                 }
             }
-
             cardRef.current.style.transform = '';  // Réinitialiser la transformation
         };
-
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
     };

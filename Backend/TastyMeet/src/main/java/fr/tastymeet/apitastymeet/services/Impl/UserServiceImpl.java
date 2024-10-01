@@ -2,9 +2,7 @@ package fr.tastymeet.apitastymeet.services.Impl;
 
 import fr.tastymeet.apitastymeet.dto.*;
 import fr.tastymeet.apitastymeet.entities.Gender;
-import fr.tastymeet.apitastymeet.entities.Picture;
 import fr.tastymeet.apitastymeet.entities.User;
-import fr.tastymeet.apitastymeet.repositories.PictureRepository;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
 import fr.tastymeet.apitastymeet.services.Interface.IMatchService;
 import fr.tastymeet.apitastymeet.services.Interface.IUserService;
@@ -13,17 +11,8 @@ import fr.tastymeet.apitastymeet.tools.JwtUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -43,15 +32,9 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private IMatchService matchService;
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
 
     @Autowired
     private PasswordService passwordService;
-
-    @Autowired
-    private PictureRepository pictureRepository;
-
 
     /***********************************Afficher les utilisateurs***********************************/
     @Override
@@ -76,20 +59,11 @@ public class UserServiceImpl implements IUserService {
         // Récupérer les utilisateurs correspondant au genre et à l'orientation
         List<UserDto> allUsers = getByGenderAndOrientation(orientation, gender);
 
-
-        // Journaliser les utilisateurs likés
-        System.out.println("Liked User IDs: " + likedUsers.stream().map(UserLikeDto::getLikedUserId).collect(Collectors.toList()));
-
-        // Journaliser tous les utilisateurs récupérés
-        System.out.println("All User IDs: " + allUsers.stream().map(UserDto::getId).collect(Collectors.toList()));
-
-
         // Exclure les utilisateurs qui ont déjà été likés
         return allUsers.stream()
                 .filter(user -> likedUsers.stream().noneMatch(likedUser -> likedUser.getLikedUserId() == user.getId()))
                 .collect(Collectors.toList());
     }
-
     /**************************************************************************************************/
 
     /***********************************Enregistrer des utilisateurs(ou update le mot de passe)***********************************/
@@ -110,11 +84,8 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserDto updateEmail(UserDto userDto) {
         User u = DtoTool.convert(userDto, User.class);
-
         User insertUser = userRepository.saveAndFlush(u);
-
         return DtoTool.convert(insertUser, UserDto.class);
-
     }
     /**************************************************************************************************/
     /***********************************Update ALL sauf le mot de passe et l'age***********************************/
@@ -122,7 +93,6 @@ public class UserServiceImpl implements IUserService {
     public UserDto update(UserDto userDto) {
         User existingUser = userRepository.findById(userDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        System.out.println(existingUser.getAge());
         if (userDto.getAge() == null) {
             userDto.setAge(existingUser.getAge());
         }
@@ -133,7 +103,6 @@ public class UserServiceImpl implements IUserService {
         User insertUser = userRepository.saveAndFlush(u);
         return DtoTool.convert(insertUser, UserDto.class);
     }
-
     /**************************************************************************************************/
     /***********************************Supprimer***********************************/
     @Override
@@ -142,29 +111,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     /**************************************************************************************************/
-    /***********************************Trouver par l'ID***********************************/
+    /***********************************Trouver un utilisateur par son l'ID***********************************/
     @Override
     public UserDto getById(long id){
         Optional<User> u= userRepository.findById(id);
-
         return DtoTool.convert(u, UserDto.class);
-    }
-
-
-    public UserChatDto getUserDetails(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec ID: " + userId));
-
-        // Convertir l'entité User en UserChatDto
-        UserChatDto userChatDto = new UserChatDto();
-        userChatDto.setFirstName(user.getFirstName());
-
-        // Convertir les pictures en PictureDto
-        List<PictureDto> pictureDtos = user.getPictures().stream()
-                .map(picture -> DtoTool.convert(picture, PictureDto.class)) // Utiliser DtoTool pour la conversion
-                .collect(Collectors.toList());
-        userChatDto.setPictures(pictureDtos);
-
-        return userChatDto;
     }
 }

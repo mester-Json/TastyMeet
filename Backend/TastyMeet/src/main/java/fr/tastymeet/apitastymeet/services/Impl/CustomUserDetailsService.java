@@ -34,7 +34,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     public String authenticateUser(AuthRequest authRequest) {
         UserDetails userDetails = loadUserByUsername(authRequest.getEmail());
-        System.out.println("Mot de passe stocké pour l'utilisateur: " + userDetails.getPassword());
 
         // Vérifiez si le mot de passe correspond
         if (!passwordService.verifyPassword(authRequest.getPassword(), userDetails.getPassword())) {

@@ -1,16 +1,11 @@
 package fr.tastymeet.apitastymeet.controllers;
 
-
-
 import fr.tastymeet.apitastymeet.dto.*;
 import fr.tastymeet.apitastymeet.services.Impl.PasswordService;
-import fr.tastymeet.apitastymeet.services.Interface.IMatchService;
-import fr.tastymeet.apitastymeet.tools.JwtUtils;
 import org.springframework.http.HttpStatus;
 import fr.tastymeet.apitastymeet.services.Interface.IPictureService;
 import fr.tastymeet.apitastymeet.services.Interface.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -26,19 +21,10 @@ public class UserController {
     private IUserService userService;
 
     @Autowired
-    private JwtUtils jwtUtils;
-
-    @Autowired
     private IPictureService pictureService;
 
     @Autowired
     private PasswordService passwordService;
-
-    @Autowired
-    private IMatchService matchService;
-
-    @Value("${file.upload-dir}")
-    private String uploadDir;
 
 
     @GetMapping(value="/display", produces ="application/json")
@@ -81,18 +67,14 @@ public class UserController {
                 if (passwordService.verifyPassword(currentPassword, user.getPassword())) {
                     user.setPassword(passwordRequest.getNewPassword());
                     userService.save(user);
-                    System.out.println("Mot de passe mis à jour avec succès");
                     return ResponseEntity.ok().body("Mot de passe mis à jour avec succès");
                 } else {
-                    System.out.println("Mot de passe actuel est incorrect");
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Mot de passe actuel est incorrect");
                 }
             } else {
-                System.out.println("Utilisateur non trouvé");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
             }
         } catch (Exception e) {
-            System.out.println("Erreur lors de la mise à jour du mot de passe");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la mise à jour du mot de passe");
         }
     }
@@ -120,7 +102,6 @@ public class UserController {
             UserDto dto = userService.update(userDto);
             return ResponseEntity.status(HttpStatus.OK).body(dto);
         } catch (MethodArgumentNotValidException e) {
-            System.out.println("Erreur de validation: " + e.getMessage());
             return ResponseEntity.badRequest().body(null);
         }
     }
