@@ -47,8 +47,13 @@ public class UserServiceImpl implements IUserService {
     private String uploadDir;
 
     @Autowired
+    private PasswordService passwordService;
+
+    @Autowired
     private PictureRepository pictureRepository;
 
+
+    /***********************************Afficher les utilisateurs***********************************/
     @Override
     public List<UserDto> getByGenderAndOrientation(Gender gender, Gender orientation) {
         return userRepository.findByGenderAndOrientation(gender, orientation).stream()
@@ -85,8 +90,25 @@ public class UserServiceImpl implements IUserService {
                 .collect(Collectors.toList());
     }
 
+    /**************************************************************************************************/
+
+    /***********************************Enregistrer des utilisateurs(ou update le mot de passe)***********************************/
     @Override
     public UserDto save(UserDto userDto) {
+        User u = DtoTool.convert(userDto, User.class);
+
+        String hashedPassword = passwordService.hashPassword(u.getPassword());
+        u.setPassword(hashedPassword);
+
+        User insertUser = userRepository.saveAndFlush(u);
+
+        return DtoTool.convert(insertUser, UserDto.class);
+
+    }
+    /**************************************************************************************************/
+    /***********************************Update seulement l'email***********************************/
+    @Override
+    public UserDto updateEmail(UserDto userDto) {
         User u = DtoTool.convert(userDto, User.class);
 
         User insertUser = userRepository.saveAndFlush(u);
@@ -94,9 +116,8 @@ public class UserServiceImpl implements IUserService {
         return DtoTool.convert(insertUser, UserDto.class);
 
     }
-
-
-
+    /**************************************************************************************************/
+    /***********************************Update ALL sauf le mot de passe et l'age***********************************/
     @Override
     public UserDto update(UserDto userDto) {
         User existingUser = userRepository.findById(userDto.getId())
@@ -109,23 +130,20 @@ public class UserServiceImpl implements IUserService {
             userDto.setPassword(existingUser.getPassword());
         }
         User u = DtoTool.convert(userDto, User.class);
-
         User insertUser = userRepository.saveAndFlush(u);
-
         return DtoTool.convert(insertUser, UserDto.class);
     }
 
+    /**************************************************************************************************/
+    /***********************************Supprimer***********************************/
     @Override
     public void deleteById(long id) {
         userRepository.deleteById(id);
     }
 
-    public UserDto getByEmail(String email){
-        User u= userRepository.findByEmail(email);
-
-        return DtoTool.convert(u, UserDto.class);
-    }
-
+    /**************************************************************************************************/
+    /***********************************Trouver par l'ID***********************************/
+    @Override
     public UserDto getById(long id){
         Optional<User> u= userRepository.findById(id);
 

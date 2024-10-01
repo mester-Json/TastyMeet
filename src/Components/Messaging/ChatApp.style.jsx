@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 
 export const AppContainer = styled.div`
-  display: flex;
+ display: flex;
   flex-direction: column;
   height: 70vh;
   max-width: 80%;
@@ -42,10 +42,13 @@ export const MessageContainer = styled.div`
 export const MessageBubble = styled.div`
   padding: 10px;
   border-radius: 10px;
-  background-color: ${({ sender }) => (sender === 'user2' ? '#2a0800' : '#D9D9D9')};
-  color: ${({ sender }) => (sender === 'user2' ? 'white' : 'black')};
-  max-width: 60%;
+  background-color: ${({ sender }) => (sender === 'user1' ? '#2a0800' : '#D9D9D9')};
+  color: ${({ sender }) => (sender === 'user1' ? 'white' : 'black')};
+  max-width: 400px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 `;
 
 export const InputContainer = styled.div`

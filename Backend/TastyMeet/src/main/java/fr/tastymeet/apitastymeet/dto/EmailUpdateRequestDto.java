@@ -4,7 +4,6 @@ public class EmailUpdateRequestDto {
     private long id;
     private String currentEmail;
     private String newEmail;
-    private String confirmNewEmail;
 
     // Getters and Setters
     public long getId() {
@@ -31,11 +30,4 @@ public class EmailUpdateRequestDto {
         this.newEmail = newEmail;
     }
 
-    public String getConfirmNewEmail() {
-        return confirmNewEmail;
-    }
-
-    public void setConfirmNewEmail(String confirmNewEmail) {
-        this.confirmNewEmail = confirmNewEmail;
-    }
 }

@@ -98,7 +98,6 @@ export const UserData = async (token) => {
             },
         });
 
-        console.log('API Response Data:', response.data);  // Ajoutez ceci
 
         const profilesWithPictures = response.data.map(profile => ({
             ...profile,
@@ -108,7 +107,6 @@ export const UserData = async (token) => {
             })),
         }));
 
-        console.log('Profiles with Pictures:', profilesWithPictures);  // Ajoutez ceci
 
         return profilesWithPictures;
     } catch (error) {

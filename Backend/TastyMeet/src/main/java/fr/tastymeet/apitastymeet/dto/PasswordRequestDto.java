@@ -4,7 +4,6 @@ public class PasswordRequestDto {
         private String currentPassword;
         private long id;
         private String newPassword;
-        private String confirmNewPassword;
 
         // Getters et Setters
         public String getCurrentPassword() {
@@ -31,11 +30,5 @@ public class PasswordRequestDto {
         this.newPassword = newPassword;
     }
 
-    public String getConfirmNewPassword() {
-        return confirmNewPassword;
-    }
 
-    public void setConfirmNewPassword(String confirmNewPassword) {
-        this.confirmNewPassword = confirmNewPassword;
-    }
 }

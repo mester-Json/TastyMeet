@@ -15,7 +15,7 @@ import java.util.Map;
 @Component
 public class JwtUtils {
 
-    private final String SECRET_KEY = "YOUR_SECRET_KEY"; // Remplacez par une clé secrète robuste
+    private final String SECRET_KEY = "Mm#UJ(v:T/RvK3vhr-3f1o7xY;gBGX"; // Remplacez par une clé secrète robuste
     private final long EXPIRATION_TIME = 86400000; // 24 heures
 
 
