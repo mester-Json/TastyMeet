@@ -22,27 +22,33 @@ public class MatchController {
     private SimpMessagingTemplate messagingTemplate;
 
 
-    // Endpoint pour liker un utilisateur
     @PostMapping("/{userId}/like/{likedUserId}")
     public ResponseEntity<?> likeUser(@PathVariable long userId, @PathVariable long likedUserId) {
         // Logique pour enregistrer le like
         matchService.likeUser(userId, likedUserId);
 
         // Vérifiez les matches après avoir liké
-        Set<UserLikeDto> matches = matchService.getMatches(userId);
+        Set<UserLikeDto> matches = matchService.getMatches(likedUserId);
+
+        // Ajoutez un log pour vérifier les correspondances
+        System.out.println("Matches after liking: " + matches);
 
         // Vérifiez si le likedUserId est dans les matches
-        if (matches.stream().anyMatch(match -> match.getLikedUserId() == likedUserId)) {
+        if (matches.stream().anyMatch(match -> match.getUserId() == userId)) {
+
             // Créez une conversation ici
             conversationService.createConversation(userId, likedUserId);
 
             // Notifiez les utilisateurs via WebSocket
             messagingTemplate.convertAndSend("/user/" + userId + "/matches", "Vous avez un nouveau match !");
             messagingTemplate.convertAndSend("/user/" + likedUserId + "/matches", "Vous avez un nouveau match !");
+        } else {
+            System.out.println("No match found for userId: " + userId + " and likedUserId: " + likedUserId);
         }
 
         return ResponseEntity.ok().build();
     }
+
 
 
 }

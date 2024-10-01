@@ -26,17 +26,27 @@ public class MatchServiceImpl implements IMatchService {
     }
 
     public Set<UserLikeDto> getMatches(long userId) {
+        // Récupérer l'utilisateur à partir de la base de données
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return user.getMatches().stream()
+        // Récupérer les utilisateurs qui ont été "likés" par l'utilisateur courant
+        Set<User> matchedUsers = user.getMatches();
+
+        // Vérifier le contenu de matchedUsers pour le débogage
+        System.out.println("Matched users for userId " + userId + ": " + matchedUsers);
+
+        // Convertir les utilisateurs correspondants en UserLikeDto
+        return matchedUsers.stream()
                 .map(matchedUser -> {
                     UserLikeDto userLikeDto = DtoTool.convert(matchedUser, UserLikeDto.class);
-                    userLikeDto.setLikedUserId(userId); // ID de l'utilisateur qui a liké
+                    // Assigner l'ID de l'utilisateur qui a "liké" (le userId)
+                    userLikeDto.setLikedUserId(userId); // Cela peut être modifié si nécessaire
                     return userLikeDto;
                 })
                 .collect(Collectors.toSet());
     }
+
 
 
     public Set<UserLikeDto> getLikes(long userId) {

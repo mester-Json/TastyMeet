@@ -29,8 +29,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private JwtUtils jwtUtils;
 
-
-
     public String authenticateUser(AuthRequest authRequest) {
         UserDetails userDetails = loadUserByUsername(authRequest.getEmail());
 

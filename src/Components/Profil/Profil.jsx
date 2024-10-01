@@ -50,7 +50,7 @@ export const Profil = () => {
             try {
                 const userId = getUserIdFromToken();
                 const data = await fetchProfileData(userId);
-                console.log(data);
+
                 if (data) {
                     setId(data.id || '');
                     setVersion(data.version || '');
@@ -83,7 +83,6 @@ export const Profil = () => {
     const handleUpdate = async (event) => {
         event.preventDefault();
         setError({});
-        console.log("Début de la mise à jour du profil");
 
         // Check for empty fields
         const fieldsToCheck = {
@@ -107,16 +106,14 @@ export const Profil = () => {
 
         if (Object.keys(newErrors).length) {
             setError(newErrors);
-            console.log("Erreurs de validation:", newErrors);
             return;
         }
 
         const formData = new FormData();
         formData.append("id", id);
-        formData.append("firstName", firstName);
-        formData.append("location", location);
-        formData.append("lastName", lastName);
         formData.append("version", version);
+        formData.append("firstName", firstName);
+        formData.append("lastName", lastName);
         formData.append("description", description);
         formData.append("orientation", orientation);
         formData.append("email", email);
@@ -130,12 +127,10 @@ export const Profil = () => {
         }
 
         try {
-            console.log("Envoi des données:", formData);
             await updateProfileData(formData);
             alert("Modification utilisateur réussie");
         } catch (error) {
             setError({ update: 'Une erreur est survenue lors de la mise à jour.' });
-            console.error("Erreur lors de la mise à jour du profil:", error);
         }
     };
 
@@ -166,9 +161,11 @@ export const Profil = () => {
             setNewPassword('');
             setConfirmNewPassword('');
         } catch (error) {
-            setError({ password: error.message });
+            setError({ password: 'Une erreur est survenue lors de la modification de l\'email.' });
         }
     };
+
+
     const handleEmailChange = async (event) => {
         event.preventDefault();
         setError({}); // Clear previous errors

@@ -29,6 +29,7 @@ export const FormRegister = () => {
         email: "",
         password: "",
         gender: "",
+        orientation: "",
         age: "",
         phone: "",
         file: "",
@@ -56,13 +57,6 @@ export const FormRegister = () => {
 
     // const [eye, setEye] = useState(eyeClose);
 
-    useEffect(() => {
-        const token = sessionStorage.getItem('token');
-        if (token) {
-            setIsAuthenticated(true);
-            navigate('/accueil');
-        }
-    }, [navigate]);
 
     useEffect(() => {
         if (age) {
@@ -129,6 +123,8 @@ export const FormRegister = () => {
     };
 
     const handleLogin = async () => {
+        event.preventDefault();
+
         const newErrors = {};
 
         if (file === avatarDefault) newErrors.file = "L'avatar est requis";
@@ -146,28 +142,26 @@ export const FormRegister = () => {
         const formData = new FormData();
         formData.append("firstName", firstName);
         formData.append("lastName", lastName);
-        formData.append("orientation", orientation);
         formData.append("password", password);
         formData.append("gender", gender);
+        formData.append("orientation", orientation)
         formData.append("description", description);
         formData.append("email", email);
         formData.append("phone", phone);
 
         const formattedAge = formatDateForDB(age);
-        console.log("Formatted age for DB:", formattedAge);
         formData.append("age", formattedAge);
-
         formData.append("file", file);
 
         if (Object.keys(newErrors).length === 0) {
             setIsLoading(true);
             try {
                 const token = await registerUser(formData);
-                localStorage.setItem('token', token);
+                sessionStorage.setItem('token', token);
                 navigate('/');
             } catch (err) {
                 console.error(err);
-                setError(err.response?.data?.message || 'Erreur lors de la connexion.');
+                setErrors(err.response?.data?.message || 'Erreur lors de l\'inscription.');
                 setShowError(true);
             } finally {
                 setIsLoading(false);
@@ -176,17 +170,7 @@ export const FormRegister = () => {
             setErrors(newErrors);
             setShowError(true);
         }
-
-
-        useEffect(() => {
-            const token = sessionStorage.getItem('token');
-            if (token) {
-                navigate('/');
-            }
-        }, [navigate]);
     };
-
-
 
     const handleDateChange = (event) => {
         setAge(event.target.value);
@@ -245,7 +229,7 @@ export const FormRegister = () => {
                             <InputField
                                 type="text"
                                 placeholder="Nom"
-                                name="lastName" // Ajout du nom pour identifier le champ
+                                name="lastName"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                             />
@@ -359,7 +343,7 @@ export const FormRegister = () => {
                 <>
                     <TitleForm1>Inscription</TitleForm1>
 
-                    <FormMoreInfo method="POST" onSubmit={handleLogin} encType="multipart/form-data">
+                    <FormMoreInfo method="POST" encType="multipart/form-data">
                         <Div>
                             {/*---------------------------- file ------------------------------------------------*/}
                             <DivError visibility={showError ? 'visible' : 'hidden'}>
@@ -403,9 +387,10 @@ export const FormRegister = () => {
                             />
                             <P>{description.length}/200 caractères utilisés</P>
                         </Div2>
-                        <Button disabled={isLoading}>
+                        <Button type="button" onClick={handleLogin} disabled={isLoading}>
                             {isLoading ? "Inscription...." : "S'inscrire"}
                         </Button>
+
                     </FormMoreInfo>
                 </>
             )}

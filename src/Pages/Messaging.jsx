@@ -3,12 +3,24 @@ import { Nav } from "../Components/Nav/Nav.jsx";
 import { Footer } from "../Components/Footer/Footer.jsx";
 import { CartMessaging } from '../Components/Messaging/CartMessaging.jsx';
 import { CountMessaging } from "../Components/Messaging/CountMessaging.jsx";
+import styled from 'styled-components';
+
+const MainContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; 
+`;
+
+const Content = styled.div`
+    flex: 1; 
+    padding: 20px; 
+`;
 
 const getUserIdFromToken = () => {
     const token = sessionStorage.getItem('token');
     if (token) {
-        const payload = JSON.parse(atob(token.split('.')[1])); // Décoder le payload
-        return payload.id; // Assurez-vous que l'ID est dans le payload
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.id;
     }
     return null;
 };
@@ -29,14 +41,17 @@ function Messaging() {
     }, []);
 
     return (
-        <>
+        <MainContainer>
             <Nav />
             <CountMessaging />
-            {conversations.map((conversation) => (
-                <CartMessaging key={conversation.id} conversation={conversation} />
-            ))}
+            <Content>
+                {conversations.map((conversation) => (
+                    <CartMessaging key={conversation.id} conversation={conversation} />
+                ))}
+            </Content>
             <Footer />
-        </>
+        </MainContainer>
     );
 }
-export default Messaging
+
+export default Messaging;

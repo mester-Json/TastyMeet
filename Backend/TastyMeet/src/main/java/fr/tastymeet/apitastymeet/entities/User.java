@@ -66,8 +66,17 @@ public class User {
     private List<ChatMessage> messagesSent = new ArrayList<>();
 
     public Set<User> getMatches() {
-        return liked.stream().filter(like -> like.liked.stream().anyMatch(user -> user.id == id)).collect(Collectors.toSet());
+        System.out.println("Liked users: " + liked);
+        return liked.stream()
+                .filter(likedUser -> {
+                    boolean hasLiked = likedUser.getLiked().stream().anyMatch(user -> user.id == this.id);
+                    System.out.println("Checking if " + likedUser.id + " has liked current user: " + hasLiked);
+                    return hasLiked;
+                })
+                .collect(Collectors.toSet());
     }
+
+
     public void like(User user) {
         liked.add(user);
     }
