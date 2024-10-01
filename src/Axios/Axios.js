@@ -41,18 +41,22 @@ export const logoutUser = async (navigate) => {
 // Fonction pour inscrire un nouvel utilisateur
 export const registerUser = async (formData) => {
     try {
-        // Envoi des données d'inscription à l'API directement sans recréer un nouvel objet FormData
-        const response = await instance.post(`/addUser`, formData, {
+        // Création d'un nouvel objet FormData pour envoyer les données du formulaire
+        const userData = new FormData();
+        formData.forEach((value, key) => {
+            userData.append(key, value);
+        });
+
+        // Envoi des données d'inscription à l'API
+        const response = await instance.post(`/addUser`, userData, {
             headers: {
                 'Content-Type': 'multipart/form-data', // Format des données pour l'upload
             },
         });
 
-        return response.data; // Retourne les données de la réponse (token ou autre)
+        return response.data; // Retourne les données de la réponse
     } catch (error) {
-        // Capture l'erreur et retourne un message plus explicite
-        const errorMessage = error.response?.data?.message || error.message;
-        throw new Error('Erreur lors de l\'inscription: ' + errorMessage);
+        throw new Error('Erreur lors de l\'inscription: ' + (error.response?.data?.message || error.message));
     }
 };
 

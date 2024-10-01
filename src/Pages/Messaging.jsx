@@ -8,12 +8,18 @@ import styled from 'styled-components';
 const MainContainer = styled.div`
     display: flex;
     flex-direction: column;
-    min-height: 100vh; 
+    min-height: 100vh;
 `;
 
 const Content = styled.div`
-    flex: 1; 
-    padding: 20px; 
+    flex: 1;
+    padding: 20px;
+`;
+
+const MessageContainer = styled.div`
+    max-height: 400px; 
+    overflow-y: auto; 
+    margin: 20px 0; 
 `;
 
 const getUserIdFromToken = () => {
@@ -45,9 +51,11 @@ function Messaging() {
             <Nav />
             <CountMessaging />
             <Content>
-                {conversations.map((conversation) => (
-                    <CartMessaging key={conversation.id} conversation={conversation} />
-                ))}
+                <MessageContainer>
+                    {conversations.map((conversation) => (
+                        <CartMessaging key={conversation.id} conversation={conversation} />
+                    ))}
+                </MessageContainer>
             </Content>
             <Footer />
         </MainContainer>

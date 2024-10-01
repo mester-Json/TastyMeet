@@ -2,11 +2,13 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import {
     AppContainer, NomConversation, MessagesContainer, MessageContainer, MessageBubble,
-    UserContainer, InputContainer, Input, Button, Div
+    UserContainer, InputContainer, Input, Icon
 } from './ChatApp.style.jsx';
 import { Avatar, MessageContent } from '../Messaging/CartMessaging.style.jsx';
 import { connectWebSocket, sendMessage, disconnectWebSocket } from '../../Services/websocket.js';
 import { fetchMessages } from '../../Axios/Axios.js';
+import { faLocationArrow } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const getUserIdFromToken = () => {
     const token = sessionStorage.getItem('token');
@@ -107,47 +109,52 @@ export const ChatApp = () => {
     };
 
     return (
-        <Div>
-            <AppContainer>
-                <NomConversation>Nom de la conversation</NomConversation>
-                <MessagesContainer>
-                    {messages.map((msg, index) => {
-                        const senderId = msg.sender.id;
-                        const user = users[senderId];
+        <AppContainer>
+            <NomConversation>Nom de la conversation</NomConversation>
+            <MessagesContainer>
+                {messages.map((msg, index) => {
+                    const senderId = msg.sender.id; // Récupère l'ID de l'expéditeur
+                    const user = users[senderId]; // Récupérez l'utilisateur à partir de l'objet users
 
-                        return (
-                            <MessageContainer key={index} sender={senderId === getUserIdFromToken() ? "user1" : "user2"}>
-                                <UserContainer sender={senderId === getUserIdFromToken() ? "user1" : "user2"}>
-                                    <Avatar>
-                                        {user && user.pictures && user.pictures.length > 0 ? (
-                                            <img src={`http://localhost:9090/api/show/${user.pictures[0].pictureName}`} alt="Avatar" />
-                                        ) : (
-                                            <img src="default-avatar.png" alt="Default Avatar" />
-                                        )}
-                                    </Avatar>
-                                    <MessageContent>
-                                        <h4>{user ? user.firstName : 'Utilisateur Inconnu'}</h4>
-                                        <span>{formatDate(msg.dateEnvoie)}</span>
-                                    </MessageContent>
-                                </UserContainer>
-                                <MessageBubble sender={senderId === getUserIdFromToken() ? "user1" : "user2"}>
+                    return (
+                        <MessageContainer
+                            key={index}
+                            sender={senderId === getUserIdFromToken() ? "user1" : "user2"}
+                        >
+                            <Avatar>
+                                {user && user.pictures && user.pictures.length > 0 ? (
+                                    <img
+                                        src={`http://localhost:9090/api/show/${user.pictures[0].pictureName}`}
+                                        alt="Avatar"
+                                    />
+                                ) : (
+                                    <img src="default-avatar.png" alt="Default Avatar" />
+                                )}
+                            </Avatar>
+                            <MessageContent>
+                                <h4>{user ? user.firstName : "Utilisateur Inconnu"}</h4>
+
+                                <MessageBubble
+                                    sender={senderId === getUserIdFromToken() ? "user1" : "user2"}
+                                >
                                     {msg.content}
                                 </MessageBubble>
-                            </MessageContainer>
-                        );
-                    })}
-                </MessagesContainer>
-                <InputContainer>
-                    <Input
-                        type="text"
-                        value={messageContent}
-                        onChange={(e) => setMessageContent(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Tapez votre message..."
-                    />
-                    <Button onClick={handleSendMessage}>Envoyer</Button>
-                </InputContainer>
-            </AppContainer>
-        </Div>
+                                <span>{formatDate(msg.dateEnvoie)}</span>
+                            </MessageContent>
+                        </MessageContainer>
+                    );
+                })}
+            </MessagesContainer>
+            <InputContainer>
+                <Input
+                    type="text"
+                    value={messageContent}
+                    onChange={(e) => setMessageContent(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Tapez votre message..."
+                />
+                <Icon icon={faLocationArrow} onClick={handleSendMessage} />
+            </InputContainer>
+        </AppContainer>
     );
 };

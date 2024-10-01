@@ -168,7 +168,7 @@ export const Profil = () => {
 
     const handleEmailChange = async (event) => {
         event.preventDefault();
-        setError({}); // Clear previous errors
+        setError({});
 
         if (newEmail !== confirmNewEmail) {
             setError({ email: 'Les nouveaux emails ne correspondent pas.' });
