@@ -184,12 +184,22 @@ export const updateProfileData = async (formData) => {
 // Fonction pour changer le mot de passe de l'utilisateur
 export const changePassword = async (data) => {
     try {
-        // Requête pour vérifier et changer le mot de passe
         const response = await instance.post(`/verifyPassword`, data);
         return response.data;
     } catch (error) {
-        console.error('Error changing password:', error);
-        throw new Error(error.response?.data?.message || 'Erreur lors de la modification du mot de passe');
+        console.error('Erreur lors du changement de mot de passe:', {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+        });
+
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            throw new Error('Mot de passe actuel incorrect.');
+        }
+
+        throw new Error(
+            error.response?.data?.message || 'Erreur lors de la modification du mot de passe'
+        );
     }
 };
 

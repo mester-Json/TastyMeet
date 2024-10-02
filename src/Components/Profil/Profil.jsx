@@ -36,11 +36,11 @@ export const Profil = () => {
     const [error, setError] = useState({});
 
     const [showPasswordForm, setShowPasswordForm] = useState(false);
+    const [showEmailForm, setShowEmailForm] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
-    const [showEmailForm, setShowEmailForm] = useState(false);
     const [currentEmail, setCurrentEmail] = useState('');
     const [newEmail, setNewEmail] = useState('');
     const [confirmNewEmail, setConfirmNewEmail] = useState('');
@@ -136,15 +136,17 @@ export const Profil = () => {
 
     const handlePasswordChange = async (event) => {
         event.preventDefault();
-        setError(null);
+        setError({});
 
         if (newPassword !== confirmNewPassword) {
             setError({ password: 'Les nouveaux mots de passe ne correspondent pas.' });
+            console.log("Error:", { password: 'Les nouveaux mots de passe ne correspondent pas.' });
             return;
         }
 
-        if (!validatePassword(newPassword)) {
-            setError({ password: 'Le nouveau mot de passe doit contenir entre 6 et 15 caractères, y compris un caractère spécial.' });
+        if (!newPassword || !currentPassword) {
+            setError({ password: 'Tous les champs doivent être remplis.' });
+            console.log("Error:", { password: 'Tous les champs doivent être remplis.' });
             return;
         }
 
@@ -155,16 +157,16 @@ export const Profil = () => {
                 newPassword,
                 confirmNewPassword,
             });
-            alert('Mot de passe modifié avec succès.');
+            alert('Mot de passe modifié.');
             setShowPasswordForm(false);
             setCurrentPassword('');
             setNewPassword('');
             setConfirmNewPassword('');
         } catch (error) {
-            setError({ password: 'Une erreur est survenue lors de la modification de l\'email.' });
+            setError({ password: 'Une erreur est survenue lors de la modification du mot de passe.' });
+            console.error('Erreur lors du changement de mot de passe:', error);
         }
     };
-
 
     const handleEmailChange = async (event) => {
         event.preventDefault();
