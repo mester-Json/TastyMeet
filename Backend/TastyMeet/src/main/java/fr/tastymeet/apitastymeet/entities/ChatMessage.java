@@ -20,7 +20,7 @@ public class ChatMessage {
     @JoinColumn(name = "conversation_id")
     private Conversation conversation;
 
-    @ManyToOne // Utilisateur qui envoie le messageconversation
+    @ManyToOne // Utilisateur qui envoie le message
     @JoinColumn(name = "sender_id")
     private User sender; // Remplacez Long senderId par User sender
 

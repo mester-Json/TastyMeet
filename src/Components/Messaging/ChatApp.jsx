@@ -6,13 +6,17 @@ import {
     MessagesContainer,
     MessageContainer,
     MessageBubble,
-    UserContainer,
     InputContainer,
     Input,
-    Button,
+    Icon,
 } from "./ChatApp.style.jsx";
 import { Avatar, MessageContent } from "../Messaging/CartMessaging.style.jsx";
+import { faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import { Client } from "@stomp/stompjs"; // Importation du client STOMP
+import {
+    fetchMessagesData,
+    fetchProfileData,
+} from '../../Axios/Axios.js';
 
 const getUserIdFromToken = () => {
     const token = sessionStorage.getItem("token");
@@ -25,19 +29,17 @@ const getUserIdFromToken = () => {
 
 export const ChatApp = () => {
     const formatDate = (dateArray) => {
-        if (!Array.isArray(dateArray) || dateArray.length !== 7) {
+        // Vérifier si c'est un tableau et s'il a la bonne longueur
+        if (!Array.isArray(dateArray) || dateArray.length < 5) {
             console.error("dateEnvoie n'est pas un tableau valide:", dateArray);
             return ""; // Retournez une chaîne vide ou un message d'erreur
         }
-
-        const year = dateArray[0];
-        const month = String(dateArray[1]).padStart(2, "0");
-        const day = String(dateArray[2]).padStart(2, "0");
         const hours = String(dateArray[3]).padStart(2, "0");
         const minutes = String(dateArray[4]).padStart(2, "0");
 
-        return `${hours}h${minutes}`;
+        return `${hours}h${minutes}`; // Format souhaité
     };
+
 
     const [messageContent, setMessageContent] = useState("");
     const [messages, setMessages] = useState([]);
@@ -46,22 +48,7 @@ export const ChatApp = () => {
     const { conversationId } = useParams();
 
     // Récupération des messages et des utilisateurs
-    const fetchMessages = () => {
-        fetch(`http://localhost:9090/conversation/${conversationId}/messages`)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Erreur lors de la récupération des messages");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                setMessages(data.messages); // Stocker les messages
-                setUsers(data.users); // Stocker les utilisateurs dans l'état
-            })
-            .catch((error) => {
-                console.error("Erreur lors de la récupération des messages :", error);
-            });
-    };
+
 
     // Connexion WebSocket avec STOMP
     const connectWebSocket = () => {
@@ -71,7 +58,7 @@ export const ChatApp = () => {
             brokerURL: "ws://localhost:9090/ws",
             onConnect: (frame) => {
                 console.log("Connecté: " + frame);
-                client.subscribe(`/topic/messages/${conversationId}`, (message) => {
+                client.subscribe(`/topic/messages/${conversationId}`, async (message) => {
                     const receivedMessage = JSON.parse(message.body);
                     console.log("Message reçu :", receivedMessage);
 
@@ -79,24 +66,18 @@ export const ChatApp = () => {
                     const senderId = receivedMessage.sender?.id; // Utiliser l'opérateur de chaîne facultatif pour éviter les erreurs
                     console.log("Sender ID récupéré :", senderId); // Log de l'ID pour débogage
 
-                    // Récupérer l'ID de l'expéditeur
                     if (senderId > 0) {
                         // Assurez-vous que l'ID est valide
                         if (!users[senderId]) {
-                            fetch(`http://localhost:9090/api/profile/${senderId}`)
-                                .then((response) => response.json())
-                                .then((userData) => {
-                                    setUsers((prevUsers) => ({
-                                        ...prevUsers,
-                                        [senderId]: userData,
-                                    }));
-                                })
-                                .catch((error) =>
-                                    console.error(
-                                        "Erreur lors de la récupération de l'utilisateur:",
-                                        error
-                                    )
-                                );
+                            try {
+                                const userData = await fetchProfileData(senderId); // Récupérer les données de l'utilisateur
+                                setUsers((prevUsers) => ({
+                                    ...prevUsers,
+                                    [senderId]: userData,
+                                }));
+                            } catch (error) {
+                                console.error("Erreur lors de la récupération de l'utilisateur:", error);
+                            }
                         }
                     } else {
                         console.warn("L'ID de l'expéditeur est invalide :", senderId);
@@ -110,18 +91,22 @@ export const ChatApp = () => {
                                 msg.dateEnvoie[0] === receivedMessage.dateEnvoie[0]
                         );
 
+                        // Ajoutez le message même si l'utilisateur n'est pas encore dans l'état
+                        const newMessage = {
+                            ...receivedMessage,
+                            user: users[senderId] || { firstName: "Utilisateur Inconnu", pictures: [] }, // Ajouter des valeurs par défaut si l'utilisateur n'est pas encore chargé
+                        };
+
                         if (!alreadyExists) {
-                            console.log("Ajout du message :", receivedMessage);
-                            return [...prevMessages, receivedMessage];
+                            console.log("Ajout du message :", newMessage);
+                            return [...prevMessages, newMessage]; // Assurez-vous de renvoyer le nouveau message
                         }
-                        console.log(
-                            "Message déjà existant, pas d'ajout :",
-                            receivedMessage
-                        );
+                        console.log("Message déjà existant, pas d'ajout :", receivedMessage);
                         return prevMessages;
                     });
                 });
-            },
+            }
+            ,
             onStompError: (frame) => {
                 console.error("Erreur STOMP: ", frame);
             },
@@ -140,13 +125,18 @@ export const ChatApp = () => {
     };
 
     useEffect(() => {
-        if (!stompClient) {
-            console.log("Connexion WebSocket en cours...");
-            fetchMessages();
-            connectWebSocket();
-        } else {
-            console.log("WebSocket déjà connecté.");
-        }
+        const loadMessages = async () => {
+            try {
+                const data = await fetchMessagesData(conversationId);
+                setMessages(data.messages || []); // Assurez-vous d'initialiser avec un tableau vide si undefined
+                setUsers(data.users || {}); // Initialiser les utilisateurs
+            } catch (error) {
+                console.error('Erreur lors de la récupération des messages :', error);
+            }
+        };
+
+        loadMessages();
+        connectWebSocket();
 
         return () => {
             if (stompClient) {
@@ -155,7 +145,8 @@ export const ChatApp = () => {
                 setStompClient(null); // Réinitialiser le client STOMP
             }
         };
-    }, [stompClient, conversationId]);
+    }, [conversationId, stompClient]);
+
 
     const handleSendMessage = () => {
         const senderId = getUserIdFromToken(); // Récupère l'ID de l'expéditeur
@@ -179,6 +170,12 @@ export const ChatApp = () => {
             setMessageContent(""); // Réinitialiser le contenu
         } else {
             console.warn("STOMP client not connected or message content is empty.");
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSendMessage();
         }
     };
 
@@ -219,14 +216,17 @@ export const ChatApp = () => {
                     );
                 })}
             </MessagesContainer>
+
             <InputContainer>
                 <Input
                     type="text"
+                    maxLength="200"
                     value={messageContent}
                     onChange={(e) => setMessageContent(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     placeholder="Tapez votre message..."
                 />
-                <Button onClick={handleSendMessage}>Envoyer</Button>
+                <Icon icon={faLocationArrow} onClick={handleSendMessage} />
             </InputContainer>
         </AppContainer>
     );

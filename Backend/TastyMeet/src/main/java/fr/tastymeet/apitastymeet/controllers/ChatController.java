@@ -29,6 +29,7 @@ public class ChatController {
     @MessageMapping("/chat/{conversationId}")
     @SendTo("/topic/messages/{conversationId}")
     public ChatMessageDto sendMessage(@Payload ChatMessage chatMessage) {
+
         long conversationId = chatMessage.getConversation().getId();
 
         // Appeler le service pour traiter l'envoi du message
@@ -39,7 +40,7 @@ public class ChatController {
         return chatMessageDto;
     }
 
-    @GetMapping("/conversation/{conversationId}/messages")
+    @GetMapping("api/conversation/{conversationId}/messages")
     public ResponseEntity<Map<String, Object>> getMessages(@PathVariable long conversationId) {
         // Récupérer les messages et les utilisateurs par ID de conversation
         Map<String, Object> response = chatMessageService.getMessagesByConversationId(conversationId);

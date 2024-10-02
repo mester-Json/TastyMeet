@@ -27,7 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("chrome-extension://fgponpodhbmadfljofbimhhlengambbn", "http://localhost:5173", "*"); //.withSockJS();
+        registry.addEndpoint("/ws").setAllowedOrigins("http://localhost:5173"); //.withSockJS();
     }
 
 
@@ -35,13 +35,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
         DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
         resolver.setDefaultMimeType(MimeTypeUtils.APPLICATION_JSON);
-
         // Utilisez le convertisseur avec JavaTimeModule
         MappingJackson2MessageConverter converter = jacksonMessageConverter();
         converter.setContentTypeResolver(resolver);
-
         messageConverters.add(converter);
-
         return false;  // Laissez Spring gérer les autres convertisseurs par défaut
     }
 

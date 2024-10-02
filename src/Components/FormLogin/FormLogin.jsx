@@ -16,7 +16,6 @@ export const FormLogin = () => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-
     useEffect(() => {
         const token = sessionStorage.getItem('token');
         if (token) {
@@ -24,7 +23,6 @@ export const FormLogin = () => {
             navigate('/accueil');
         }
     }, [navigate]);
-
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -34,54 +32,41 @@ export const FormLogin = () => {
         setError(null);
         setShowError(false);
 
-
         let hasError = false;
-
 
         if (!email || !password) {
             if (!email) setEmailError('L\'adresse e-mail est requise.');
             if (!password) setPasswordError('Le mot de passe est requis.');
-            hasError(true);
-            return;
+            hasError = true;
         }
 
-        if (!emailRegex.test(email)) {
+        if (email && !emailRegex.test(email)) {
             setEmailError('Adresse e-mail invalide.');
-            hasError(true);
-            return;
+            hasError = true;
         }
-
 
         if (hasError) {
             setShowError(true);
             return;
         }
 
-
-
-
         setIsLoading(true);
-
 
         try {
             const token = await SignIn(email, password);
             sessionStorage.setItem('token', token);
             setIsAuthenticated(true);
-            navigate('/accueil');
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.message || 'Erreur lors de la connexion.');
             setShowError(true);
         } finally {
-            setIsLoading(false);
+
         }
     };
-
-    if (isAuthenticated) {
-        return null;
-    }
-
-
 
     return (
         <Div>

@@ -1,5 +1,6 @@
 package fr.tastymeet.apitastymeet.dto;
 
+import fr.tastymeet.apitastymeet.entities.Conversation;
 import lombok.*;
 
 import java.time.LocalDateTime;

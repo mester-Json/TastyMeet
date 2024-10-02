@@ -4,6 +4,10 @@ import { Footer } from "../Components/Footer/Footer.jsx";
 import { CartMessaging } from '../Components/Messaging/CartMessaging.jsx';
 import { CountMessaging } from "../Components/Messaging/CountMessaging.jsx";
 
+import {
+    fetchConversationData,
+} from '../Axios/Axios.js';
+
 const getUserIdFromToken = () => {
     const token = sessionStorage.getItem('token');
     if (token) {
@@ -17,16 +21,36 @@ function Messaging() {
     const [conversations, setConversations] = useState([]);
 
     useEffect(() => {
-        const userId = getUserIdFromToken();
-        fetch(`http://localhost:9090/api/conversations/${userId}`)
-            .then(response => response.json())
-            .then(data => {
-                setConversations(data);
-            })
-            .catch(error => {
-                console.error("Erreur lors de la récupération des conversations:", error);
-            });
+        const fetchConversation = async () => {
+            try {
+                const userId = getUserIdFromToken();
+                const data = await fetchConversationData(userId);
+                if (data) {
+                    setConversations(data);
+                } else {
+                    setError({ fetch: 'Une erreur est survenue lors de la récupération des données.' });
+                }
+            } catch (error) {
+                setError({ fetch: 'Une erreur est survenue lors de la récupération des données.' });
+            }
+
+        };
+
+        fetchConversation();
     }, []);
+
+
+    // useEffect(() => {
+    //     const userId = getUserIdFromToken();
+    //     fetch(`http://localhost:9090/api/conversations/${userId}`)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             setConversations(data);
+    //         })
+    //         .catch(error => {
+    //             console.error("Erreur lors de la récupération des conversations:", error);
+    //         });
+    // }, []);
 
     return (
         <>

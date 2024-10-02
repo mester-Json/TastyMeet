@@ -20,7 +20,7 @@ export const AppRoutes = () => {
 
                 {/* Protected Routes */}
                 <Route path="/messaging" element={isAuthenticated() ? <Messaging /> : <Navigate to="/" />} />
-                <Route path="/message/:conversationId" element={isAuthenticated() ? <Message /> : <Navigate to="/login" replace />} />
+                <Route path="/message/:conversationId" element={isAuthenticated() ? <Message /> : <Navigate to="/" />} />
                 <Route path="/accueil" element={isAuthenticated() ? <Accueil /> : <Navigate to="/" />} />
                 <Route path="/profile" element={isAuthenticated() ? <ProfilPage /> : <Navigate to="/" />} />
                 <Route path="/help" element={isAuthenticated() ? <Help /> : <Navigate to="/" />} />
