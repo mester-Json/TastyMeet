@@ -41,7 +41,7 @@ export const AppRoutes = () => {
                   <Navigate to="/login" replace />
                 )
               }
-            />{" "}
+            />
             <Route
               path="/accueil"
               element={isAuthenticated() ? <Home /> : <Navigate to="/" />}
