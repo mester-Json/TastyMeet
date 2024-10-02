@@ -218,24 +218,6 @@ export const row = {
   marginBottom: "10px",
 };
 
-export const fileInput = {
-  display: "none", // Masquer le champ de fichier
-};
-
-export const addPhotoText = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  height: "150px",
-  borderRadius: "10px",
-  backgroundColor: "#f0f0f0",
-  border: "2px solid #ddd",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-  color: "#333",
-  cursor: "pointer",
-  fontSize: "1rem",
-  textAlign: "center",
-};
 
 export const rowButtons = {
   display: "flex",
@@ -285,4 +267,53 @@ export const ShowInput = {
   border: "1px solid #ccc",
   boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.1)",
   transition: "border-color 0.3s, box-shadow 0.3s",
+};
+
+
+export const photos = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  justifyContent: 'flex-start', // Pour aligner à gauche
+  gap: '5px', // Ajuster l'espacement si nécessaire
+  width: '100%', // S'assurer que le conteneur prend toute la largeur
+};
+
+export const photo = {
+  width: '100%', // Assurez-vous que l'image prend toute la largeur du conteneur
+  height: '100%', // Assurez-vous que l'image prend toute la hauteur du conteneur
+  objectFit: 'cover', // Conserve le ratio sans déformer
+  maxWidth: '100%', // Empêche l'image de dépasser la largeur du conteneur
+};
+
+export const deleteButton = {
+  position: 'absolute', // Positionnement absolu pour placer le bouton sur l'image
+  top: '10px',
+  right: '10px',
+  backgroundColor: 'rgba(255, 0, 0, 0.7)', // Couleur rouge semi-transparent
+  color: '#fff',
+  border: 'none',
+  borderRadius: '50%',
+  width: '30px',
+  height: '30px',
+  cursor: 'pointer',
+  fontSize: '1.2rem',
+};
+
+export const fileInput = {
+  display: 'none', // Masquer le champ de fichier
+};
+
+export const addPhotoText = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '150px',
+  borderRadius: '10px',
+  backgroundColor: '#f0f0f0',
+  border: '2px solid #ddd',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  color: '#333',
+  cursor: 'pointer',
+  fontSize: '1rem',
+  textAlign: 'center',
 };

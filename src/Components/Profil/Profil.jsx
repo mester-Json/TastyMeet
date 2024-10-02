@@ -382,25 +382,33 @@ export const Profil = () => {
 
         <RightColumn>
           <Titre>Galerie de Photos</Titre>
-          <DivPicture>
-            {pictures.slice(0, 4).map((photo, index) => (
-              <DivOnePicture key={index}>
-                <OnePicture
-                  src={`http://localhost:9090/api/show/${photo.pictureName}`}
-                  alt={`Photo ${index + 1}`}
-                />
-                <ButtonPicture onClick={() => handleDeletePhoto(photo.id)}>
-                  -
-                </ButtonPicture>
-              </DivOnePicture>
-            ))}
-            {pictures.length < 4 && (
-              <LabelPicture>
-                <InputFile type="file" onChange={handleFileUpload} />
-                <DivTextPicture>Ajouter une photo</DivTextPicture>
-              </LabelPicture>
-            )}
-          </DivPicture>
+          <div style={styles.photos}>
+                        {pictures.slice(0, 4).map((photo, index) => (
+                            <div key={index} style={styles.photoContainer}>
+                                <img
+                                    src={`http://localhost:9090/api/show/${photo.pictureName}`}
+                                    alt={`Photo ${index + 1}`}
+                                    style={styles.photo}
+                                />
+                                <button
+                                    style={styles.deleteButton}
+                                    onClick={() => handleDeletePhoto(photo.id)}
+                                >
+                                    -
+                                </button>
+                            </div>
+                        ))}
+                        {pictures.length < 4 && (
+                            <label style={styles.photoContainer}>
+                                <input
+                                    type="file"
+                                    onChange={handleFileUpload}
+                                    style={styles.fileInput}
+                                />
+                                <div style={styles.addPhotoText}>Ajouter une photo</div>
+                            </label>
+                        )}
+          </div>
         </RightColumn>
       </Container>
 
