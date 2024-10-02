@@ -43,7 +43,6 @@ export const FormMoreInfo = styled.form`
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     justify-content: center;
     align-items: center;
-    margin: 250px 0 0 600px;
 
     @media (max-width: 1024px) {
         margin: 200px auto;
