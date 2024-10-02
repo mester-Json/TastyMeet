@@ -193,6 +193,7 @@ export const changePassword = async (data) => {
             data: error.response?.data,
         });
 
+        // Vérifie si l'erreur est due à un mot de passe incorrect
         if (error.response?.status === 401 || error.response?.status === 403) {
             throw new Error('Mot de passe actuel incorrect.');
         }
