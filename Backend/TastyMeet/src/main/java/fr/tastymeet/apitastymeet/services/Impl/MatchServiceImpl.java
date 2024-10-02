@@ -33,6 +33,9 @@ public class MatchServiceImpl implements IMatchService {
         // Récupérer les utilisateurs qui ont été "likés" par l'utilisateur courant
         Set<User> matchedUsers = user.getMatches();
 
+        // Vérifier le contenu de matchedUsers pour le débogage
+        System.out.println("Matched users for userId " + userId + ": " + matchedUsers);
+
         // Convertir les utilisateurs correspondants en UserLikeDto
         return matchedUsers.stream()
                 .map(matchedUser -> {

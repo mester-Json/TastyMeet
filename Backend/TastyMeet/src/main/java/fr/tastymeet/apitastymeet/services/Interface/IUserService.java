@@ -12,13 +12,13 @@ public interface IUserService {
 
     List<UserDto> getDisplayableUsers(String token);
 
-    UserDto updateEmail(UserDto userDto);
-
     UserDto save(UserDto userDto);
 
     UserDto update(UserDto userDto);
 
     void deleteById(long id);
+
+    UserDto getByEmail(String email);
 
     UserDto getById(long id);
 }

@@ -1,5 +1,6 @@
 package fr.tastymeet.apitastymeet.dto;
 
+
 import lombok.Data;
 
 @Data

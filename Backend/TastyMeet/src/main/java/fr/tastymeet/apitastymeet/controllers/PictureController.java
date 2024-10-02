@@ -1,22 +1,30 @@
 package fr.tastymeet.apitastymeet.controllers;
 
+import fr.tastymeet.apitastymeet.dto.PictureDto;
 import fr.tastymeet.apitastymeet.services.Interface.IPictureService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api")
 public class PictureController {
+
+
 
     @Autowired
     private IPictureService pictureService;
@@ -26,6 +34,7 @@ public class PictureController {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Aucun fichier sélectionné.");
         }
+
         try {
             pictureService.uploadPicture(file, userId);
             return ResponseEntity.ok("Fichier téléversé avec succès : " + file.getOriginalFilename());
@@ -33,6 +42,8 @@ public class PictureController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors du téléversement du fichier.");
         }
     }
+
+
 
     @GetMapping("/show/{imageName}")
     public ResponseEntity<Resource> getImage(@PathVariable String imageName) throws IOException {

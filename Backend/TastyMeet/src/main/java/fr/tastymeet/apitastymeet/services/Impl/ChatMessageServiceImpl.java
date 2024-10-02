@@ -1,6 +1,6 @@
 package fr.tastymeet.apitastymeet.services.Impl;
-
 import fr.tastymeet.apitastymeet.dto.ChatMessageDto;
+import fr.tastymeet.apitastymeet.dto.PictureDto;
 import fr.tastymeet.apitastymeet.dto.UserChatDto;
 import fr.tastymeet.apitastymeet.dto.UserDto;
 import fr.tastymeet.apitastymeet.entities.ChatMessage;
@@ -10,6 +10,7 @@ import fr.tastymeet.apitastymeet.repositories.ChatMessageRepository;
 import fr.tastymeet.apitastymeet.repositories.PictureRepository;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
 import fr.tastymeet.apitastymeet.services.Interface.IChatMessageService;
+import fr.tastymeet.apitastymeet.services.Interface.IPictureService;
 import fr.tastymeet.apitastymeet.services.Interface.IUserService;
 import fr.tastymeet.apitastymeet.tools.DtoTool; // Importer la classe DtoTool
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +36,14 @@ public class ChatMessageServiceImpl implements IChatMessageService {
     private IUserService userService;
 
     @Autowired
+    private IPictureService pictureService;
+
+    @Autowired
     private PictureRepository pictureRepository;
 
     // Enregistrer un nouveau message
     @Override
-    public ChatMessageDto sendMessage(ChatMessage chatMessage, long conversationId) {
+    public ChatMessageDto sendMessage(ChatMessage chatMessage, Long conversationId) {
         // Initialiser la date d'envoi si elle est nulle
         if (chatMessage.getDateEnvoie() == null) {
             chatMessage.setDateEnvoie(LocalDateTime.now());
@@ -67,7 +71,7 @@ public class ChatMessageServiceImpl implements IChatMessageService {
 
 
     @Override
-    public Map<String, Object> getMessagesByConversationId(long conversationId) {
+    public Map<String, Object> getMessagesByConversationId(Long conversationId) {
         // Récupérer les messages par ID de conversation
         List<ChatMessage> messages = chatMessageRepository.findByConversationId(conversationId);
 

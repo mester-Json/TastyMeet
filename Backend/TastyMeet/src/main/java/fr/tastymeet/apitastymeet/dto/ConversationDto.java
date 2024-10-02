@@ -1,5 +1,7 @@
 package fr.tastymeet.apitastymeet.dto;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Data // Génère des getters, setters, toString, equals, et hashCode

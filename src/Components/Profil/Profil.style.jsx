@@ -32,12 +32,7 @@ export const rightColumn = {
     borderRadius: '10px',
     padding: '20px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    maxWidth: '1200px', // Assurez-vous que ce maxWidth soit suffisant
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center', // Centrez le contenu si nécessaire
 };
-
 
 export const row = {
     display: 'flex',
@@ -90,31 +85,19 @@ export const photoGalleryHeader = {
 export const photos = {
     display: 'flex',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start', // Pour aligner à gauche
-    gap: '5px', // Ajuster l'espacement si nécessaire
-    width: '100%', // S'assurer que le conteneur prend toute la largeur
+    gap: '10px',
+    justifyContent: 'center',
 };
-
 
 export const photo = {
-    width: '100%', // Assurez-vous que l'image prend toute la largeur du conteneur
-    height: '100%', // Assurez-vous que l'image prend toute la hauteur du conteneur
-    objectFit: 'cover', // Conserve le ratio sans déformer
-    maxWidth: '100%', // Empêche l'image de dépasser la largeur du conteneur
-};
-
-export const deleteButton = {
-    position: 'absolute', // Positionnement absolu pour placer le bouton sur l'image
-    top: '10px',
-    right: '10px',
-    backgroundColor: 'rgba(255, 0, 0, 0.7)', // Couleur rouge semi-transparent
-    color: '#fff',
-    border: 'none',
-    borderRadius: '50%',
-    width: '30px',
-    height: '30px',
+    width: 'calc(50% - 10px)', // Ajuste la largeur en fonction du gap
+    height: '150px',
+    borderRadius: '10px',
+    objectFit: 'cover',
+    border: '2px solid #ddd',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    transition: 'transform 0.3s, box-shadow 0.3s',
     cursor: 'pointer',
-    fontSize: '1.2rem',
 };
 
 export const fileInput = {
@@ -134,16 +117,6 @@ export const addPhotoText = {
     cursor: 'pointer',
     fontSize: '1rem',
     textAlign: 'center',
-};
-
-export const photoContainer = {
-    position: 'relative',
-    width: 'calc(50% - 15px)', // Deux images par ligne
-    height: '150px', // Hauteur fixe pour uniformiser les images
-    borderRadius: '10px',
-    overflow: 'hidden', // Masquer le débordement
-    border: '2px solid #ddd',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 };
 
 export const rowButtons = {

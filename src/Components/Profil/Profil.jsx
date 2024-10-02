@@ -8,9 +8,7 @@ import {
     deletePhoto,
     uploadFile,
 } from '../../Axios/Axios.js';
-const refreshPage = () => {
-    window.location.reload();
-};
+
 const getUserIdFromToken = () => {
     const token = sessionStorage.getItem('token');
     if (token) {
@@ -52,10 +50,10 @@ export const Profil = () => {
             try {
                 const userId = getUserIdFromToken();
                 const data = await fetchProfileData(userId);
-                console.log(data.version);
+
                 if (data) {
                     setId(data.id || '');
-                    setVersion(parseInt(data.version) || 0);
+                    setVersion(data.version || '');
                     setEmail(data.email || '');
                     setFirstName(data.firstName || '');
                     setLastName(data.lastName || '');
@@ -85,7 +83,6 @@ export const Profil = () => {
     const handleUpdate = async (event) => {
         event.preventDefault();
         setError({});
-        console.log("Début de la mise à jour du profil");
 
         // Check for empty fields
         const fieldsToCheck = {
@@ -109,16 +106,14 @@ export const Profil = () => {
 
         if (Object.keys(newErrors).length) {
             setError(newErrors);
-            console.log("Erreurs de validation:", newErrors);
             return;
         }
 
         const formData = new FormData();
         formData.append("id", id);
-        formData.append("firstName", firstName);
-        formData.append("location", location);
-        formData.append("lastName", lastName);
         formData.append("version", version);
+        formData.append("firstName", firstName);
+        formData.append("lastName", lastName);
         formData.append("description", description);
         formData.append("orientation", orientation);
         formData.append("email", email);
@@ -132,15 +127,11 @@ export const Profil = () => {
         }
 
         try {
-            console.log("Envoi des données:", formData);
             await updateProfileData(formData);
             alert("Modification utilisateur réussie");
-            refreshPage();
         } catch (error) {
             setError({ update: 'Une erreur est survenue lors de la mise à jour.' });
-            console.error("Erreur lors de la mise à jour du profil:", error);
         }
-
     };
 
     const handlePasswordChange = async (event) => {
@@ -162,16 +153,19 @@ export const Profil = () => {
                 id,
                 currentPassword,
                 newPassword,
+                confirmNewPassword,
             });
             alert('Mot de passe modifié avec succès.');
             setShowPasswordForm(false);
             setCurrentPassword('');
             setNewPassword('');
-            refreshPage();
+            setConfirmNewPassword('');
         } catch (error) {
-            setError({ password: error.message });
+            setError({ password: 'Une erreur est survenue lors de la modification de l\'email.' });
         }
     };
+
+
     const handleEmailChange = async (event) => {
         event.preventDefault();
         setError({}); // Clear previous errors
@@ -191,12 +185,13 @@ export const Profil = () => {
                 id,
                 currentEmail,
                 newEmail,
+                confirmNewEmail,
             });
             alert('Email modifié avec succès.');
             setShowEmailForm(false);
             setCurrentEmail('');
             setNewEmail('');
-            refreshPage();
+            setConfirmNewEmail('');
         } catch (error) {
             setError({ email: 'Une erreur est survenue lors de la modification de l\'email.' });
             console.error('Error changing email:', error);
@@ -210,9 +205,7 @@ export const Profil = () => {
 
         try {
             await deletePhoto(photoId);
-
             console.log("Photo supprimée avec succès");
-            refreshPage();
         } catch (error) {
             console.error("Erreur:", error);
         }
@@ -229,9 +222,7 @@ export const Profil = () => {
                 pictureName: selectedFiles[0].name
             };
             setPictures(prevPictures => [...prevPictures, newPicture]);
-
             alert('Une image a été ajoutée');
-            refreshPage();
         } catch (error) {
             console.error('Erreur:', error);
         }
@@ -382,9 +373,6 @@ export const Profil = () => {
                         )}
                     </div>
                 </div>
-
-
-
             </div>
 
             {showPasswordForm && (

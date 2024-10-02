@@ -1,16 +1,16 @@
-import { Contact , FooterStyle , P } from './Footer.style.jsx';
+import { Contact, FooterStyle, P } from './Footer.style.jsx';
 
-export const Footer = () =>{
+export const Footer = () => {
     return (
         <>
-        <FooterStyle>
-            <Contact>
-                Contact Us
-            </Contact>
-            <P>
-                ©-2024
-            </P>
-        </FooterStyle>
+            <FooterStyle>
+                <Contact>
+                    Contact Us
+                </Contact>
+                <P>
+                    ©-2024
+                </P>
+            </FooterStyle>
         </>
     )
 }

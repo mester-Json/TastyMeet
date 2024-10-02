@@ -29,14 +29,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private JwtUtils jwtUtils;
 
-    @Autowired
-    private PasswordService passwordService;
-
     public String authenticateUser(AuthRequest authRequest) {
         UserDetails userDetails = loadUserByUsername(authRequest.getEmail());
 
         // Vérifiez si le mot de passe correspond
-        if (!passwordService.verifyPassword(authRequest.getPassword(), userDetails.getPassword())) {
+        if (!authRequest.getPassword().equals(userDetails.getPassword())) {
             throw new RuntimeException("Invalid username or password");
         }
 

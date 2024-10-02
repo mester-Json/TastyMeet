@@ -5,19 +5,30 @@ export const FormularRegister = styled.form`
     display: flex;
     flex-wrap: wrap;
     background-color: rgba(207, 206, 206, 0.5);
-    padding: 1.25rem; /* 20px -> 1.25rem */
-    max-width: 70%; /* Réduit à un pourcentage */
+    padding: 20px;
+    max-width: 700px;
     height: auto;
-    border-radius: 1.25rem; /* 20px -> 1.25rem */
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1); /* 0 4px 8px */
-    margin: 10rem auto; /* 150px -> 10rem */
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 150px;
+    margin-bottom: 150px;
+    margin-left: auto;
+    margin-right: auto;
     justify-content: center;
     align-items: center;
 
-    @media (max-width: 768px) {
+    @media (max-width: 721px) {
+        padding: 15px;
+        margin-top: 100px;
+        margin-bottom: 100px;
         max-width: 90%;
-        margin-top: 3rem;
-        margin-bottom: 3rem;
+    }
+
+    @media (max-width: 480px) {
+        padding: 10px;
+        margin-top: 50px;
+        margin-bottom: 50px;
+        max-width: 95%;
     }
 `;
 
@@ -25,153 +36,255 @@ export const FormMoreInfo = styled.form`
     display: flex;
     flex-wrap: wrap;
     background-color: rgba(207, 206, 206, 0.5);
-    padding: 1.25rem;
-    max-width: 90%; /* Pourcentage pour la responsivité */
+    padding: 20px;
+    max-width: 700px;
     height: auto;
-    border-radius: 1.25rem;
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     justify-content: center;
     align-items: center;
-    margin: 15rem auto 0; /* Adapté pour centrer mieux */
-    @media (max-width: 768px) {
+    margin: 250px 0 0 600px;
+
+    @media (max-width: 1024px) {
+        margin: 200px auto;
+    }
+
+    @media (max-width: 721px) {
+        margin: 150px auto;
         max-width: 90%;
-        margin: 3rem auto 0;
+    }
+
+    @media (max-width: 480px) {
+        padding: 10px;
+        margin: 100px auto;
+        max-width: 95%;
     }
 `;
 
-/* ----------------------------------------*/
 /* -----------------Input-----------------------*/
 export const InputField = styled.input`
-    width: 100%; /* Utilisation de 100% pour la largeur */
-    padding: 0.5rem; /* 7px -> 0.5rem */
+    width: 300px;
+    padding: 7px;
     border: 1px solid #ccc;
-    border-radius: 1.25rem; /* 20px -> 1.25rem */
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: box-shadow 0.3s ease;
-    margin-bottom: 0.5rem;
+    margin-bottom: 5px;
+
     &:focus {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         outline: none;
     }
+
     &::placeholder {
         text-align: center;
+    }
+
+    @media (max-width: 721px) {
+        width: 250px;
+    }
+
+    @media (max-width: 480px) {
+        width: 200px;
     }
 `;
 
 export const InputFieldAge = styled(InputField)`
-    padding: 0.5rem; /* Unité relative pour l'accessibilité */
+    padding: 4px;
     text-align: center;
 `;
 
 export const InputAvatar = styled.input`
-    padding: 0.625rem; /* 10px -> 0.625rem */
-    border-radius: 50%;
+    padding: 10px;
+    border-radius: 100px;
+
+    @media (max-width: 721px) {
+        padding: 8px;
+    }
+
+    @media (max-width: 480px) {
+        padding: 6px;
+    }
 `;
 
-/* ----------------------------------------*/
 /* -----------------Button+Select-----------------------*/
 export const Select = styled.select`
-    width: 100%; /* Remplacer px par 100% */
-    padding: 0.5rem;
-    font-size: 0.875rem; /* 13px -> 0.875rem */
+    width: 315px;
+    padding: 5px;
+    font-size: 13px;
     text-align: center;
-    border-radius: 1.25rem;
+    border-radius: 20px;
     border: 1px solid #ccc;
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: box-shadow 0.3s ease;
-    margin-bottom: 0.5rem;
+    margin-bottom: 5px;
+
     &:focus {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         outline: none;
+    }
+
+    @media (max-width: 721px) {
+        width: 260px;
+    }
+
+    @media (max-width: 480px) {
+        width: 220px;
     }
 `;
 
 export const Button = styled.button`
-    width: 100%; /* Largeur relative à son parent */
-    height: 2rem; /* 30px -> 2rem */
-    background: #2a0800;
+    width: 200px;
+    height: 30px;
+    background: #2A0800;
     color: white;
     border: none;
-    border-radius: 1.25rem;
+    border-radius: 20px;
     cursor: pointer;
-    margin-top: 1.5rem; /* 25px -> 1.5rem */
+    margin-top: 25px;
     transition: transform 0.3s ease, background-color 0.3s ease;
 
     &:hover {
         background-color: #775144;
-        transform: translateY(0.3125rem); /* 5px -> 0.3125rem */
+        transform: translateY(5px);
+    }
+
+    @media (max-width: 721px) {
+        width: 180px;
+    }
+
+    @media (max-width: 480px) {
+        width: 160px;
     }
 `;
 
-/* ----------------------------------------*/
 /* -----------------Img-----------------------*/
 export const ImgAvatar = styled.img`
-    width: 9.375rem; /* 150px -> 9.375rem */
-    height: 9.375rem;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
-    box-shadow: 0 0.3125rem 0.625rem rgba(0, 0, 0, 0.8);
-    margin-bottom: 0.625rem; /* 10px -> 0.625rem */
+    box-shadow: 0 5px 10px rgba(0, 0.2, 0.2, 0.8);
+    margin-bottom: 10px;
+
+    @media (max-width: 721px) {
+        width: 120px;
+        height: 120px;
+    }
+
+    @media (max-width: 480px) {
+        width: 100px;
+        height: 100px;
+    }
 `;
 
 export const ImgEye = styled.img`
     position: absolute;
-    right: 40%; /* Remplacer les pixels par des pourcentages */
+    right: 640px;
     top: 54.4%;
     transform: translateY(-50%);
     cursor: pointer;
-    width: 1.25rem; /* 20px -> 1.25rem */
-    height: 1.25rem;
+    width: 20px;
+    height: 20px;
+
+    @media (max-width: 721px) {
+        right: 10px;
+    }
+
+    @media (max-width: 480px) {
+        right: 5px;
+    }
 `;
 
-/* ----------------------------------------*/
 /* -----------------Text+Label-----------------------*/
 export const TitleForm1 = styled.h1`
-    font-size: 2rem; /* xx-large remplacé par une valeur plus spécifique */
+    font-size: xx-large;
     color: white;
     font-weight: bold;
     text-align: center;
+
+    @media (max-width: 721px) {
+        font-size: x-large;
+    }
+
+    @media (max-width: 480px) {
+        font-size: large;
+    }
 `;
 
 export const TitleForm2 = styled.h2`
-    font-size: 2rem;
+    font-size: xx-large;
     color: white;
     font-weight: bold;
     text-align: center;
+
+    @media (max-width: 721px) {
+        font-size: x-large;
+    }
+
+    @media (max-width: 480px) {
+        font-size: large;
+    }
 `;
 
 export const P = styled.p`
-    font-size: 0.75rem; /* 12px -> 0.75rem */
-    margin-left: 50%; /* Ajuster avec % */
+    font-size: 12px;
+    margin-left: 200px;
+
+    @media (max-width: 721px) {
+        margin-left: 100px;
+    }
+
+    @media (max-width: 480px) {
+        margin-left: 50px;
+    }
 `;
 
 export const Description = styled.textarea`
-    border-radius: 1.25rem;
-    padding: 0.625rem;
-    max-height: 15.625rem; /* 250px -> 15.625rem */
-    height: 6.25rem; /* 100px -> 6.25rem */
+    border-radius: 20px;
+    padding: 10px;
+    max-height: 250px;
+    height: 100px;
     overflow-y: auto;
-`;
 
-/* ----------------------------------------*/
+    @media (max-width: 721px) {
+        max-width: 90%;
+    }
+
+    @media (max-width: 480px) {
+        max-width: 95%;
+    }
+`;
+export const LabelError = styled.label`
+    text-align:center;
+        font-size:13px;
+        color: red;
+    `;
+
 /* -----------------Div-----------------------*/
 export const Div = styled.div`
     display: flex;
     flex-direction: column;
-    margin-top: 0.375rem; /* 6px -> 0.375rem */
-    margin-right: 0.9375rem; /* 15px -> 0.9375rem */
-    padding: 0.3125rem; /* 5px -> 0.3125rem */
+    margin-top: 6px;
+    margin-right: 15px;
+    padding: 5px;
+
+    @media (max-width: 721px) {
+        margin-right: 0;
+    }
 `;
 
 export const Div2 = styled(Div)`
-    margin-left: 0.9375rem;
+    margin-left: 15px;
+
+    @media (max-width: 721px) {
+        margin-left: 0;
+    }
 `;
 
 export const DivError = styled.div`
-    height: 1.5625rem; /* 25px -> 1.5625rem */
+    height: 25px;
     text-align: left;
-    margin-bottom: 0.5rem;
+    margin-bottom: 5px;
     margin-right: auto;
     margin-left: auto;
 `;
-
-/* ----------------------------------------*/

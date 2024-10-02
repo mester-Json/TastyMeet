@@ -1,5 +1,4 @@
-import { MessageBar, Avatar, MessageContent } from '../Messaging/CartMessaging.style.jsx';
-import { Link } from 'react-router-dom';
+import { MessageBar, Avatar, MessageContent, LinkStyle, Div } from '../Messaging/CartMessaging.style.jsx';
 
 const getUserIdFromToken = () => {
     const token = sessionStorage.getItem('token');
@@ -16,8 +15,9 @@ export const CartMessaging = ({ conversation }) => {
     const { lastMessage } = conversation;
 
     return (
-        <div>
-            <Link style={{ textDecoration: 'none' }} to={`/message/${conversation.id}`}>
+
+        <Div>
+            <LinkStyle to={`/message/${conversation.id}`}>
                 <MessageBar>
                     <Avatar>
                         <img
@@ -30,7 +30,7 @@ export const CartMessaging = ({ conversation }) => {
                         <p>{lastMessage || "Envoyez un message à " + participant.firstName + " en premier"}</p> {/* Afficher un message par défaut s'il n'y a pas de dernier message */}
                     </MessageContent>
                 </MessageBar>
-            </Link>
-        </div>
+            </LinkStyle>
+        </Div>
     );
 };

@@ -5,6 +5,6 @@ import fr.tastymeet.apitastymeet.dto.ConversationDto;
 import java.util.List;
 
 public interface IConversationService {
-    List<ConversationDto> getConversationsByUserId(long userId);
+    List<ConversationDto> getConversationsByUserId(Long userId);
     void createConversation(long userId1, long userId2);
 }
