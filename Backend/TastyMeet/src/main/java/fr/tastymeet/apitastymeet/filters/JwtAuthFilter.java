@@ -14,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -39,14 +38,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
             String jwtToken = authHeader.substring(7);
             String username = jwtUtils.extractUsername(jwtToken);
-            String userId = jwtUtils.extractClaim(jwtToken, "id"); // Extraire l'ID utilisateur
+            //String userId = jwtUtils.extractClaim(jwtToken, "id"); // Extraire l'ID utilisateur
 
             if (username != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 if (Boolean.TRUE.equals(jwtUtils.validateToken(jwtToken, userDetails))) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, jwtToken, userDetails.getAuthorities());
-                    authToken.setDetails(userId); // Stocker l'ID dans les détails
+                    //authToken.setDetails(userId); // Stocker l'ID dans les détails
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 } else {
                     throw new ServletException("Invalid token");
@@ -54,12 +53,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-        return path.startsWith("/") ;
     }
 
     private boolean isInterceptedRequest(HttpServletRequest request) {

@@ -5,12 +5,12 @@ export const NavBar = styled.nav`
   display: flex;
   width: 100%;
   background: #2A0800;
-  position:relative;
   justify-content: space-between;
 `
 
 
 export const NavDiv = styled.div`
+ display: flex;
   align-items: center;
   height: 100%;
   padding: 0 20px; 
@@ -66,6 +66,7 @@ export const BurgerMenu = styled.button`
 
 export const Menu = styled.ul`
     list-style: none;
+    display: flex;
     flex-direction: column;
     background: #2A0800;
     position: absolute;

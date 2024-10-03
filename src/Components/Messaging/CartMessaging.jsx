@@ -1,4 +1,5 @@
-import { MessageBar, Avatar, MessageContent, LinkStyle, Div } from '../Messaging/CartMessaging.style.jsx';
+import { MessageBar, Avatar, MessageContent } from '../Messaging/CartMessaging.style.jsx';
+import { Link } from 'react-router-dom';
 
 const getUserIdFromToken = () => {
     const token = sessionStorage.getItem('token');
@@ -15,13 +16,12 @@ export const CartMessaging = ({ conversation }) => {
     const { lastMessage } = conversation;
 
     return (
-
-        <Div>
-            <LinkStyle to={`/message/${conversation.id}`}>
+        <div>
+            <Link style={{ textDecoration: 'none' }} to={`/message/${conversation.id}`}>
                 <MessageBar>
                     <Avatar>
                         <img
-                            src={`http://localhost:9090/api/show/${participant.pictures[0]?.pictureName}`}
+                            src={`https://9e97b2d83d2d0de2cc31eb56f3939262.serveo.net/api/show/${participant.id}/${participant.pictures[0]?.pictureName}`}
                             alt={`Avatar de ${participant.firstName}`}
                         />
                     </Avatar>
@@ -30,7 +30,7 @@ export const CartMessaging = ({ conversation }) => {
                         <p>{lastMessage || "Envoyez un message à " + participant.firstName + " en premier"}</p> {/* Afficher un message par défaut s'il n'y a pas de dernier message */}
                     </MessageContent>
                 </MessageBar>
-            </LinkStyle>
-        </Div>
+            </Link>
+        </div>
     );
 };

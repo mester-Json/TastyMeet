@@ -3,32 +3,47 @@ import axios from "axios";
 
 // Création d'une instance axios pour les requêtes vers l'API principale
 const instance = axios.create({
-    baseURL: 'http://localhost:9090/api/', // URL de base pour les requêtes API
+    baseURL: 'https://79c0f43541801476a6d5bedd8e55a469.serveo.net/api/', // URL de base pour les requêtes API
     headers: {
         'Content-Type': 'application/json', // Format des données envoyé à l'API
     }
 });
 
-// Création d'une autre instance axios pour la gestion des messages
-const MessagePreview = axios.create({
-    baseURL: 'http://localhost:9090/conversation/', // URL de base pour les requêtes de conversation
-    headers: {
-        'Content-Type': 'application/json', // Format des données pour les messages
+instance.interceptors.request.use(
+    function (config) {
+        // Récupère le token depuis une source (localStorage, state, etc.)
+        const token = sessionStorage.getItem('token'); // ou une autre méthode pour obtenir le token
+        if (token) {
+            // Ajoute le header Authorization si le token est présent
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        return config;
+    },
+    function (error) {
+        // Gérer les erreurs avant que la requête ne soit envoyée
+        return Promise.reject(error);
     }
-});
+);
+
 
 ////////////////////
 /////  LOGOUT  /////
 ////////////////////
 
 // Fonction pour déconnecter l'utilisateur
-export const logoutUser = async (navigate) => {
+export const logoutUser = async () => {
     try {
+
         // Requête à l'API pour déconnecter l'utilisateur
-        await instance.post('/auth/logout');
+        const response = await instance.post('/auth/logout');
+
 
         // Suppression du token de sessionStorage après déconnexion
         sessionStorage.removeItem('token');
+
+        // Rediriger l'utilisateur vers la page de connexion
+        window.location.replace('/');
+
     } catch (error) {
         console.error('Erreur lors de la déconnexion :', error);
     }
@@ -112,23 +127,19 @@ export const UserData = async (token) => {
     try {
         // Requête pour récupérer les données de l'utilisateur
         const response = await instance.get('/display', {
-            headers: {
-                'Authorization': `Bearer ${token}`, // Envoie le token d'authentification
-            },
         });
 
-        console.log('API Response Data:', response.data);
 
         // Modifie les données des profils pour inclure les URLs complètes des images
         const profilesWithPictures = response.data.map(profile => ({
             ...profile,
             pictures: profile.pictures.map(picture => ({
                 pictureName: picture.pictureName,
-                imageUrl: `http://localhost:9090/api/show/${picture.pictureName}`,
+                imageUrl: `https://9e97b2d83d2d0de2cc31eb56f3939262.serveo.net/api/show/${profile.id}/${picture.pictureName}`,
+
             })),
         }));
 
-        console.log('Profiles with Pictures:', profilesWithPictures);
 
         return profilesWithPictures; // Retourne les profils modifiés
     } catch (error) {
@@ -142,9 +153,7 @@ export const HandleLike = async (userId, profileId, token) => {
     try {
         // Envoie une requête POST pour liker un profil
         const response = await instance.post(`/${userId}/like/${profileId}`, {}, {
-            headers: {
-                'Authorization': `Bearer ${token}`, // Token d'authentification
-            },
+
         });
         return response.data; // Retourne la réponse de l'API
     } catch (error) {
@@ -161,6 +170,16 @@ export const fetchProfileData = async (userId) => {
         return response.data;
     } catch (error) {
         console.error('Error fetching profile data:', error);
+        throw new Error('Erreur lors de la récupération des données.');
+    }
+};
+
+export const fetchConversationData = async (userId) => {
+    try {
+        const response = await instance.get(`/conversations/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching conversation data:', error);
         throw new Error('Erreur lors de la récupération des données.');
     }
 };
@@ -184,14 +203,25 @@ export const updateProfileData = async (formData) => {
 // Fonction pour changer le mot de passe de l'utilisateur
 export const changePassword = async (data) => {
     try {
-        // Requête pour vérifier et changer le mot de passe
         const response = await instance.post(`/verifyPassword`, data);
         return response.data;
     } catch (error) {
-        console.error('Error changing password:', error);
-        throw new Error(error.response?.data?.message || 'Erreur lors de la modification du mot de passe');
+        console.error('Erreur lors du changement de mot de passe:', {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data,
+        });
+
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            throw new Error('Mot de passe actuel incorrect.');
+        }
+
+        throw new Error(
+            error.response?.data?.message || 'Erreur lors de la modification du mot de passe'
+        );
     }
 };
+
 
 // Fonction pour changer l'email de l'utilisateur
 export const changeEmail = async (data) => {
@@ -238,10 +268,10 @@ export const uploadFile = async (id, formData) => {
 //////////////
 
 // Fonction pour récupérer les messages d'une conversation donnée
-export const fetchMessages = async (conversationId) => {
+export const fetchMessagesData = async (conversationId) => {
     try {
         // Requête pour récupérer les messages
-        const response = await MessagePreview.get(`/${conversationId}/messages`);
+        const response = await instance.get(`/conversation/${conversationId}/messages`);
         return response.data;
     } catch (error) {
         console.error('Erreur lors de la récupération des messages :', error);

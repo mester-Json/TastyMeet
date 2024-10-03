@@ -2,28 +2,18 @@ package fr.tastymeet.apitastymeet.services.Impl;
 
 import fr.tastymeet.apitastymeet.dto.*;
 import fr.tastymeet.apitastymeet.entities.Gender;
-import fr.tastymeet.apitastymeet.entities.Picture;
 import fr.tastymeet.apitastymeet.entities.User;
-import fr.tastymeet.apitastymeet.repositories.PictureRepository;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
 import fr.tastymeet.apitastymeet.services.Interface.IMatchService;
+import fr.tastymeet.apitastymeet.services.Interface.IPictureService;
 import fr.tastymeet.apitastymeet.services.Interface.IUserService;
 import fr.tastymeet.apitastymeet.tools.DtoTool;
 import fr.tastymeet.apitastymeet.tools.JwtUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -43,12 +33,13 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private IMatchService matchService;
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    @Autowired
+    private IPictureService pictureService;
 
     @Autowired
-    private PictureRepository pictureRepository;
+    private PasswordService passwordService;
 
+    /***********************************Afficher les utilisateurs***********************************/
     @Override
     public List<UserDto> getByGenderAndOrientation(Gender gender, Gender orientation) {
         return userRepository.findByGenderAndOrientation(gender, orientation).stream()
@@ -71,37 +62,81 @@ public class UserServiceImpl implements IUserService {
         // Récupérer les utilisateurs correspondant au genre et à l'orientation
         List<UserDto> allUsers = getByGenderAndOrientation(orientation, gender);
 
-
-        // Journaliser les utilisateurs likés
-        System.out.println("Liked User IDs: " + likedUsers.stream().map(UserLikeDto::getLikedUserId).collect(Collectors.toList()));
-
-        // Journaliser tous les utilisateurs récupérés
-        System.out.println("All User IDs: " + allUsers.stream().map(UserDto::getId).collect(Collectors.toList()));
-
-
         // Exclure les utilisateurs qui ont déjà été likés
         return allUsers.stream()
                 .filter(user -> likedUsers.stream().noneMatch(likedUser -> likedUser.getLikedUserId() == user.getId()))
                 .collect(Collectors.toList());
     }
+    /**************************************************************************************************/
 
+    /***********************************Enregistrer des utilisateurs(ou update le mot de passe)***********************************/
     @Override
     public UserDto save(UserDto userDto) {
         User u = DtoTool.convert(userDto, User.class);
+
+        String hashedPassword = passwordService.hashPassword(u.getPassword());
+        u.setPassword(hashedPassword);
 
         User insertUser = userRepository.saveAndFlush(u);
 
         return DtoTool.convert(insertUser, UserDto.class);
 
     }
+    /**************************************************************************************************/
 
+    /***********************************Update Le mot de passe (fait appel à save)***********************************/
+    @Override
+    public String updatePassword(long userId, String currentPassword, String newPassword) {
+        try {
+            UserDto user = getById(userId);
+            if (user != null) {
+                // Vérifier le mot de passe actuel
+                if (passwordService.verifyPassword(currentPassword, user.getPassword())) {
+                    user.setPassword(newPassword);
+                    save(user); // Assurez-vous que la méthode save met à jour le mot de passe
+                    return "Mot de passe mis à jour avec succès";
+                } else {
+                    return "Mot de passe actuel est incorrect";
+                }
+            } else {
+                return "Utilisateur non trouvé";
+            }
+        } catch (Exception e) {
+            return "Erreur lors de la mise à jour du mot de passe";
+        }
+    }
+    /**************************************************************************************************/
 
+    /***********************************Update seulement l'email***********************************/
+    @Override
+    public String updateEmail(EmailUpdateRequestDto emailUpdateRequest) {
+        // Récupérer l'utilisateur à partir du repository
+        User user = userRepository.findById(emailUpdateRequest.getId())
+                .orElse(null); // Utiliser orElse(null) pour obtenir null si non trouvé
 
+        if (user == null) {
+            return "Utilisateur non trouvé.";
+        }
+
+        // Vérifie si l'email actuel est correct
+        if (!user.getEmail().equals(emailUpdateRequest.getCurrentEmail())) {
+            return "L'email actuel est incorrect.";
+        }
+
+        // Met à jour l'email de l'utilisateur
+        user.setEmail(emailUpdateRequest.getNewEmail());
+
+        // Utiliser saveAndFlush pour persister les modifications
+        userRepository.saveAndFlush(user);
+
+        return "Email mis à jour avec succès.";
+    }
+    /**************************************************************************************************/
+    /***********************************Update ALL sauf le mot de passe et l'age***********************************/
     @Override
     public UserDto update(UserDto userDto) {
         User existingUser = userRepository.findById(userDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        System.out.println(existingUser.getAge());
         if (userDto.getAge() == null) {
             userDto.setAge(existingUser.getAge());
         }
@@ -109,44 +144,21 @@ public class UserServiceImpl implements IUserService {
             userDto.setPassword(existingUser.getPassword());
         }
         User u = DtoTool.convert(userDto, User.class);
-
         User insertUser = userRepository.saveAndFlush(u);
-
         return DtoTool.convert(insertUser, UserDto.class);
     }
-
+    /**************************************************************************************************/
+    /***********************************Supprimer***********************************/
     @Override
     public void deleteById(long id) {
         userRepository.deleteById(id);
     }
 
-    public UserDto getByEmail(String email){
-        User u= userRepository.findByEmail(email);
-
-        return DtoTool.convert(u, UserDto.class);
-    }
-
+    /**************************************************************************************************/
+    /***********************************Trouver un utilisateur par son l'ID***********************************/
+    @Override
     public UserDto getById(long id){
         Optional<User> u= userRepository.findById(id);
-
         return DtoTool.convert(u, UserDto.class);
-    }
-
-
-    public UserChatDto getUserDetails(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec ID: " + userId));
-
-        // Convertir l'entité User en UserChatDto
-        UserChatDto userChatDto = new UserChatDto();
-        userChatDto.setFirstName(user.getFirstName());
-
-        // Convertir les pictures en PictureDto
-        List<PictureDto> pictureDtos = user.getPictures().stream()
-                .map(picture -> DtoTool.convert(picture, PictureDto.class)) // Utiliser DtoTool pour la conversion
-                .collect(Collectors.toList());
-        userChatDto.setPictures(pictureDtos);
-
-        return userChatDto;
     }
 }

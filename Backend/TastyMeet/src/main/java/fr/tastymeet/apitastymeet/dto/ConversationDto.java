@@ -1,8 +1,8 @@
 package fr.tastymeet.apitastymeet.dto;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data // Génère des getters, setters, toString, equals, et hashCode
 public class ConversationDto {
@@ -10,4 +10,5 @@ public class ConversationDto {
     private UserChatDto user1;
     private UserChatDto user2;
     private String lastMessage; // Dernier message
+    private LocalDateTime dateLastMessage; // Date du dernier message
 }

@@ -15,7 +15,6 @@ import {
 } from "./Home.style.jsx";
 import { faHeart, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Slider from 'react-slick';
 import { UserData, HandleLike } from '../../Axios/Axios.js';
 
 export const Home = () => {
@@ -27,6 +26,21 @@ export const Home = () => {
     const sliderRef = useRef(null);
     const autoPlayRef = useRef(null);
     const cardRef = useRef(null);
+
+    const formatDateOfBirth = (dateArray) => {
+
+        // Assurez-vous que dateArray est bien un tableau et qu'il a la bonne longueur
+        if (!Array.isArray(dateArray) || dateArray.length !== 3) {
+            return dateArray; // Retournez la valeur d'origine si elle n'est pas valide
+        }
+
+        const year = dateArray[0]; // L'année est le premier élément
+        const month = String(dateArray[1]).padStart(2, '0'); // Le mois est le deuxième élément
+        const day = String(dateArray[2]).padStart(2, '0'); // Le jour est le troisième élément
+
+        // Retourner la date au format YYYY-MM-DD
+        return `${year}-${month}-${day}`;
+    };
 
     const getUserIdFromToken = () => {
         const token = sessionStorage.getItem('token');
@@ -51,20 +65,19 @@ export const Home = () => {
     const MAX_ROTATION_DEGREE = 50;
     const HORIZONTAL_MARGIN = 700;
 
+    //A chaque fois que l'on change de profil, on affiche la première image de ce profil
     useEffect(() => {
-        console.log('Changement d\'index de profil :', currentIndex);
         if (currentIndex !== null) {
             setImageIndex(0);
         }
     }, [currentIndex]);
 
+    //AutoPlay des images
     useEffect(() => {
         if (!currentProfile || !currentProfile.pictures || currentProfile.pictures.length === 0) {
-            console.log('No profile or pictures available');
             return;
         }
 
-        console.log('Profil actuel :', currentProfile);
         autoPlayRef.current = setInterval(() => {
             setImageIndex((prev) => (prev + 1 < currentProfile.pictures.length ? prev + 1 : 0));
         }, 10000);
@@ -72,57 +85,27 @@ export const Home = () => {
         return () => clearInterval(autoPlayRef.current);
     }, [currentProfile]);
 
-    useEffect(() => {
-        if (profiles.length > 0 && currentIndex === null) {
-            console.log('Initialisation du premier profil');
-            setCurrentIndex(0);
-        }
-    }, [profiles]);
 
-    // const getNextRandomIndex = () => {
-    //     const availableProfiles = profiles.filter((_, index) => !dislikedProfiles.includes(index));
-    //     console.log('Profils disponibles après filtrage :', availableProfiles);
-
-    //     if (availableProfiles.length === 0) {
-    //         console.log('Tous les profils ont été rejetés ou likés.');
-    //         return null;
-    //     }
-
-    //     let nextIndex;
-    //     do {
-    //         nextIndex = Math.floor(Math.random() * profiles.length);
-    //     } while (dislikedProfiles.includes(nextIndex) || nextIndex >= availableProfiles.length);
-
-    //     return availableProfiles[nextIndex] ? profiles.indexOf(availableProfiles[nextIndex]) : null;
-    // };
 
     const getNextRandomIndex = () => {
         const availableProfiles = profiles.filter((_, index) => !dislikedProfiles.includes(index));
-        console.log('Profils disponibles après filtrage :', availableProfiles);
 
         if (availableProfiles.length === 0) {
-            console.log('Tous les profils ont été rejetés ou likés.');
             return null; // Retourne null si aucun profil disponible
         }
 
-        // Si des profils sont disponibles, choisissez un index valide
-        let nextIndex;
-        do {
-            nextIndex = Math.floor(Math.random() * availableProfiles.length); // Utilisez la longueur des profils disponibles
-        } while (dislikedProfiles.includes(nextIndex) || nextIndex >= availableProfiles.length);
-
-        // Retournez l'index correspondant dans la liste originale
-        return profiles.indexOf(availableProfiles[nextIndex]); // Trouvez l'index du profil dans la liste originale
+        // Utilisez la longueur des profils disponibles pour choisir un index valide
+        const nextIndex = Math.floor(Math.random() * availableProfiles.length);
+        return profiles.indexOf(availableProfiles[nextIndex]); // Trouver l'index dans la liste originale
     };
-
 
 
     const handleMouseDown = (e) => {
         e.preventDefault();
-        const card = cardRef.current;
-        card.style.cursor = 'grabbing';
+        cardRef.current.style.cursor = 'grabbing';
+
         const startX = e.clientX;
-        const cardWidth = card.offsetWidth;
+        const cardWidth = cardRef.current.offsetWidth;
         const screenWidth = window.innerWidth;
 
         const handleMouseMove = (moveEvent) => {
@@ -132,28 +115,31 @@ export const Home = () => {
                 -(screenWidth / 2) + HORIZONTAL_MARGIN + (cardWidth / 2)
             );
             const rotation = Math.min(Math.max(limitedDeltaX / 10, -MAX_ROTATION_DEGREE), MAX_ROTATION_DEGREE);
-            card.style.transform = `translateX(${limitedDeltaX}px) rotate(${rotation}deg)`;
+            cardRef.current.style.transform = `translateX(${limitedDeltaX}px) rotate(${rotation}deg)`;
         };
 
-        const handleMouseUp = () => {
-            card.style.cursor = 'grab';
+        const handleMouseUp = (upEvent) => {
+            cardRef.current.style.cursor = 'grab';
             document.removeEventListener('mouseup', handleMouseUp);
             document.removeEventListener('mousemove', handleMouseMove);
-
-            const deltaX = e.clientX - startX;
-            const isSwipeValid = Math.abs(deltaX) > MAX_SWIPE_DISTANCE;
+            const deltaX = upEvent.clientX - startX;
+            const absDeltaX = Math.abs(deltaX);
+            const isSwipeValid = absDeltaX > MAX_SWIPE_DISTANCE;
 
             if (isSwipeValid) {
-                handleDislike(); // Appel ici pour gérer le dislike lors d'un swipe
+                const nextIndex = getNextRandomIndex();
+                if (nextIndex !== null) {
+                    setCurrentIndex(nextIndex);
+                    handleLike();  // Envoyer le like seulement si un swipe valide
+                }
             }
-
-            card.style.transform = '';
+            cardRef.current.style.transform = '';  // Réinitialiser la transformation
         };
-
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
     };
 
+    //Récupère les informations des utilisateurs 
     const fetchProfileData = async () => {
         const token = sessionStorage.getItem('token');
         if (!token) {
@@ -163,13 +149,10 @@ export const Home = () => {
 
         try {
             const profilesData = await UserData(token);
-            console.log('Données de profils récupérées :', profilesData);
 
             if (profilesData.length > 0) {
                 setProfiles(profilesData);
-                setCurrentIndex(0); // Afficher le premier profil après récupération
-            } else {
-                console.log('Aucun profil disponible.');
+
             }
         } catch (error) {
             console.error('Erreur lors de la récupération des profils :', error);
@@ -180,36 +163,6 @@ export const Home = () => {
         fetchProfileData();
     }, []);
 
-    // const handleLike = async () => {
-    //     const userId = getUserIdFromToken();
-    //     const token = sessionStorage.getItem('token');
-
-    //     if (!userId || !currentProfile) return;
-
-    //     try {
-    //         console.log('Envoi du like pour le profil :', currentProfile.id);
-    //         await HandleLike(userId, currentProfile.id, token);
-
-    //         setProfiles((prevProfiles) => {
-    //             const updatedProfiles = prevProfiles.filter(profile => profile.id !== currentProfile.id);
-    //             console.log('Profils mis à jour après le like :', updatedProfiles);
-    //             return updatedProfiles;
-    //         });
-
-    //         // Obtenez le nouvel index après un like
-    //         const nextIndex = getNextRandomIndex();
-    //         if (nextIndex !== null) {
-    //             setCurrentIndex(nextIndex);
-    //             console.log('Index mis à jour après like :', nextIndex);
-    //         } else {
-    //             console.log("Aucun profil suivant trouvé.");
-    //             setCurrentIndex(null); // Réinitialiser à null si aucun profil suivant
-    //         }
-    //     } catch (error) {
-    //         console.error('Erreur lors du like :', error);
-    //     }
-    // };
-
     const handleLike = async () => {
         const userId = getUserIdFromToken();
         const token = sessionStorage.getItem('token');
@@ -217,21 +170,17 @@ export const Home = () => {
         if (!userId || !currentProfile) return;
 
         try {
-            console.log('Envoi du like pour le profil:', currentProfile.id);
             await HandleLike(userId, currentProfile.id, token);
 
             setProfiles((prevProfiles) => {
                 const updatedProfiles = prevProfiles.filter(profile => profile.id !== currentProfile.id);
-                console.log('Profils mis à jour après le like:', updatedProfiles);
                 return updatedProfiles;
             });
 
             const nextIndex = getNextRandomIndex(); // Obtenez le prochain index valide après un like
             if (nextIndex !== null) {
                 setCurrentIndex(nextIndex);
-                console.log('Index mis à jour après like:', nextIndex);
             } else {
-                console.log("Aucun profil suivant trouvé.");
                 setCurrentIndex(null); // Réinitialisez l'index si aucun profil n'est disponible
             }
         } catch (error) {
@@ -244,19 +193,15 @@ export const Home = () => {
         setDislikedProfiles((prev) => [...prev, currentIndex]);
 
         // Mettre à jour la liste des profils après un dislike
-        setProfiles((prevProfiles) => {
-            const updatedProfiles = prevProfiles.filter((_, index) => index !== currentIndex);
-            console.log('Profils mis à jour après un dislike:', updatedProfiles);
-            return updatedProfiles;
-        });
+        const updatedProfiles = profiles.filter((_, index) => index !== currentIndex);
 
-        // Obtenez le prochain index valide après le dislike
-        const nextIndex = getNextRandomIndex();
-        if (nextIndex !== null) {
-            setCurrentIndex(nextIndex);
+        if (updatedProfiles.length === 0) {
+            setProfiles(updatedProfiles); // Mettre à jour la liste des profils
+            setCurrentIndex(null); // Réinitialiser à null si aucun profil n'est disponible
         } else {
-            console.log("Aucun profil suivant disponible.");
-            setCurrentIndex(null); // Réinitialisez l'index si aucun profil n'est disponible
+            setProfiles(updatedProfiles); // Mettre à jour la liste des profils
+            const nextIndex = Math.floor(Math.random() * updatedProfiles.length); // Obtenez un index valide parmi les profils restants
+            setCurrentIndex(nextIndex);
         }
     };
 
@@ -264,16 +209,12 @@ export const Home = () => {
 
     useEffect(() => {
         if (currentIndex !== null && currentIndex >= 0 && currentIndex < profiles.length) {
-            console.log('Changement d\'index de profil :', currentIndex);
-            console.log('Profil actuel :', profiles[currentIndex]);
         } else {
-            console.log('Index courant non valide ou aucun profil trouvé');
             // Si l'index n'est pas valide, essayez d'en obtenir un nouveau
             const nextIndex = getNextRandomIndex();
             if (nextIndex !== null) {
                 setCurrentIndex(nextIndex);
             } else {
-                console.log("Aucun profil suivant disponible.");
                 setCurrentIndex(null); // Réinitialiser à null si aucun profil suivant
             }
         }
@@ -316,7 +257,7 @@ export const Home = () => {
                                     <Name>{currentProfile.firstName}</Name>
                                     <GenderAge>
                                         <span>{currentProfile.gender}</span>
-                                        <span>{currentProfile.age}</span>
+                                        <span>{formatDateOfBirth(currentProfile.age)}</span>
                                     </GenderAge>
                                     <Description>{currentProfile.description}</Description>
                                 </DescriptionPersso>
@@ -327,7 +268,8 @@ export const Home = () => {
                         <FontAwesomeIcon icon={faCircleXmark} />
                     </RightArrow>
                 </>
-            )}
-        </Container>
+            )
+            }
+        </Container >
     );
 };

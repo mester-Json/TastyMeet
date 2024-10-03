@@ -16,11 +16,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
@@ -29,11 +31,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private PasswordService passwordService;
+
     public String authenticateUser(AuthRequest authRequest) {
         UserDetails userDetails = loadUserByUsername(authRequest.getEmail());
 
         // Vérifiez si le mot de passe correspond
-        if (!authRequest.getPassword().equals(userDetails.getPassword())) {
+        if (!passwordService.verifyPassword(authRequest.getPassword(), userDetails.getPassword())) {
             throw new RuntimeException("Invalid username or password");
         }
 
@@ -56,7 +61,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        // Créer la liste des autorités
+        // Créer la liste des autorités / Pas encore utilisé dans l'application
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .collect(Collectors.toList());

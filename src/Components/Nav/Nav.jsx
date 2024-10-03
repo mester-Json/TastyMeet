@@ -37,9 +37,10 @@ export const Nav = () => {
                     <li><a href="/messaging">Tchacher</a></li>
                     <li><a href="/help">Help</a></li>
                     {isLoggedIn && (
-                        <li><a href="#" id="logout" onClick={handleLogout}>Déconnexion</a></li>
+                        <li><a href="/" id="logout" onClick={handleLogout}>Déconnexion</a></li>
                     )}
-                </Menu>            </NavDiv>
+                </Menu>
+            </NavDiv>
         </NavBar>
     );
 };

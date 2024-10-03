@@ -9,7 +9,7 @@ export const CountMessaging = () => {
         <>
             <div>
                 <CountText>
-                    26 Nouveaux messages
+                    Nouveaux messages
                 </CountText>
             </div>
         </>

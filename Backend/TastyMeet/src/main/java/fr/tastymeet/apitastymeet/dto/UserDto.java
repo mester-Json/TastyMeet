@@ -6,7 +6,6 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +24,7 @@ public class UserDto {
     private String password;
     private String firstName;
     private String lastName;
-    private String city;
-    private String location;
+    private String localisation;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate age;
     private List<PictureDto> pictures = new ArrayList<>();

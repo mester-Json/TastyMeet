@@ -10,17 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class PictureServiceImpl implements IPictureService {
@@ -41,14 +36,23 @@ public class PictureServiceImpl implements IPictureService {
         }
 
         String filename = file.getOriginalFilename();
-        Path path = Paths.get(uploadDir + File.separator + filename);
+        // Définir le chemin du dossier utilisateur
+        Path userDirectory = Paths.get(uploadDir + File.separator + "user_" + userId);
+
+        // Si le dossier n'existe pas, le créer
+        if (!Files.exists(userDirectory)) {
+            Files.createDirectories(userDirectory);
+        }
+
+        //Construction du chemin complet en ajoutant le nom du fichier
+        Path path = userDirectory.resolve(filename);
 
         // Créer le PictureDto
         PictureDto dto = new PictureDto();
         dto.setPictureName(filename);
         dto.setUserId(userId);
 
-        // Sauvegarde le fichier sur le système de fichiers
+        // fichier est écrit sur le disque à l'emplacement spécifié (sauvegarde du fichier sur le systeme)
         Files.write(path, file.getBytes());
 
         // Conversion de PictureDto en Picture

@@ -46,7 +46,9 @@ export const MessageContainer = styled.div`
 
 export const MessageBubble = styled.div`
   padding: 10px;
-  border-radius: 10px;
+  border-radius: ${({ sender }) => (sender === 'user1' ? '67px 68px 0px 66px' : '67px 0px 68px 66px')};
+  -webkit-border-radius: ${({ sender }) => (sender === 'user1' ? '67px 68px 0px 66px' : '64px 65px 64px 0px;')};
+  -moz-border-radius: ${({ sender }) => (sender === 'user1' ? '67px 68px 0px 66px' : '64px 65px 64px 0px;')};
   background-color: ${({ sender }) => (sender === 'user1' ? '#2a0800' : '#D9D9D9')};
   color: ${({ sender }) => (sender === 'user1' ? 'white' : 'black')};
   max-width: 400px;
