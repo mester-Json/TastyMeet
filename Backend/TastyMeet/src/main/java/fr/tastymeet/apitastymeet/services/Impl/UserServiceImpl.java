@@ -5,6 +5,7 @@ import fr.tastymeet.apitastymeet.entities.Gender;
 import fr.tastymeet.apitastymeet.entities.User;
 import fr.tastymeet.apitastymeet.repositories.UserRepository;
 import fr.tastymeet.apitastymeet.services.Interface.IMatchService;
+import fr.tastymeet.apitastymeet.services.Interface.IPictureService;
 import fr.tastymeet.apitastymeet.services.Interface.IUserService;
 import fr.tastymeet.apitastymeet.tools.DtoTool;
 import fr.tastymeet.apitastymeet.tools.JwtUtils;
@@ -32,6 +33,8 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private IMatchService matchService;
 
+    @Autowired
+    private IPictureService pictureService;
 
     @Autowired
     private PasswordService passwordService;
@@ -80,12 +83,53 @@ public class UserServiceImpl implements IUserService {
 
     }
     /**************************************************************************************************/
+
+    /***********************************Update Le mot de passe (fait appel à save)***********************************/
+    @Override
+    public String updatePassword(long userId, String currentPassword, String newPassword) {
+        try {
+            UserDto user = getById(userId);
+            if (user != null) {
+                // Vérifier le mot de passe actuel
+                if (passwordService.verifyPassword(currentPassword, user.getPassword())) {
+                    user.setPassword(newPassword);
+                    save(user); // Assurez-vous que la méthode save met à jour le mot de passe
+                    return "Mot de passe mis à jour avec succès";
+                } else {
+                    return "Mot de passe actuel est incorrect";
+                }
+            } else {
+                return "Utilisateur non trouvé";
+            }
+        } catch (Exception e) {
+            return "Erreur lors de la mise à jour du mot de passe";
+        }
+    }
+    /**************************************************************************************************/
+
     /***********************************Update seulement l'email***********************************/
     @Override
-    public UserDto updateEmail(UserDto userDto) {
-        User u = DtoTool.convert(userDto, User.class);
-        User insertUser = userRepository.saveAndFlush(u);
-        return DtoTool.convert(insertUser, UserDto.class);
+    public String updateEmail(EmailUpdateRequestDto emailUpdateRequest) {
+        // Récupérer l'utilisateur à partir du repository
+        User user = userRepository.findById(emailUpdateRequest.getId())
+                .orElse(null); // Utiliser orElse(null) pour obtenir null si non trouvé
+
+        if (user == null) {
+            return "Utilisateur non trouvé.";
+        }
+
+        // Vérifie si l'email actuel est correct
+        if (!user.getEmail().equals(emailUpdateRequest.getCurrentEmail())) {
+            return "L'email actuel est incorrect.";
+        }
+
+        // Met à jour l'email de l'utilisateur
+        user.setEmail(emailUpdateRequest.getNewEmail());
+
+        // Utiliser saveAndFlush pour persister les modifications
+        userRepository.saveAndFlush(user);
+
+        return "Email mis à jour avec succès.";
     }
     /**************************************************************************************************/
     /***********************************Update ALL sauf le mot de passe et l'age***********************************/

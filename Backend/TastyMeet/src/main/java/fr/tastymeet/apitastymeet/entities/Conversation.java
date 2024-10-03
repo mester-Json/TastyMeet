@@ -11,7 +11,6 @@ import java.util.List;
 @Setter
 @Entity
 public class Conversation {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

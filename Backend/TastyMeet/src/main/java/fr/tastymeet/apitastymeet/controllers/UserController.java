@@ -59,40 +59,50 @@ public class UserController {
     @PostMapping("/verifyPassword")
     public ResponseEntity<String> verifyPassword(@RequestBody PasswordRequestDto passwordRequest) {
         try {
-            String currentPassword = passwordRequest.getCurrentPassword();
-            long id = passwordRequest.getId();
-            UserDto user = userService.getById(id);
-            if (user != null) {
-                // Vérifier le mot de passe actuel
-                if (passwordService.verifyPassword(currentPassword, user.getPassword())) {
-                    user.setPassword(passwordRequest.getNewPassword());
-                    userService.save(user);
-                    return ResponseEntity.ok().body("Mot de passe mis à jour avec succès");
-                } else {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Mot de passe actuel est incorrect");
-                }
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
+            // Appelle le service pour mettre à jour le mot de passe
+            String message = userService.updatePassword(
+                    passwordRequest.getId(),
+                    passwordRequest.getCurrentPassword(),
+                    passwordRequest.getNewPassword()
+            );
+
+            // Crée la réponse appropriée en fonction du message
+            switch (message) {
+                case "Mot de passe mis à jour avec succès":
+                    return ResponseEntity.ok().body(message);
+                case "Mot de passe actuel est incorrect":
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+                case "Utilisateur non trouvé":
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+                default:
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la mise à jour du mot de passe");
+            // Gère l'exception ici
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de la mise à jour du mot de passe : " + e.getMessage());
         }
     }
 
     @PostMapping(value = "/updateEmail", consumes = "application/json", produces = "application/json")
     public ResponseEntity<String> updateEmail(@RequestBody EmailUpdateRequestDto emailUpdateRequest) {
         try {
-            UserDto user = userService.getById(emailUpdateRequest.getId());
-            if (user != null && user.getEmail().equals(emailUpdateRequest.getCurrentEmail())) {
-                    // Mettre à jour l'email de l'utilisateur
-                    user.setEmail(emailUpdateRequest.getNewEmail());
-                    userService.updateEmail(user);
-                    return ResponseEntity.ok("Email mis à jour avec succès.");
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("L'email actuel est incorrect.");
+            // Appelle le service pour mettre à jour l'email
+            String message = userService.updateEmail(emailUpdateRequest);
+
+            // Retourne la réponse appropriée en fonction du message du service
+            switch (message) {
+                case "Email mis à jour avec succès.":
+                    return ResponseEntity.ok(message);
+                case "L'email actuel est incorrect.":
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+                default:
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la mise à jour de l'email.");
+            // Gère l'exception ici
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de la mise à jour du mot de passe : " + e.getMessage());
         }
     }
 

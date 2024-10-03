@@ -24,8 +24,7 @@ public class UserDto {
     private String password;
     private String firstName;
     private String lastName;
-    private String city;
-    private String location;
+    private String localisation;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate age;
     private List<PictureDto> pictures = new ArrayList<>();

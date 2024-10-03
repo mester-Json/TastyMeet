@@ -1,46 +1,81 @@
-import React, { useState } from "react";
-import { Container, HelpContainer, Title, HelpText, QuestionContainer, QuestionButton, QuestionContent } from "./FormHelp.style.jsx";
+import React, { useEffect, useState } from "react";
+import {
+  Container,
+  Header,
+  Title,
+  HelpText,
+  QuestionContainer,
+  QuestionButton,
+  QuestionContent,
+} from "./FormHelp.style.jsx";
 
 export const FormHelp = () => {
   // Gérer l'état de la visibilité des contenus déroulants pour chaque question
-  const [isOpen1, setIsOpen1] = useState(false);
-  const [isOpen2, setIsOpen2] = useState(false);
-  const [isOpen3, setIsOpen3] = useState(false);
+  // const [isOpen1, setIsOpen1] = useState(false);
+  // const [isOpen2, setIsOpen2] = useState(false);
+  // const [isOpen3, setIsOpen3] = useState(false);
+  const [openQuestions, setOpenQuestions] = useState([false, false, false]);
 
+
+  const toggleDropdown = (index) => {
+    const updatedQuestions = openQuestions.map((isOpen, i) =>
+      i === index ? !isOpen : isOpen
+    );
+    setOpenQuestions(updatedQuestions);
+  };
   // Fonction pour gérer l'ouverture et la fermeture de la liste
-  const toggleDropdown1 = () => setIsOpen1(!isOpen1);
-  const toggleDropdown2 = () => setIsOpen2(!isOpen2);
-  const toggleDropdown3 = () => setIsOpen3(!isOpen3);
+
+  // const toggleDropdown1 = () => setIsOpen1(!isOpen1);
+  // const toggleDropdown2 = () => setIsOpen2(!isOpen2);
+  // const toggleDropdown3 = () => setIsOpen3(!isOpen3);
 
   return (
     <Container>
-      <HelpContainer>
+      <Header>
+        <Title>HELP</Title>
         <HelpText>
-          <Title>HELP</Title>
-          <p> Bienvenue sur la page d'aide ! Ici, vous trouverez des réponses aux questions les plus fréquemment posées ainsi que des solutions aux problèmes courants. Si vous avez besoin d'assistance, nous sommes là pour vous aider.</p>
+          Batnae municipium in Anthemusia conditum Macedonum manu priscorum ab
+          Euphrate flumine brevi spatio disparatur, refertum mercatoribus
+          opulentis, ubi annua sollemnitate prope Septembris initium mensis ad
+          nundinas magna promiscuae fortunae convenit multitudo ad commer-canda
+          quae Indi mittunt et Seres aliaque plurima vehi terra marique
+          consueta.
         </HelpText>
-      </HelpContainer>
+      </Header>
       <QuestionContainer>
         {/* Première question avec son contenu déroulant */}
-        <QuestionButton onClick={toggleDropdown1}>+ C'est une question</QuestionButton>
-        <QuestionContent isOpen={isOpen1}>
-          <p>Pour créer un compte, cliquez sur le bouton "S'inscrire" en haut à droite de la page. Remplissez le formulaire avec vos informations personnelles (nom, adresse e-mail, mot de passe) puis validez. Vous recevrez un e-mail de confirmation.</p>
+        <QuestionButton onClick={() => toggleDropdown(0)}>
+          + C'est une question
+        </QuestionButton>
+        <QuestionContent opened={`` + openQuestions[0]}>
+          <p>
+            Ceci est le contenu de la première question. Lorem ipsum dolor sit
+            amet...
+          </p>
         </QuestionContent>
 
         {/* Deuxième question avec son contenu déroulant */}
-        <QuestionButton onClick={toggleDropdown2}>+ C'est une question</QuestionButton>
-        <QuestionContent isOpen={isOpen2}>
-          <p>Si vous avez oublié votre mot de passe, cliquez sur le lien "Mot de passe oublié" sur la page de connexion. Entrez l'adresse e-mail associée à votre compte et vous recevrez un e-mail pour réinitialiser votre mot de passe.</p>
+        <QuestionButton onClick={() => toggleDropdown(1)}>
+          + C'est une question
+        </QuestionButton>
+        <QuestionContent opened={`` + openQuestions[1]}>
+          <p>
+            Ceci est le contenu de la deuxième question. Lorem ipsum dolor sit
+            amet...
+          </p>
         </QuestionContent>
 
         {/* Troisième question avec son contenu déroulant */}
-        <QuestionButton onClick={toggleDropdown3}>+ C'est une question</QuestionButton>
-        <QuestionContent isOpen={isOpen3}>
-          <p>Si vous avez toujours des questions ou des problèmes après avoir consulté notre page d'aide, n'hésitez pas à nous contacter directement :
-
-            E-mail : support@Tastymeet.com</p>
+        <QuestionButton onClick={() => toggleDropdown(2)}>
+          + C'est une question
+        </QuestionButton>
+        <QuestionContent opened={`` + openQuestions[2]}>
+          <p>
+            Ceci est le contenu de la troisième question. Lorem ipsum dolor sit
+            amet...
+          </p>
         </QuestionContent>
       </QuestionContainer>
     </Container>
   );
-}
+};

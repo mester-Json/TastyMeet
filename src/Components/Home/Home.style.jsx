@@ -6,15 +6,13 @@ export const Container = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top:100px;
     height: 70vh;
 `;
 
-
 export const Card = styled.div`
-
-
+    
 `;
+
 
 export const DivImage = styled.div`
     width: 450px;
@@ -56,8 +54,10 @@ export const Name = styled.h2`
 
 export const Description = styled.p`
     text-align: center;
-
-    
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 20px;
 `;
 
 const NavArrow = styled.div`
@@ -134,7 +134,6 @@ export const DescriptionPersso = styled.div`
     background-color: white;
     width: 100%;
     border-top: 9px solid black;
-    height: 200px ;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
     user-select: none;

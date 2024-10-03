@@ -10,7 +10,7 @@ import fr.tastymeet.apitastymeet.services.Interface.IConversationService;
 import fr.tastymeet.apitastymeet.tools.DtoTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,15 +32,27 @@ public class ConversationServiceImpl implements IConversationService {
     }
 
     public List<ConversationDto> getConversationsByUserId(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec ID: " + userId));
-        return conversationRepository.findByUser1OrUser2(user, user)
-                .stream()
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec ID: " + userId));
+
+        // Récupérer les conversations
+        List<Conversation> conversations = conversationRepository.findByUser1OrUser2(user, user);
+
+        // Mapper les conversations vers des ConversationDto et récupérer le dernier message
+        List<ConversationDto> conversationDtos = conversations.stream()
                 .map(conversation -> {
                     ConversationDto dto = DtoTool.convert(conversation, ConversationDto.class);
                     ChatMessage lastMessage = conversation.getLastMessage();
-                    dto.setLastMessage(lastMessage != null ? lastMessage.getContent() : null); // Assurez-vous que getContent() retourne le texte du message
+                    dto.setLastMessage(lastMessage != null ? lastMessage.getContent() : null); // Contenu du dernier message
+                    dto.setDateLastMessage(lastMessage != null ? lastMessage.getDateEnvoie() : null); // Date du dernier message
                     return dto;
                 })
                 .collect(Collectors.toList());
+
+        // Trier les ConversationDto par date d'envoi des derniers messages, du plus récent au plus ancien
+        return conversationDtos.stream()
+                .sorted(Comparator.comparing(ConversationDto::getDateLastMessage, Comparator.nullsLast(Comparator.reverseOrder()))) // Comparator.nullsLast peremet de gérer les valeurs null
+                .collect(Collectors.toList());
     }
+
 }

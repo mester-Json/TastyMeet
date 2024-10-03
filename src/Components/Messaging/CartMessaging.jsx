@@ -21,7 +21,7 @@ export const CartMessaging = ({ conversation }) => {
                 <MessageBar>
                     <Avatar>
                         <img
-                            src={`http://localhost:9090/api/show/${participant.pictures[0]?.pictureName}`}
+                            src={`http://localhost:9090/api/show/${participant.id}/${participant.pictures[0]?.pictureName}`}
                             alt={`Avatar de ${participant.firstName}`}
                         />
                     </Avatar>

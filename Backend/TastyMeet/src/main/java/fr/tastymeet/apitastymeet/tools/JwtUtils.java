@@ -40,9 +40,6 @@ public class JwtUtils {
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
-    public String extractClaim(String token, String claim) {
-        return extractAllClaims(token).get(claim, String.class); // Méthode pour extraire des claims
-    }
     private Claims extractAllClaims(String token) {
         return Jwts.parser().setSigningKey(SECRETKEY).parseClaimsJws(token).getBody();
     }

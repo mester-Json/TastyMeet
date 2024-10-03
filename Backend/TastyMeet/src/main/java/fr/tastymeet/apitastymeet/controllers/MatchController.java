@@ -37,8 +37,8 @@ public class MatchController {
 
             // Notifiez les utilisateurs via WebSocket
             //En cours de développement
-            //messagingTemplate.convertAndSend("/user/" + userId + "/matches", "Vous avez un nouveau match !");
-            //messagingTemplate.convertAndSend("/user/" + likedUserId + "/matches", "Vous avez un nouveau match !");
+           /* messagingTemplate.convertAndSend("/user/" + userId + "/matches", "Vous avez un nouveau match !");
+            messagingTemplate.convertAndSend("/user/" + likedUserId + "/matches", "Vous avez un nouveau match !");*/
         }
         return ResponseEntity.ok().build();
     }

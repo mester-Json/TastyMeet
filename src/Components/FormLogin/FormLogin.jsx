@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Div, Form, InputField, Button, Inscription, Mdp } from './FormLogin.style.jsx';
+import { Div, Form, InputField, Button, Inscription, Mdp, DivText } from './FormLogin.style.jsx';
 import { SignIn } from '../../Axios/Axios.js';
 
 export const FormLogin = () => {
@@ -121,14 +121,14 @@ export const FormLogin = () => {
                     {isLoading ? 'Connexion...' : 'Se connecter'}
                 </Button>
 
-                <div>
+                <DivText>
                     <Inscription to="/register">
                         Inscription
                     </Inscription>
                     <Mdp>
                         Mot de passe Oublié
                     </Mdp>
-                </div>
+                </DivText>
             </Form>
         </Div>
     );

@@ -40,6 +40,7 @@ public class ChatMessageServiceImpl implements IChatMessageService {
     // Enregistrer un nouveau message
     @Override
     public ChatMessageDto sendMessage(ChatMessage chatMessage, long conversationId) {
+
         // Initialiser la date d'envoi si elle est nulle
         if (chatMessage.getDateEnvoie() == null) {
             chatMessage.setDateEnvoie(LocalDateTime.now());
@@ -65,7 +66,7 @@ public class ChatMessageServiceImpl implements IChatMessageService {
 
 
 
-
+    //Récuperer les messages grâce a l'id d'une conversation (permet de récuperer l'historique d'une conversation pour l'afficher)
     @Override
     public Map<String, Object> getMessagesByConversationId(long conversationId) {
         // Récupérer les messages par ID de conversation
@@ -75,7 +76,8 @@ public class ChatMessageServiceImpl implements IChatMessageService {
         List<Map<String, Object>> messageDtos = messages.stream()
                 .map(message -> {
                     Map<String, Object> messageDto = new HashMap<>();
-                    messageDto.put("sender", Map.of("id", message.getSender().getId())); // Juste l'ID de l'expéditeur
+                    // une sous map qui nous permet de récuperer seulement l'id et pas d'autre information
+                    messageDto.put("sender", Map.of("id", message.getSender().getId()));
                     messageDto.put("content", message.getContent());
                     messageDto.put("dateEnvoie", message.getDateEnvoie()); // Ou convertis au format désiré
                     return messageDto;
@@ -109,14 +111,15 @@ public class ChatMessageServiceImpl implements IChatMessageService {
                             .collect(Collectors.toList());
 
                     userDto.put("pictures", pictureDtos);
-                    return Map.entry(user.getId(), userDto);  // Créer une entrée Map avec l'ID de l'utilisateur
+                    // Créer une entrée Map avec l'ID de l'utilisateur (pour associer chaque utilisateur a son DTO)
+                    return Map.entry(user.getId(), userDto);
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)); // Utiliser les clés et valeurs
 
 
         // Construction de la réponse
         Map<String, Object> response = new HashMap<>();
-        response.put("users", userDtos); // Utilisateurs avec images
+        response.put("users", userDtos); // Utilisateurs id, prenom et images
         response.put("messages", messageDtos); // Messages simplifiés avec ID de l'expéditeur
 
         return response;

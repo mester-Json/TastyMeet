@@ -40,7 +40,6 @@ export const ChatApp = () => {
         return `${hours}h${minutes}`; // Format souhaité
     };
 
-
     const [messageContent, setMessageContent] = useState("");
     const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState({}); // Objet contenant les utilisateurs
@@ -57,14 +56,11 @@ export const ChatApp = () => {
         const client = new Client({
             brokerURL: "ws://localhost:9090/ws",
             onConnect: (frame) => {
-                console.log("Connecté: " + frame);
                 client.subscribe(`/topic/messages/${conversationId}`, async (message) => {
                     const receivedMessage = JSON.parse(message.body);
-                    console.log("Message reçu :", receivedMessage);
 
                     // Récupérer l'ID de l'expéditeur
                     const senderId = receivedMessage.sender?.id; // Utiliser l'opérateur de chaîne facultatif pour éviter les erreurs
-                    console.log("Sender ID récupéré :", senderId); // Log de l'ID pour débogage
 
                     if (senderId > 0) {
                         // Assurez-vous que l'ID est valide
@@ -98,10 +94,8 @@ export const ChatApp = () => {
                         };
 
                         if (!alreadyExists) {
-                            console.log("Ajout du message :", newMessage);
                             return [...prevMessages, newMessage]; // Assurez-vous de renvoyer le nouveau message
                         }
-                        console.log("Message déjà existant, pas d'ajout :", receivedMessage);
                         return prevMessages;
                     });
                 });
@@ -130,6 +124,7 @@ export const ChatApp = () => {
                 const data = await fetchMessagesData(conversationId);
                 setMessages(data.messages || []); // Assurez-vous d'initialiser avec un tableau vide si undefined
                 setUsers(data.users || {}); // Initialiser les utilisateurs
+
             } catch (error) {
                 console.error('Erreur lors de la récupération des messages :', error);
             }
@@ -140,7 +135,6 @@ export const ChatApp = () => {
 
         return () => {
             if (stompClient) {
-                console.log("Déconnexion du WebSocket...");
                 stompClient.deactivate();
                 setStompClient(null); // Réinitialiser le client STOMP
             }
@@ -150,7 +144,6 @@ export const ChatApp = () => {
 
     const handleSendMessage = () => {
         const senderId = getUserIdFromToken(); // Récupère l'ID de l'expéditeur
-        console.log("ID de l'expéditeur :", senderId); // Log de l'ID pour débogage
 
         if (stompClient && stompClient.connected && messageContent) {
             const chatMessage = {
@@ -159,8 +152,6 @@ export const ChatApp = () => {
                 content: messageContent,
                 dateEnvoie: null,
             };
-
-            console.log("Envoi du message :", chatMessage); // Log du message avant envoi
 
             stompClient.publish({
                 destination: `/app/chat/${conversationId}`,
@@ -180,54 +171,55 @@ export const ChatApp = () => {
     };
 
     return (
-        <AppContainer>
-            <NomConversation>Nom de la conversation</NomConversation>
-            <MessagesContainer>
-                {messages.map((msg, index) => {
-                    const senderId = msg.sender.id; // Récupère l'ID de l'expéditeur
-                    const user = users[senderId]; // Récupérez l'utilisateur à partir de l'objet users
+        <div style={{ minWidth: '90%' }}>
+            <AppContainer>
+                <NomConversation>Nom de la conversation</NomConversation>
+                <MessagesContainer>
+                    {messages.map((msg, index) => {
+                        const senderId = msg.sender.id; // Récupère l'ID de l'expéditeur
+                        const user = users[senderId]; // Récupérez l'utilisateur à partir de l'objet users
 
-                    return (
-                        <MessageContainer
-                            key={index}
-                            sender={senderId === getUserIdFromToken() ? "user1" : "user2"}
-                        >
-                            <Avatar>
-                                {user && user.pictures && user.pictures.length > 0 ? (
-                                    <img
-                                        src={`http://localhost:9090/api/show/${user.pictures[0].pictureName}`}
-                                        alt="Avatar"
-                                    />
-                                ) : (
-                                    <img src="default-avatar.png" alt="Default Avatar" />
-                                )}
-                            </Avatar>
-                            <MessageContent>
-                                <h4>{user ? user.firstName : "Utilisateur Inconnu"}</h4>
+                        return (
+                            <MessageContainer
+                                key={index}
+                                sender={senderId === getUserIdFromToken() ? "user1" : "user2"}
+                            >
+                                <Avatar>
+                                    {user && user.pictures && user.pictures.length > 0 ? (
+                                        <img
+                                            src={`http://localhost:9090/api/show/${user.id}/${user.pictures[0].pictureName}`}
+                                            alt="Avatar"
+                                        />
+                                    ) : (
+                                        <img src="default-avatar.png" alt="Default Avatar" />
+                                    )}
+                                </Avatar>
+                                <MessageContent>
+                                    <h4>{user ? user.firstName : "Utilisateur Inconnu"}</h4>
 
-                                <MessageBubble
-                                    sender={senderId === getUserIdFromToken() ? "user1" : "user2"}
-                                >
-                                    {msg.content}
-                                </MessageBubble>
-                                <span>{formatDate(msg.dateEnvoie)}</span>
-                            </MessageContent>
-                        </MessageContainer>
-                    );
-                })}
-            </MessagesContainer>
-
-            <InputContainer>
-                <Input
-                    type="text"
-                    maxLength="200"
-                    value={messageContent}
-                    onChange={(e) => setMessageContent(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Tapez votre message..."
-                />
-                <Icon icon={faLocationArrow} onClick={handleSendMessage} />
-            </InputContainer>
-        </AppContainer>
+                                    <MessageBubble
+                                        sender={senderId === getUserIdFromToken() ? "user1" : "user2"}
+                                    >
+                                        {msg.content}
+                                    </MessageBubble>
+                                    <span>{formatDate(msg.dateEnvoie)}</span>
+                                </MessageContent>
+                            </MessageContainer>
+                        );
+                    })}
+                </MessagesContainer>
+                <InputContainer>
+                    <Input
+                        type="text"
+                        maxLength="200"
+                        value={messageContent}
+                        onChange={(e) => setMessageContent(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Tapez votre message..."
+                    />
+                    <Icon icon={faLocationArrow} onClick={handleSendMessage} />
+                </InputContainer>
+            </AppContainer>
+        </div>
     );
 };

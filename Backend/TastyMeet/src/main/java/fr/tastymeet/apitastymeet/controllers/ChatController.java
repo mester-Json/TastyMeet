@@ -34,6 +34,8 @@ public class ChatController {
 
         // Appeler le service pour traiter l'envoi du message
         ChatMessageDto chatMessageDto = chatMessageService.sendMessage(chatMessage, conversationId);
+
+        // envoyer le message sous forme de ChatMessageDto et maintient la communication en temps réel
         messagingTemplate.convertAndSend("/topic/messages/" + conversationId, chatMessageDto);
 
         // Retourner le DTO

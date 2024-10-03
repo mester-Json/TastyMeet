@@ -35,8 +35,7 @@ public class User {
     private Gender gender;
     private Gender orientation;
     private long phone;
-    private String location;
-    private String city;
+    private String localisation;
     @ElementCollection
     private Set<Roles> roles = Set.of(Roles.PUBLIC);
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -48,12 +47,15 @@ public class User {
     @OneToMany(mappedBy = "user2")
     private List<Conversation> conversationsAsUser2;
 
+    //utilisateur liké
     @ManyToMany
     private Set<User> liked = new HashSet<>();
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChatMessage> messagesSent = new ArrayList<>();
 
+    //likedUser.getLiked(), renvoie une liste d'utilisateur que likedUser a aimé
+    //user -> user.id == this.id => si c'est le cas alors match
     public Set<User> getMatches() {
         return liked.stream().filter(likedUser -> {
                     boolean hasLiked = likedUser.getLiked().stream().anyMatch(user -> user.id == this.id);

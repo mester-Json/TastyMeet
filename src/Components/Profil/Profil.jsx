@@ -1,21 +1,43 @@
 import { useEffect, useState } from 'react';
 import * as styles from './Profil.style.jsx';
 import {
+    ErrorDivDescription,
+    ErrorDiv,
+    Div,
+    Container,
+    LeftColumn,
+    FormLeft,
+    InputInfo,
+    InputField,
+    Info,
+    TextInfo,
+    SelectInput,
+    Description,
+    RightColumn,
+    ButtonLarge,
+    ButtonSmall,
+    Titre,
+} from "./Profil.style.jsx";
+import {
     fetchProfileData,
     updateProfileData,
     changePassword,
     changeEmail,
     deletePhoto,
     uploadFile,
+    logoutUser,
 } from '../../Axios/Axios.js';
-const refreshPage = () => {
-    window.location.reload();
-};
+
 const getUserIdFromToken = () => {
     const token = sessionStorage.getItem('token');
     if (token) {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.id;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.id;
+        } catch (error) {
+            console.error('Erreur lors du parsing du token:', error);
+            return null;
+        }
     }
     return null;
 };
@@ -31,18 +53,17 @@ export const Profil = () => {
     const [orientation, setOrientation] = useState('');
     const [description, setDescription] = useState('');
     const [phone, setPhone] = useState('');
-    const [location, setLocation] = useState('');
-    const [city, setCity] = useState('');
+    const [localisation, setLocalisation] = useState('');
     const [file, setFile] = useState(null);
     const [pictures, setPictures] = useState([]);
     const [error, setError] = useState({});
 
     const [showPasswordForm, setShowPasswordForm] = useState(false);
+    const [showEmailForm, setShowEmailForm] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
-    const [showEmailForm, setShowEmailForm] = useState(false);
     const [currentEmail, setCurrentEmail] = useState('');
     const [newEmail, setNewEmail] = useState('');
     const [confirmNewEmail, setConfirmNewEmail] = useState('');
@@ -52,7 +73,7 @@ export const Profil = () => {
             try {
                 const userId = getUserIdFromToken();
                 const data = await fetchProfileData(userId);
-                console.log(data.version);
+
                 if (data) {
                     setId(data.id || '');
                     setVersion(parseInt(data.version) || 0);
@@ -63,8 +84,7 @@ export const Profil = () => {
                     setOrientation(data.orientation || '');
                     setDescription(data.description || '');
                     setPhone(data.phone || '');
-                    setLocation(data.location || '');
-                    setCity(data.city || '');
+                    setLocalisation(data.localisation || '');
                     setPictures(data.pictures || []);
                 } else {
                     setError({ fetch: 'Une erreur est survenue lors de la récupération des données.' });
@@ -85,13 +105,12 @@ export const Profil = () => {
     const handleUpdate = async (event) => {
         event.preventDefault();
         setError({});
-        console.log("Début de la mise à jour du profil");
 
         // Check for empty fields
         const fieldsToCheck = {
             firstName,
             lastName,
-            location,
+            localisation,
             phone,
             gender,
             description,
@@ -109,16 +128,15 @@ export const Profil = () => {
 
         if (Object.keys(newErrors).length) {
             setError(newErrors);
-            console.log("Erreurs de validation:", newErrors);
             return;
         }
 
         const formData = new FormData();
         formData.append("id", id);
-        formData.append("firstName", firstName);
-        formData.append("location", location);
-        formData.append("lastName", lastName);
         formData.append("version", version);
+        formData.append("firstName", firstName);
+        formData.append("lastName", lastName);
+        formData.append("localisation", localisation);
         formData.append("description", description);
         formData.append("orientation", orientation);
         formData.append("email", email);
@@ -132,28 +150,27 @@ export const Profil = () => {
         }
 
         try {
-            console.log("Envoi des données:", formData);
             await updateProfileData(formData);
             alert("Modification utilisateur réussie");
-            refreshPage();
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
         } catch (error) {
             setError({ update: 'Une erreur est survenue lors de la mise à jour.' });
-            console.error("Erreur lors de la mise à jour du profil:", error);
         }
-
     };
 
     const handlePasswordChange = async (event) => {
         event.preventDefault();
-        setError(null);
+        setError({});
 
         if (newPassword !== confirmNewPassword) {
             setError({ password: 'Les nouveaux mots de passe ne correspondent pas.' });
             return;
         }
 
-        if (!validatePassword(newPassword)) {
-            setError({ password: 'Le nouveau mot de passe doit contenir entre 6 et 15 caractères, y compris un caractère spécial.' });
+        if (!newPassword || !currentPassword) {
+            setError({ password: 'Tous les champs doivent être remplis.' });
             return;
         }
 
@@ -163,18 +180,25 @@ export const Profil = () => {
                 currentPassword,
                 newPassword,
             });
-            alert('Mot de passe modifié avec succès.');
+            alert('Mot de passe modifié.');
             setShowPasswordForm(false);
-            setCurrentPassword('');
-            setNewPassword('');
-            refreshPage();
         } catch (error) {
-            setError({ password: error.message });
+            setError({ password: 'Une erreur est survenue lors de la modification du mot de passe.' });
+            console.error('Erreur lors du changement de mot de passe:', error);
+        }
+    };
+    const handleLogout = async (e) => {
+        try {
+            await logoutUser();
+            sessionStorage.removeItem('token');  // S'assurer que le token est bien supprimé
+            window.location.href = '/login';  // Redirection explicite après déconnexion
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion', error);
         }
     };
     const handleEmailChange = async (event) => {
         event.preventDefault();
-        setError({}); // Clear previous errors
+        setError({});
 
         if (newEmail !== confirmNewEmail) {
             setError({ email: 'Les nouveaux emails ne correspondent pas.' });
@@ -193,15 +217,17 @@ export const Profil = () => {
                 newEmail,
             });
             alert('Email modifié avec succès.');
-            setShowEmailForm(false);
-            setCurrentEmail('');
-            setNewEmail('');
-            refreshPage();
+            await handleLogout();
+
+            // Rediriger vers la page de connexion ou une autre page
+            window.location.href = '/';
         } catch (error) {
             setError({ email: 'Une erreur est survenue lors de la modification de l\'email.' });
             console.error('Error changing email:', error);
         }
     };
+
+
 
 
     const handleDeletePhoto = async (photoId) => {
@@ -210,9 +236,6 @@ export const Profil = () => {
 
         try {
             await deletePhoto(photoId);
-
-            console.log("Photo supprimée avec succès");
-            refreshPage();
         } catch (error) {
             console.error("Erreur:", error);
         }
@@ -222,16 +245,16 @@ export const Profil = () => {
         const selectedFiles = Array.from(e.target.files);
         const formData = new FormData();
         selectedFiles.forEach(file => formData.append('file', file));
-
         try {
             await uploadFile(id, formData);
             const newPicture = {
                 pictureName: selectedFiles[0].name
             };
             setPictures(prevPictures => [...prevPictures, newPicture]);
-
             alert('Une image a été ajoutée');
-            refreshPage();
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
         } catch (error) {
             console.error('Erreur:', error);
         }
@@ -239,221 +262,236 @@ export const Profil = () => {
 
     const togglePasswordForm = (event) => {
         event.preventDefault();
+        if (showEmailForm) {
+            setShowEmailForm(false);
+        }
         setShowPasswordForm(!showPasswordForm);
     };
 
     const toggleEmailForm = (event) => {
         event.preventDefault();
+        if (showPasswordForm) {
+            setShowPasswordForm(false);
+        }
         setShowEmailForm(!showEmailForm);
     };
 
     return (
         <>
-            <div style={styles.container}>
-                <div style={styles.leftColumn}>
-                    <form>
+            <div style={{ minWidth: '80%' }}>
+                <Container>
+                    <LeftColumn>
+                        <FormLeft>
+                            <InputInfo>
+                                <InputField
+                                    type="text"
+                                    name="firstName"
+                                    value={firstName}
+                                    placeholder="Prénom"
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                />
+
+                                <InputField
+                                    type="text"
+                                    name="lastName"
+                                    value={lastName}
+                                    placeholder="Nom"
+                                    onChange={(e) => setLastName(e.target.value)}
+                                />
+                            </InputInfo>
+                            <InputInfo>
+                                <ErrorDiv>
+                                    {error.firstName && (
+                                        <Div style={styles.error}>{error.firstName}</Div>
+                                    )}
+                                </ErrorDiv>
+                                <ErrorDiv>
+                                    {error.lastName && (
+                                        <Div style={styles.error}>{error.lastName}</Div>
+                                    )}
+                                </ErrorDiv>
+                            </InputInfo>
+                            <InputInfo>
+                                <InputField
+                                    type="text"
+                                    name="localisation"
+                                    value={localisation}
+                                    placeholder="Adresse"
+                                    onChange={(e) => setLocalisation(e.target.value)}
+                                />
+
+                                <InputField
+                                    type="tel"
+                                    name="phone"
+                                    value={phone}
+                                    placeholder="Téléphone"
+                                    onChange={(e) => setPhone(e.target.value)}
+                                />
+                            </InputInfo>
+
+                            <InputInfo>
+                                <ErrorDiv>
+                                    {error.localisation && (
+                                        <Div style={styles.error}>{error.localisation}</Div>
+                                    )}
+                                </ErrorDiv>
+                                <ErrorDiv>
+                                    {error.phone && <Div style={styles.error}>{error.phone}</Div>}
+                                </ErrorDiv>
+
+                            </InputInfo>
+
+                            <InputInfo>
+                                <Info>
+                                    <TextInfo>Genre :</TextInfo>
+                                    <SelectInput
+                                        name="gender"
+                                        value={gender}
+                                        onChange={(e) => setGender(e.target.value)}
+                                    >
+                                        <option value="HOMME">Homme</option>
+                                        <option value="FEMME">Femme</option>
+                                        <option value="TRANS">trans</option>
+                                        <option value="NONBINAIRE">Non binaire</option>
+                                    </SelectInput>
+                                </Info>
+                                <Info>
+                                    <TextInfo>Orientation :</TextInfo>
+                                    <SelectInput
+                                        name="orientation"
+                                        value={orientation}
+                                        onChange={(e) => setOrientation(e.target.value)}
+                                    >
+                                        <option value="HOMME">Homme</option>
+                                        <option value="FEMME">Femme</option>
+                                        <option value="TRANS">trans</option>
+                                        <option value="NONBINAIRE">Non binaire</option>
+                                    </SelectInput>
+                                </Info>
+                            </InputInfo>
+                            <Description
+                                name="description"
+                                maxLength="200"
+                                value={description}
+                                placeholder="Description"
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                            <ErrorDivDescription>
+                                {error.description && (
+                                    <Div style={styles.error}>{error.description}</Div>
+                                )}
+                            </ErrorDivDescription>
+                            <ButtonLarge onClick={handleUpdate}>
+                                Accepter les modifications
+                            </ButtonLarge>
+                            <InputInfo>
+                                <ButtonSmall onClick={togglePasswordForm}>
+                                    {showPasswordForm ? "Annuler" : "Modifier le mot de passe"}
+                                </ButtonSmall>
+                                <ButtonSmall onClick={toggleEmailForm}>
+                                    {showEmailForm ? "Annuler" : "Modifier l'email"}
+                                </ButtonSmall>
+                            </InputInfo>
+                        </FormLeft>
+                    </LeftColumn>
+
+                    <RightColumn>
+                        <Titre>Galerie de Photos</Titre>
+                        <div style={styles.photos}>
+                            {pictures.slice(0, 4).map((photo, index) => (
+                                <div key={index} style={styles.photoContainer}>
+                                    <img
+                                        src={`http://localhost:9090/api/show/${id}/${photo.pictureName}`}
+                                        alt={`Photo ${index + 1}`}
+                                        style={styles.photo}
+                                    />
+                                    <button
+                                        style={styles.deleteButton}
+                                        onClick={() => handleDeletePhoto(photo.id)}
+                                    >
+                                        -
+                                    </button>
+                                </div>
+                            ))}
+                            {pictures.length < 4 && (
+                                <label style={styles.photoContainer}>
+                                    <input
+                                        type="file"
+                                        onChange={handleFileUpload}
+                                        style={styles.fileInput}
+                                    />
+                                    <div style={styles.addPhotoText}>Ajouter une photo</div>
+                                </label>
+                            )}
+                        </div>
+                    </RightColumn>
+                </Container>
+
+                {showPasswordForm && (
+                    <form onSubmit={handlePasswordChange} style={styles.ShowForm}>
                         <div style={styles.row}>
                             <input
-                                type="text"
-                                name="firstName"
-                                value={firstName}
-                                placeholder="Prénom"
-                                onChange={(e) => setFirstName(e.target.value)}
-                                style={styles.input}
+                                type="password"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                placeholder="Mot de passe actuel"
+                                style={styles.ShowInput}
                             />
-                            {error.firstName && <div style={styles.error}>{error.firstName}</div>}
-
                             <input
-                                type="text"
-                                name="lastName"
-                                value={lastName}
-                                placeholder="Nom"
-                                onChange={(e) => setLastName(e.target.value)}
-                                style={styles.input}
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                placeholder="Nouveau mot de passe"
+                                style={styles.ShowInput}
                             />
-                            {error.lastName && <div style={styles.error}>{error.lastName}</div>}
-
+                            <input
+                                type="password"
+                                value={confirmNewPassword}
+                                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                placeholder="Confirmer le nouveau mot de passe"
+                                style={styles.ShowInput}
+                            />
+                            <ErrorDiv>
+                                {error.password && <Div style={styles.error}>{error.password}</Div>}
+                            </ErrorDiv>
+                            <button type="submit" style={styles.button} >Changer le mot de passe</button>
                         </div>
+                    </form>
+                )}
+
+                {showEmailForm && (
+                    <form onSubmit={handleEmailChange} style={styles.ShowForm}>
                         <div style={styles.row}>
                             <input
-                                type="text"
-                                name="location"
-                                value={location}
-                                placeholder="Adresse"
-                                onChange={(e) => setLocation(e.target.value)}
-                                style={{ ...styles.input, marginTop: '10px' }}
+                                type="email"
+                                value={currentEmail}
+                                onChange={(e) => setCurrentEmail(e.target.value)}
+                                placeholder="Email actuel"
+                                style={styles.ShowInput}
                             />
-                            {error.location && <div style={styles.error}>{error.location}</div>}
-
                             <input
-                                type="tel"
-                                name="phone"
-                                value={phone}
-                                placeholder="Téléphone"
-                                onChange={(e) => setPhone(e.target.value)}
-                                style={styles.input}
+                                type="email"
+                                value={newEmail}
+                                onChange={(e) => setNewEmail(e.target.value)}
+                                placeholder="Nouvel email"
+                                style={styles.ShowInput}
                             />
-                            {error.phone && <div style={styles.error}>{error.phone}</div>}
-
-                        </div>
-
-                        <div style={styles.row}>
-                            <div style={{ width: '100%' }}>
-                                <p>Genre :</p>
-                                <select
-                                    name="gender"
-                                    value={gender}
-                                    onChange={(e) => setGender(e.target.value)}
-                                    style={styles.select}
-                                >
-                                    <option value="MALE">Homme</option>
-                                    <option value="FEMALE">Femme</option>
-                                    <option value="TRANS">trans</option>
-                                    <option value="NONBINAIRE">Non binaire</option>
-                                </select>
-                            </div>
-                            <div style={{ width: '100%' }}>
-                                <p>Orientation :</p>
-                                <select
-                                    name="orientation"
-                                    value={orientation}
-                                    onChange={(e) => setOrientation(e.target.value)}
-                                    style={styles.select}
-                                >
-                                    <option value="MALE">Homme</option>
-                                    <option value="FEMALE">Femme</option>
-                                    <option value="TRANS">trans</option>
-                                    <option value="NONBINAIRE">Non binaire</option>
-                                </select>
-                            </div>
-                        </div>
-                        <textarea
-                            name="description"
-                            maxLength="200"
-                            value={description}
-                            placeholder="Description"
-                            onChange={(e) => setDescription(e.target.value)}
-                            style={{ ...styles.input, ...styles.textarea, marginTop: '10px' }}
-                        />
-                        {error.description && <div style={styles.error}>{error.description}</div>}
-
-                        <button onClick={handleUpdate} style={styles.buttonModif}>
-                            Accepter les modifications
-                        </button>
-                        <div style={styles.rowButtons}>
-                            <button style={styles.button} onClick={togglePasswordForm}>
-                                {showPasswordForm ? 'Annuler' : 'Modifier le mot de passe'}
-                            </button>
-                            <button style={styles.button} onClick={toggleEmailForm}>
-                                {showEmailForm ? 'Annuler' : "Modifier l'email"}
-                            </button>
+                            <input
+                                type="email"
+                                value={confirmNewEmail}
+                                onChange={(e) => setConfirmNewEmail(e.target.value)}
+                                placeholder="Confirmer le nouvel email"
+                                style={styles.ShowInput}
+                            />
+                            <ErrorDiv>
+                                {error.email && <Div style={styles.error}>{error.email}</Div>}
+                            </ErrorDiv>
+                            <button type="submit" style={styles.button} >Changer l'email</button>
                         </div>
 
                     </form>
-                </div>
-
-                <div style={styles.rightColumn}>
-                    <h2 style={styles.photoGalleryHeader}>Galerie de Photos</h2>
-                    <div style={styles.photos}>
-                        {pictures.slice(0, 4).map((photo, index) => (
-                            <div key={index} style={styles.photoContainer}>
-                                <img
-                                    src={`http://localhost:9090/api/show/${photo.pictureName}`}
-                                    alt={`Photo ${index + 1}`}
-                                    style={styles.photo}
-                                />
-                                <button
-                                    style={styles.deleteButton}
-                                    onClick={() => handleDeletePhoto(photo.id)}
-                                >
-                                    -
-                                </button>
-                            </div>
-                        ))}
-                        {pictures.length < 4 && (
-                            <label style={styles.photoContainer}>
-                                <input
-                                    type="file"
-                                    onChange={handleFileUpload}
-                                    style={styles.fileInput}
-                                />
-                                <div style={styles.addPhotoText}>Ajouter une photo</div>
-                            </label>
-                        )}
-                    </div>
-                </div>
-
-
-
+                )}
             </div>
-
-            {showPasswordForm && (
-                <form onSubmit={handlePasswordChange} style={styles.ShowForm}>
-                    <div style={styles.row}>
-                        <input
-                            type="password"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            placeholder="Mot de passe actuel"
-                            style={styles.ShowInput}
-                        />
-
-                    </div>
-                    <div style={styles.row}>
-                        <input
-                            type="password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            placeholder="Nouveau mot de passe"
-                            style={styles.ShowInput}
-                        />
-                        <input
-                            type="password"
-                            value={confirmNewPassword}
-                            onChange={(e) => setConfirmNewPassword(e.target.value)}
-                            placeholder="Confirmer le nouveau mot de passe"
-                            style={styles.ShowInput}
-                        />
-                        {error.password && <div style={styles.error}>{error.password}</div>}
-
-                        <button type="submit" style={styles.button}>Changer le mot de passe</button>
-                    </div>
-                </form>
-            )}
-
-            {showEmailForm && (
-                <form onSubmit={handleEmailChange} style={styles.ShowForm}>
-                    <div style={styles.row}>
-                        <input
-                            type="email"
-                            value={currentEmail}
-                            onChange={(e) => setCurrentEmail(e.target.value)}
-                            placeholder="Email actuel"
-                            style={styles.ShowInput}
-                        />
-                    </div>
-                    <div style={styles.row}>
-                        <input
-                            type="email"
-                            value={newEmail}
-                            onChange={(e) => setNewEmail(e.target.value)}
-                            placeholder="Nouvel email"
-                            style={styles.ShowInput}
-                        />
-                        <input
-                            type="email"
-                            value={confirmNewEmail}
-                            onChange={(e) => setConfirmNewEmail(e.target.value)}
-                            placeholder="Confirmer le nouvel email"
-                            style={styles.ShowInput}
-                        />
-                        {error.email && <div style={styles.error}>{error.email}</div>}
-
-                        <button type="submit" style={styles.button}>Changer l'email</button>
-                    </div>
-                </form>
-            )}
         </>
     );
 };
-

@@ -38,7 +38,7 @@ public class MatchServiceImpl implements IMatchService {
                 .map(matchedUser -> {
                     UserLikeDto userLikeDto = DtoTool.convert(matchedUser, UserLikeDto.class);
                     // Assigner l'ID de l'utilisateur qui a "liké" (le userId)
-                    userLikeDto.setLikedUserId(userId); // Cela peut être modifié si nécessaire
+                    userLikeDto.setLikedUserId(userId);
                     return userLikeDto;
                 })
                 .collect(Collectors.toSet());

@@ -1,85 +1,114 @@
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
   background-color: rgba(207, 206, 206, 0.5);
-  padding: 20px;
-  width: 80%;
-  max-width: 550px;
-  min-width:150px;
-  height: auto;
-  margin: 20px auto;
-  border-radius: 20px;
+  padding: 1.5vw;
+  border-radius: 1.5vw;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
+  height: 18vh;
+  @media (min-width: 426px) {
+    height: 100%; 
+  }
 `;
 
 export const InputField = styled.input`
-  width: calc(100% - 35px);
-  padding: 12px;
-  margin: 25px 15px 0 0;
+  text-align: center;
+  padding: 3vw;
+  margin: 0.5vw;
   border: 1px solid #ccc;
-  border-radius: 20px;
+  border-radius: 1.5vw;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: box-shadow 0.3s ease;
-
   &:focus {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     outline: none;
   }
+  font-size: 3vw;
+  @media (min-width: 426px) {
+    font-size: 2vw;
+    padding: 0.5vw;
+  }
 
+  @media (min-width: 769px) {
+    font-size: 1.5vw;
+    padding: 0.5vw;
+  }
+
+  @media (min-width: 1266px) {
+    font-size: 1vw;
+    padding: 0.5vw;
+  }
 `;
 
 export const Button = styled.button`
-  width: calc(100% - auto);
-  padding: 10px ;
-  background: #2A0800;
+  padding: 2vw;
+  background: #2a0800;
   color: white;
   border: none;
-  border-radius: 20px;
+  border-radius: 1.5vw;
   cursor: crosshair;
-  margin:25px  10px  20px  10px  ;
+  margin: 0.5vw 1vw 0.5vw 1vw;
   transition: transform 0.3s ease, background-color 0.3s ease;
 
   &:hover {
     background-color: #775144;
     transform: translateY(-5px);
   }
+  font-size: 3vw;
+
+  @media (min-width: 426px) {
+    font-size: 2vw;
+    padding: 0.4vw;
+  }
+
+  @media (min-width: 769px) {
+    font-size: 1.5vw;
+    padding: 0.4vw;
+  }
+
+  @media (min-width: 1266px) {
+    font-size: 1vw;
+    padding: 0.4vw;
+  }
+`;
+
+export const DivText = styled.div`
+  display: inline-flex;
+  justify-content: space-around;
 `;
 
 export const Inscription = styled(Link)`
   color: black;
-  margin: 50px ;
-  text-align: center;
-
   &:hover {
-    color: #4FFFE3;
-  }  
-  @media (max-width: 768px) {
-    font-size:10px;
-    margin-left:0px;
-}
+    color: #4fffe3;
+  }
 `;
 
 export const Mdp = styled(Link)`
   color: black;
-  margin: 50px  ;
-  text-align: center;
-
   &:hover {
-    color: #4FFFE3;
-  }
-  @media (max-width:768px) {
-    font-size:10px;
-    margin-left:5px;
-
+    color: #4fffe3;
   }
 `;
 
 export const Div = styled.div`
-    padding:150px;
-    margin-bottom:63px;
+  width: 70%;
+  font-size: 3vw;
+  @media (min-width: 426px) {
+    width: 50%;
+    font-size: 2vw;
+  }
 
-`
+  @media (min-width: 769px) {
+    width: 45%;
+    font-size: 1.5vw;
+  }
+
+  @media (min-width: 1266px) {
+    width: 30%;
+    font-size: 1vw;
+  }
+`;
